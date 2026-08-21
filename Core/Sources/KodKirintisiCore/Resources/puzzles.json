@@ -1,0 +1,237 @@
+{
+  "version": 1,
+  "puzzles": [
+    {
+      "id": "swift-value-semantics-001",
+      "category": "swift-language",
+      "difficulty": 1,
+      "title": "Copying a struct",
+      "question": "What does this print?",
+      "codeSnippet": "struct P { var x = 0 }\nvar a = P()\nvar b = a\nb.x = 5\nprint(a.x)",
+      "language": "swift",
+      "choices": ["0", "5", "nil", "Compile error"],
+      "correctIndex": 0,
+      "explanation": "Structs are value types. `var b = a` copies the value, so mutating `b` cannot affect `a`. Had `P` been a class, both names would point at the same instance and the answer would be 5.",
+      "whyOthersWrong": [
+        "",
+        "That would be true for a reference type (class), not a struct.",
+        "`x` has a default value and is never optional.",
+        "The code is valid Swift; `a` and `b` are both `var`."
+      ],
+      "reference": {
+        "title": "Swift Book — Structures and Classes",
+        "url": "https://docs.swift.org/swift-book/documentation/the-swift-programming-language/classesandstructures"
+      },
+      "tags": ["value-type", "struct", "copy"]
+    },
+    {
+      "id": "swift-protocol-dispatch-001",
+      "category": "swift-language",
+      "difficulty": 3,
+      "title": "Protocol extension dispatch",
+      "question": "What does this print?",
+      "codeSnippet": "protocol G {}\nextension G { func f() { print(\"A\") } }\nstruct S: G { func f() { print(\"B\") } }\nlet g: G = S()\ng.f()",
+      "language": "swift",
+      "choices": ["A", "B", "AB", "Compile error"],
+      "correctIndex": 0,
+      "explanation": "`f()` is not a requirement of protocol `G`, it only exists in the extension. Calls through the existential type `G` are statically dispatched to the extension's implementation, so `S.f()` never runs. Adding `func f()` to the protocol body would make it a requirement and print B.",
+      "whyOthersWrong": [
+        "",
+        "B would require `f()` to be declared inside `protocol G`, enabling dynamic dispatch.",
+        "Only one implementation is called.",
+        "The code compiles; shadowing an extension method is legal."
+      ],
+      "reference": {
+        "title": "Swift Book — Protocol Extensions",
+        "url": "https://docs.swift.org/swift-book/documentation/the-swift-programming-language/protocols"
+      },
+      "tags": ["protocol", "dispatch", "extension"]
+    },
+    {
+      "id": "swift-defer-return-001",
+      "category": "swift-language",
+      "difficulty": 2,
+      "title": "defer and the return value",
+      "question": "What does this print?",
+      "codeSnippet": "func f() -> Int {\n  var x = 1\n  defer { x += 1 }\n  return x\n}\nprint(f())",
+      "language": "swift",
+      "choices": ["1", "2", "3", "Compile error"],
+      "correctIndex": 0,
+      "explanation": "The return value is copied before the `defer` block runs. `defer` executes as the scope exits, mutating the local `x` after its value has already been handed back. With an `inout` parameter or a reference type the mutation would be observable.",
+      "whyOthersWrong": [
+        "",
+        "The increment happens after the value is captured for return.",
+        "`defer` runs exactly once.",
+        "`defer` inside a function body is valid."
+      ],
+      "reference": {
+        "title": "Swift Book — Deferred Actions",
+        "url": "https://docs.swift.org/swift-book/documentation/the-swift-programming-language/controlflow"
+      },
+      "tags": ["defer", "control-flow", "return"]
+    },
+    {
+      "id": "swift-mutating-let-001",
+      "category": "swift-language",
+      "difficulty": 1,
+      "title": "mutating on a let value",
+      "question": "What happens here?",
+      "codeSnippet": "struct S {\n  var x = 0\n  mutating func bump() { x += 1 }\n}\nlet s = S()\ns.bump()",
+      "language": "swift",
+      "choices": ["Prints 1", "Prints 0", "Compile error", "Runtime crash"],
+      "correctIndex": 2,
+      "explanation": "A `mutating` method may only be called on a mutable value. `s` is a `let`, so the compiler rejects the call before the program ever runs. Changing `let` to `var` fixes it.",
+      "whyOthersWrong": [
+        "Nothing is printed; the code does not compile.",
+        "Nothing is printed; the code does not compile.",
+        "",
+        "This is caught at compile time, not at runtime."
+      ],
+      "reference": {
+        "title": "Swift Book — Mutating Methods",
+        "url": "https://docs.swift.org/swift-book/documentation/the-swift-programming-language/methods"
+      },
+      "tags": ["mutating", "struct", "let"]
+    },
+    {
+      "id": "swift-optional-chain-type-001",
+      "category": "swift-language",
+      "difficulty": 1,
+      "title": "Type of an optional chain",
+      "question": "What is the type of `r`?",
+      "codeSnippet": "struct A { var b: Int = 1 }\nlet a: A? = A()\nlet r = a?.b",
+      "language": "swift",
+      "choices": ["Int", "Int?", "A?", "Any"],
+      "correctIndex": 1,
+      "explanation": "Optional chaining always wraps the result in an optional, because the whole expression evaluates to nil when the base is nil. Even though `b` is a non-optional `Int`, `a?.b` is `Int?`.",
+      "whyOthersWrong": [
+        "Chaining adds a level of optionality; it never returns a plain value.",
+        "",
+        "`r` holds the property, not the containing value.",
+        "Swift infers a concrete type here, not `Any`."
+      ],
+      "reference": {
+        "title": "Swift Book — Optional Chaining",
+        "url": "https://docs.swift.org/swift-book/documentation/the-swift-programming-language/optionalchaining"
+      },
+      "tags": ["optional", "chaining", "type-inference"]
+    },
+    {
+      "id": "memory-closure-cycle-001",
+      "category": "memory-arc",
+      "difficulty": 2,
+      "title": "Breaking a closure retain cycle",
+      "question": "Which one breaks a strong reference cycle between an object and its stored closure?",
+      "language": "none",
+      "choices": ["[weak self]", "@escaping", "lazy var", "final class"],
+      "correctIndex": 0,
+      "explanation": "A capture list such as `[weak self]` (or `[unowned self]`) stops the closure from holding a strong reference back to the object, so ARC can deallocate it. The other keywords change escaping semantics, initialization timing or inheritance, none of which affect ownership.",
+      "whyOthersWrong": [
+        "",
+        "`@escaping` only tells the compiler the closure may outlive the call; it makes cycles more likely, not less.",
+        "`lazy` delays initialization; ownership is unchanged.",
+        "`final` prevents subclassing and can enable static dispatch; it has no effect on retain counts."
+      ],
+      "reference": {
+        "title": "Swift Book — Automatic Reference Counting",
+        "url": "https://docs.swift.org/swift-book/documentation/the-swift-programming-language/automaticreferencecounting"
+      },
+      "tags": ["arc", "closure", "weak", "retain-cycle"]
+    },
+    {
+      "id": "memory-lazy-init-001",
+      "category": "memory-arc",
+      "difficulty": 2,
+      "title": "When does lazy run?",
+      "question": "What is printed first?",
+      "codeSnippet": "class C {\n  lazy var v: Int = {\n    print(\"init\"); return 1\n  }()\n}\nlet c = C(); print(\"made\"); print(c.v)",
+      "language": "swift",
+      "choices": ["made", "init", "1", "Nothing"],
+      "correctIndex": 0,
+      "explanation": "A `lazy var` initializer does not run until the property is first read. Creating `C()` prints nothing, so \"made\" comes first, then \"init\" when `c.v` is accessed, then \"1\".",
+      "whyOthersWrong": [
+        "",
+        "The initializer is deferred until the first access to `v`.",
+        "The value is printed last, after its initializer runs.",
+        "All three lines are printed."
+      ],
+      "reference": {
+        "title": "Swift Book — Lazy Stored Properties",
+        "url": "https://docs.swift.org/swift-book/documentation/the-swift-programming-language/properties"
+      },
+      "tags": ["lazy", "initialization", "properties"]
+    },
+    {
+      "id": "concurrency-actor-reentrancy-001",
+      "category": "concurrency",
+      "difficulty": 3,
+      "title": "Actors and await",
+      "question": "What can happen at an `await` inside an actor method?",
+      "language": "none",
+      "choices": [
+        "State stays frozen",
+        "Another call runs",
+        "Deadlock",
+        "The method restarts"
+      ],
+      "correctIndex": 1,
+      "explanation": "Swift actors are reentrant. Suspending at an `await` releases the actor, so another queued call can enter and mutate state. Any assumption you made about the actor's state before the suspension point must be re-checked afterwards.",
+      "whyOthersWrong": [
+        "The actor is not held across suspension points; state can change.",
+        "",
+        "Reentrancy exists precisely to avoid deadlocks.",
+        "Execution resumes after the await, it does not start over."
+      ],
+      "reference": {
+        "title": "Swift Book — Actors",
+        "url": "https://docs.swift.org/swift-book/documentation/the-swift-programming-language/concurrency"
+      },
+      "tags": ["actor", "reentrancy", "await"]
+    },
+    {
+      "id": "foundation-grapheme-count-001",
+      "category": "foundation",
+      "difficulty": 3,
+      "title": "Counting characters",
+      "question": "What does this print?",
+      "codeSnippet": "let s = \"e\\u{301}\"\nprint(s.count)",
+      "language": "swift",
+      "choices": ["1", "2", "3", "0"],
+      "correctIndex": 0,
+      "explanation": "Swift's `Character` is an extended grapheme cluster. \"e\" followed by U+0301 (combining acute accent) renders as a single user-perceived character \"é\", so `count` is 1. `s.unicodeScalars.count` would be 2 and `s.utf8.count` would be 3.",
+      "whyOthersWrong": [
+        "",
+        "That is the number of Unicode scalars, not characters.",
+        "That is the UTF-8 byte count.",
+        "The string is not empty."
+      ],
+      "reference": {
+        "title": "Swift Book — Strings and Characters",
+        "url": "https://docs.swift.org/swift-book/documentation/the-swift-programming-language/stringsandcharacters"
+      },
+      "tags": ["string", "unicode", "grapheme"]
+    },
+    {
+      "id": "foundation-dictionary-order-001",
+      "category": "foundation",
+      "difficulty": 1,
+      "title": "Iterating a Dictionary",
+      "question": "What is the iteration order of a Swift Dictionary?",
+      "language": "none",
+      "choices": ["Insertion order", "Sorted by key", "Not guaranteed", "Sorted by value"],
+      "correctIndex": 2,
+      "explanation": "Dictionary is an unordered collection; its iteration order is an implementation detail and can even differ between runs because of hash seeding. Sort explicitly (`dict.sorted { $0.key < $1.key }`) whenever order matters — especially before rendering a list.",
+      "whyOthersWrong": [
+        "That is the behaviour of an array of pairs or an ordered dictionary type.",
+        "Keys are hashed, not sorted.",
+        "",
+        "Values do not influence storage order."
+      ],
+      "reference": {
+        "title": "Swift Standard Library — Dictionary",
+        "url": "https://developer.apple.com/documentation/swift/dictionary"
+      },
+      "tags": ["dictionary", "ordering", "collections"]
+    }
+  ]
+}
