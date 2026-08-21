@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  core-linux:
+    # The whole architecture rests on Core being platform independent, so the
+    # authoritative build runs on Linux, where UIKit and friends do not exist.
+    name: Core (Linux)
+    runs-on: ubuntu-latest
+    container: swift:6.0.3
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build
+        run: swift build --package-path Core
+
+      - name: Test
+        run: swift test --package-path Core
+
+  lint:
+    name: Lint (macOS)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install tools
+        run: brew install swiftlint swiftformat
+
+      - name: SwiftFormat
+        run: swiftformat --lint .
+
+      - name: SwiftLint
+        run: swiftlint lint --strict
