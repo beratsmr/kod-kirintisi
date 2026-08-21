@@ -1,0 +1,34 @@
+included:
+  - Core/Sources
+  - Core/Tests
+  - Shared
+  - App/Sources
+  - App/Tests
+  - Widget/Sources
+
+excluded:
+  - Core/.build
+  - .build
+
+opt_in_rules:
+  - force_unwrapping
+
+line_length:
+  warning: 120
+  error: 160
+
+# CLAUDE.md forbids `!` and `try!` anywhere, test code included.
+force_unwrapping:
+  severity: error
+force_try:
+  severity: error
+force_cast:
+  severity: error
+
+custom_rules:
+  core_platform_import:
+    name: "Platform import in Core"
+    included: ".*/Core/Sources/.*\\.swift"
+    regex: '^\s*import\s+(UIKit|SwiftUI|WidgetKit|AppIntents|CoreSpotlight|UserNotifications|Combine)\b'
+    message: "Core must compile on Linux: only Foundation may be imported here."
+    severity: error
