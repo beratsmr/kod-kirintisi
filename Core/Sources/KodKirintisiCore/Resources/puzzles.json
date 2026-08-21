@@ -1558,6 +1558,1243 @@
         "copy-on-write",
         "value-type"
       ]
+    },
+    {
+      "id": "swiftui-state-ownership-001",
+      "category": "swiftui",
+      "difficulty": 1,
+      "title": "What @State is for",
+      "question": "What kind of value should a SwiftUI view keep in @State?",
+      "language": "none",
+      "choices": [
+        "Its own private value",
+        "Shared app state",
+        "A network client",
+        "A singleton"
+      ],
+      "correctIndex": 0,
+      "explanation": "@State is storage the view owns, kept alive by SwiftUI across body recomputations. It is meant to be private and local; state that outlives or is shared between views belongs somewhere with a longer life, passed in instead.",
+      "whyOthersWrong": [
+        "",
+        "Shared state should be owned higher up and passed down or put in the environment.",
+        "Services are dependencies to inject, not view-local values.",
+        "A singleton already exists globally; wrapping it in @State gains nothing."
+      ],
+      "reference": {
+        "title": "SwiftUI — State",
+        "url": "https://developer.apple.com/documentation/swiftui/state"
+      },
+      "tags": [
+        "state",
+        "swiftui",
+        "data-flow"
+      ]
+    },
+    {
+      "id": "swiftui-binding-purpose-001",
+      "category": "swiftui",
+      "difficulty": 1,
+      "title": "What @Binding gives you",
+      "question": "What does a @Binding provide to a child view?",
+      "language": "none",
+      "choices": [
+        "A copy of a value",
+        "Read and write access",
+        "Read-only access",
+        "A new source of truth"
+      ],
+      "correctIndex": 1,
+      "explanation": "A binding is a two-way reference to state owned somewhere else, so the child can read and write without owning it. That keeps one source of truth: the parent's @State stays authoritative while the child edits it.",
+      "whyOthersWrong": [
+        "A copy would let the two drift apart.",
+        "",
+        "Read-only would be a plain let property.",
+        "It deliberately avoids creating a second source of truth."
+      ],
+      "reference": {
+        "title": "SwiftUI — Binding",
+        "url": "https://developer.apple.com/documentation/swiftui/binding"
+      },
+      "tags": [
+        "binding",
+        "swiftui",
+        "data-flow"
+      ]
+    },
+    {
+      "id": "swiftui-body-recompute-001",
+      "category": "swiftui",
+      "difficulty": 2,
+      "title": "How often body runs",
+      "question": "What should you assume about how often a view's body is evaluated?",
+      "language": "none",
+      "choices": [
+        "Once per view",
+        "Often, unpredictably",
+        "Only on appear",
+        "Once per second"
+      ],
+      "correctIndex": 1,
+      "explanation": "SwiftUI re-evaluates body whenever it decides the view may have changed, and that can happen far more often than you expect. body must therefore be cheap and free of side effects; put work in .task or .onAppear instead.",
+      "whyOthersWrong": [
+        "Views are value types recreated constantly; body is not a one-time setup.",
+        "",
+        "Appearance is one trigger among many.",
+        "There is no fixed cadence."
+      ],
+      "reference": {
+        "title": "SwiftUI — View",
+        "url": "https://developer.apple.com/documentation/swiftui/view"
+      },
+      "tags": [
+        "swiftui",
+        "body",
+        "performance"
+      ]
+    },
+    {
+      "id": "swiftui-modifier-order-001",
+      "category": "swiftui",
+      "difficulty": 2,
+      "title": "Order of view modifiers",
+      "question": "Do .padding().background(.red) and .background(.red).padding() look the same?",
+      "language": "none",
+      "choices": [
+        "Yes, always",
+        "No, order matters",
+        "Only for text",
+        "Only in a stack"
+      ],
+      "correctIndex": 1,
+      "explanation": "Each modifier wraps the view it is applied to, so order decides what is being wrapped. Padding first makes the background cover the padded area; background first paints only the original bounds and the padding stays outside it.",
+      "whyOthersWrong": [
+        "The two produce visibly different results.",
+        "",
+        "The rule applies to every view, not just text.",
+        "Containers do not change how wrapping works."
+      ],
+      "reference": {
+        "title": "SwiftUI — View modifiers",
+        "url": "https://developer.apple.com/documentation/swiftui/viewmodifier"
+      },
+      "tags": [
+        "swiftui",
+        "modifiers",
+        "layout"
+      ]
+    },
+    {
+      "id": "swiftui-zstack-order-001",
+      "category": "swiftui",
+      "difficulty": 1,
+      "title": "Layering in a ZStack",
+      "question": "In a ZStack, which child appears on top?",
+      "language": "none",
+      "choices": [
+        "The first one",
+        "The last one",
+        "The largest one",
+        "The opaque one"
+      ],
+      "correctIndex": 1,
+      "explanation": "A ZStack draws its children in source order, so each one is painted over the previous and the last is closest to the viewer. Use .zIndex when you need a different order without moving the code.",
+      "whyOthersWrong": [
+        "The first is drawn first and ends up furthest back.",
+        "",
+        "Size does not affect layering.",
+        "Opacity does not affect ordering either."
+      ],
+      "reference": {
+        "title": "SwiftUI — ZStack",
+        "url": "https://developer.apple.com/documentation/swiftui/zstack"
+      },
+      "tags": [
+        "swiftui",
+        "zstack",
+        "layout"
+      ]
+    },
+    {
+      "id": "swiftui-view-identity-001",
+      "category": "swiftui",
+      "difficulty": 3,
+      "title": "Why animations jump",
+      "question": "What happens when you change a view's .id() value?",
+      "language": "none",
+      "choices": [
+        "It is replaced",
+        "It is updated",
+        "Nothing",
+        "It animates smoothly"
+      ],
+      "correctIndex": 0,
+      "explanation": "Identity tells SwiftUI whether two renders are the same view. A new id means the old view is torn down and a new one is inserted, so its @State resets and transitions run instead of animating in place. That is sometimes exactly what you want.",
+      "whyOthersWrong": [
+        "",
+        "An in-place update happens when the identity stays the same.",
+        "Identity changes are one of the most consequential things you can do.",
+        "You get an insertion and removal, which is rarely a smooth in-place animation."
+      ],
+      "reference": {
+        "title": "SwiftUI — id(_:)",
+        "url": "https://developer.apple.com/documentation/swiftui/view/id(_:)"
+      },
+      "tags": [
+        "swiftui",
+        "identity",
+        "animation"
+      ]
+    },
+    {
+      "id": "swiftui-observable-macro-001",
+      "category": "swiftui",
+      "difficulty": 2,
+      "title": "The @Observable macro",
+      "question": "What advantage does @Observable have over ObservableObject?",
+      "language": "none",
+      "choices": [
+        "Tracks used properties",
+        "Requires no class",
+        "Works without SwiftUI",
+        "Is thread safe"
+      ],
+      "correctIndex": 0,
+      "explanation": "@Observable tracks which properties a view actually read, so only views depending on a changed property are invalidated. ObservableObject republishes for the whole object, waking up views that never touched the property that changed.",
+      "whyOthersWrong": [
+        "",
+        "@Observable is still applied to a class.",
+        "Observation is a separate framework, but the benefit here is finer invalidation.",
+        "It provides no concurrency guarantees on its own."
+      ],
+      "reference": {
+        "title": "Observation — Observable",
+        "url": "https://developer.apple.com/documentation/observation"
+      },
+      "tags": [
+        "observable",
+        "swiftui",
+        "observation"
+      ]
+    },
+    {
+      "id": "swiftui-stateobject-vs-observed-001",
+      "category": "swiftui",
+      "difficulty": 3,
+      "title": "@StateObject versus @ObservedObject",
+      "question": "What goes wrong if you create an object in @ObservedObject instead of @StateObject?",
+      "language": "none",
+      "choices": [
+        "It is recreated",
+        "It never updates",
+        "It leaks",
+        "It crashes"
+      ],
+      "correctIndex": 0,
+      "explanation": "@StateObject makes SwiftUI own the object and keep it across body recomputations. @ObservedObject does not own it, so an object constructed inline is thrown away and rebuilt every time the view is re-evaluated, silently resetting its state.",
+      "whyOthersWrong": [
+        "",
+        "Updates still arrive; the problem is that the object keeps starting over.",
+        "The old instance is released, so this is lost state rather than a leak.",
+        "It is a correctness bug, not a crash."
+      ],
+      "reference": {
+        "title": "SwiftUI — StateObject",
+        "url": "https://developer.apple.com/documentation/swiftui/stateobject"
+      },
+      "tags": [
+        "stateobject",
+        "swiftui",
+        "lifecycle"
+      ]
+    },
+    {
+      "id": "swiftui-environment-purpose-001",
+      "category": "swiftui",
+      "difficulty": 2,
+      "title": "What the environment is for",
+      "question": "What problem does the SwiftUI environment solve?",
+      "language": "none",
+      "choices": [
+        "Passing values down",
+        "Persisting data",
+        "Background work",
+        "Navigation"
+      ],
+      "correctIndex": 0,
+      "explanation": "The environment carries values implicitly down the view tree, so a deep child can read something without every intermediate view forwarding it. It holds both system values, such as colour scheme, and your own custom keys.",
+      "whyOthersWrong": [
+        "",
+        "Nothing in the environment is written to disk.",
+        "It does not schedule work.",
+        "Navigation has its own dedicated APIs."
+      ],
+      "reference": {
+        "title": "SwiftUI — Environment",
+        "url": "https://developer.apple.com/documentation/swiftui/environment"
+      },
+      "tags": [
+        "environment",
+        "swiftui",
+        "data-flow"
+      ]
+    },
+    {
+      "id": "swiftui-task-modifier-001",
+      "category": "swiftui",
+      "difficulty": 2,
+      "title": "The task modifier",
+      "question": "What happens to a .task when its view disappears?",
+      "language": "none",
+      "choices": [
+        "It is cancelled",
+        "It keeps running",
+        "It restarts",
+        "It pauses"
+      ],
+      "correctIndex": 0,
+      "explanation": ".task ties an async operation to the view's lifetime and cancels it when the view goes away. Your code still has to respond to cancellation, by checking Task.isCancelled or using APIs that throw CancellationError.",
+      "whyOthersWrong": [
+        "",
+        "Leaving it running is exactly what this modifier avoids.",
+        "Restarting happens when the task's id value changes, not on disappearance.",
+        "Structured concurrency cancels rather than pauses."
+      ],
+      "reference": {
+        "title": "SwiftUI — task(priority:_:)",
+        "url": "https://developer.apple.com/documentation/swiftui/view/task(priority:_:)"
+      },
+      "tags": [
+        "swiftui",
+        "task",
+        "concurrency"
+      ]
+    },
+    {
+      "id": "swiftui-list-identity-001",
+      "category": "swiftui",
+      "difficulty": 2,
+      "title": "Why a List animates oddly",
+      "question": "What does a List need to animate insertions and deletions correctly?",
+      "language": "none",
+      "choices": [
+        "Stable identifiers",
+        "Sorted data",
+        "A fixed row height",
+        "An index key"
+      ],
+      "correctIndex": 0,
+      "explanation": "The list diffs old and new rows by identity, so identifiers must survive reordering. Using array indices as identifiers makes every row after an insertion look like a changed row, which produces the wrong animation and can reset row state.",
+      "whyOthersWrong": [
+        "",
+        "Order is up to you; the diff does not require sorting.",
+        "Rows can have varying heights.",
+        "Index-based keys are precisely the common mistake."
+      ],
+      "reference": {
+        "title": "SwiftUI — Identifiable",
+        "url": "https://developer.apple.com/documentation/swift/identifiable"
+      },
+      "tags": [
+        "swiftui",
+        "list",
+        "identity"
+      ]
+    },
+    {
+      "id": "swiftui-viewbuilder-001",
+      "category": "swiftui",
+      "difficulty": 3,
+      "title": "What @ViewBuilder does",
+      "question": "What does the @ViewBuilder attribute enable?",
+      "language": "none",
+      "choices": [
+        "Multiple child views",
+        "Lazy rendering",
+        "Automatic layout",
+        "View caching"
+      ],
+      "correctIndex": 0,
+      "explanation": "@ViewBuilder is a result builder that turns several statements, and if or switch branches, into one composed view value. Without it a closure could only return a single expression, which is why custom container views annotate their content parameter with it.",
+      "whyOthersWrong": [
+        "",
+        "Laziness comes from containers like LazyVStack.",
+        "Layout is decided by the containers themselves.",
+        "No caching is implied."
+      ],
+      "reference": {
+        "title": "SwiftUI — ViewBuilder",
+        "url": "https://developer.apple.com/documentation/swiftui/viewbuilder"
+      },
+      "tags": [
+        "viewbuilder",
+        "swiftui",
+        "result-builder"
+      ]
+    },
+    {
+      "id": "swiftui-lazy-stack-001",
+      "category": "swiftui",
+      "difficulty": 2,
+      "title": "VStack versus LazyVStack",
+      "question": "What does LazyVStack do differently from VStack?",
+      "language": "none",
+      "choices": [
+        "Creates rows on demand",
+        "Scrolls by itself",
+        "Reuses views",
+        "Sorts children"
+      ],
+      "correctIndex": 0,
+      "explanation": "A VStack builds every child immediately, which is fine for a handful and wasteful for thousands. A LazyVStack creates children only as they are about to become visible, which is why it belongs inside a ScrollView.",
+      "whyOthersWrong": [
+        "",
+        "Scrolling still comes from an enclosing ScrollView.",
+        "It creates lazily rather than recycling cells the way UITableView did.",
+        "Neither reorders its children."
+      ],
+      "reference": {
+        "title": "SwiftUI — LazyVStack",
+        "url": "https://developer.apple.com/documentation/swiftui/lazyvstack"
+      },
+      "tags": [
+        "swiftui",
+        "lazyvstack",
+        "performance"
+      ]
+    },
+    {
+      "id": "swiftui-geometryreader-001",
+      "category": "swiftui",
+      "difficulty": 3,
+      "title": "GeometryReader's sizing",
+      "question": "How does a GeometryReader size itself in its parent?",
+      "language": "none",
+      "choices": [
+        "It takes all the space",
+        "It hugs its content",
+        "It is zero sized",
+        "It matches its child"
+      ],
+      "correctIndex": 0,
+      "explanation": "GeometryReader accepts all the space its parent offers so it can report those dimensions, which often makes surrounding layout collapse unexpectedly. Reach for it only where you truly need measurements, and prefer layout that adapts on its own.",
+      "whyOthersWrong": [
+        "",
+        "Hugging content is what most views do, and precisely what this one does not.",
+        "It is greedy, not empty.",
+        "Its own size is independent of the child it builds."
+      ],
+      "reference": {
+        "title": "SwiftUI — GeometryReader",
+        "url": "https://developer.apple.com/documentation/swiftui/geometryreader"
+      },
+      "tags": [
+        "swiftui",
+        "geometryreader",
+        "layout"
+      ]
+    },
+    {
+      "id": "swiftui-animation-scope-001",
+      "category": "swiftui",
+      "difficulty": 2,
+      "title": "withAnimation's effect",
+      "question": "What does withAnimation actually animate?",
+      "language": "none",
+      "choices": [
+        "State changes inside it",
+        "The whole screen",
+        "Only opacity",
+        "Nothing by itself"
+      ],
+      "correctIndex": 0,
+      "explanation": "withAnimation marks the state changes made inside its closure, and SwiftUI animates whatever views depend on them from their old values to their new ones. It animates the consequences of a state change rather than any particular view.",
+      "whyOthersWrong": [
+        "",
+        "Only the views affected by that state take part.",
+        "Any animatable property can change, not just opacity.",
+        "It very much does something, given a state change."
+      ],
+      "reference": {
+        "title": "SwiftUI — withAnimation",
+        "url": "https://developer.apple.com/documentation/swiftui/withanimation(_:_:)"
+      },
+      "tags": [
+        "swiftui",
+        "animation",
+        "state"
+      ]
+    },
+    {
+      "id": "swiftui-preview-nature-001",
+      "category": "swiftui",
+      "difficulty": 1,
+      "title": "What previews are",
+      "question": "Does a SwiftUI preview run your real view code?",
+      "language": "none",
+      "choices": [
+        "Yes, it is compiled",
+        "No, it is a mock",
+        "Only in release",
+        "Only on device"
+      ],
+      "correctIndex": 0,
+      "explanation": "A preview compiles and runs the actual view in a host process, which is why a crash in your code breaks the canvas. It is a real execution with a supplied environment, not a drawing of a mock.",
+      "whyOthersWrong": [
+        "",
+        "Nothing about the view is faked.",
+        "Previews are a development-time feature.",
+        "They run on the Mac as well as on a device."
+      ],
+      "reference": {
+        "title": "SwiftUI — Previews",
+        "url": "https://developer.apple.com/documentation/swiftui/preview(_:body:)"
+      },
+      "tags": [
+        "swiftui",
+        "previews",
+        "tooling"
+      ]
+    },
+    {
+      "id": "swiftui-safe-area-001",
+      "category": "swiftui",
+      "difficulty": 2,
+      "title": "Filling the whole screen",
+      "question": "Which modifier lets a background extend under the notch and home indicator?",
+      "language": "none",
+      "choices": [
+        "ignoresSafeArea",
+        "frame(maxWidth:)",
+        "padding(0)",
+        "clipped()"
+      ],
+      "correctIndex": 0,
+      "explanation": ".ignoresSafeArea() lets a view draw into the insets the system normally reserves. Use it for backgrounds rather than for content, since text or controls under the notch become hard to read or hard to tap.",
+      "whyOthersWrong": [
+        "",
+        "A flexible frame still stops at the safe area.",
+        "Zero padding does not override safe area insets.",
+        "Clipping trims a view; it does not extend it."
+      ],
+      "reference": {
+        "title": "SwiftUI — ignoresSafeArea",
+        "url": "https://developer.apple.com/documentation/swiftui/view/ignoressafearea(_:edges:)"
+      },
+      "tags": [
+        "swiftui",
+        "safe-area",
+        "layout"
+      ]
+    },
+    {
+      "id": "swift-lazy-sequence-001",
+      "category": "swift-language",
+      "difficulty": 3,
+      "title": "What lazy changes",
+      "question": "What does adding .lazy before a map do?",
+      "language": "none",
+      "choices": [
+        "Defers the work",
+        "Runs it in parallel",
+        "Caches results",
+        "Sorts the output"
+      ],
+      "correctIndex": 0,
+      "explanation": "A lazy view computes each element only as it is consumed, so chained transforms avoid building intermediate arrays. Combined with first(where:) it can stop early, though for small collections the extra indirection may not pay for itself.",
+      "whyOthersWrong": [
+        "",
+        "Laziness is about when work happens, not on how many threads.",
+        "Elements are recomputed on each traversal rather than cached.",
+        "Order is preserved, not changed."
+      ],
+      "reference": {
+        "title": "Swift Standard Library — lazy",
+        "url": "https://developer.apple.com/documentation/swift/sequence/lazy"
+      },
+      "tags": [
+        "lazy",
+        "sequence",
+        "performance"
+      ]
+    },
+    {
+      "id": "swift-some-vs-any-001",
+      "category": "swift-language",
+      "difficulty": 3,
+      "title": "some versus any",
+      "question": "What does `some Shape` mean compared to `any Shape`?",
+      "language": "none",
+      "choices": [
+        "One fixed unknown type",
+        "Any type each time",
+        "A class only",
+        "A generic class"
+      ],
+      "correctIndex": 0,
+      "explanation": "`some` is an opaque type: one concrete type the caller cannot name but which stays the same, so no boxing is needed. `any` is an existential that can hold a different conforming type at each assignment, at the cost of dynamic dispatch.",
+      "whyOthersWrong": [
+        "",
+        "That describes `any`.",
+        "Both work with structs, enums and classes alike.",
+        "Neither implies a class."
+      ],
+      "reference": {
+        "title": "Swift Book — Opaque Types",
+        "url": "https://docs.swift.org/swift-book/documentation/the-swift-programming-language/opaquetypes"
+      },
+      "tags": [
+        "opaque-type",
+        "existential",
+        "generics"
+      ]
+    },
+    {
+      "id": "swift-struct-vs-class-001",
+      "category": "swift-language",
+      "difficulty": 1,
+      "title": "Choosing struct or class",
+      "question": "What is the main reason to choose a class over a struct?",
+      "language": "none",
+      "choices": [
+        "Reference semantics",
+        "Better performance",
+        "Fewer lines",
+        "Codable support"
+      ],
+      "correctIndex": 0,
+      "explanation": "Pick a class when you genuinely need one shared instance that several places observe or mutate, or when you need inheritance or deinit. Otherwise a struct's value semantics remove a whole category of aliasing bugs.",
+      "whyOthersWrong": [
+        "",
+        "Structs are often faster, avoiding allocation and reference counting.",
+        "The syntax is nearly identical.",
+        "Both can conform to Codable."
+      ],
+      "reference": {
+        "title": "Swift Book — Structures and Classes",
+        "url": "https://docs.swift.org/swift-book/documentation/the-swift-programming-language/classesandstructures"
+      },
+      "tags": [
+        "struct",
+        "class",
+        "value-type"
+      ]
+    },
+    {
+      "id": "concurrency-await-meaning-001",
+      "category": "concurrency",
+      "difficulty": 1,
+      "title": "What await marks",
+      "question": "What does the await keyword indicate at a call site?",
+      "language": "none",
+      "choices": [
+        "A possible suspension",
+        "A new thread",
+        "A lock",
+        "A delay"
+      ],
+      "correctIndex": 0,
+      "explanation": "await marks a point where the function may suspend and give up its thread until the result is ready. It is a marker for the reader and the compiler, not an instruction to block or to start a thread.",
+      "whyOthersWrong": [
+        "",
+        "Whether work moves threads is decided by actor isolation and the executor.",
+        "Nothing is locked; the thread is released rather than held.",
+        "There is no built-in wait; the suspension lasts as long as the work does."
+      ],
+      "reference": {
+        "title": "Swift Book — Concurrency",
+        "url": "https://docs.swift.org/swift-book/documentation/the-swift-programming-language/concurrency"
+      },
+      "tags": [
+        "async-await",
+        "suspension"
+      ]
+    },
+    {
+      "id": "concurrency-actor-purpose-001",
+      "category": "concurrency",
+      "difficulty": 1,
+      "title": "What an actor protects",
+      "question": "What does declaring a type as an actor guarantee?",
+      "language": "none",
+      "choices": [
+        "Serialised state access",
+        "Faster execution",
+        "Background execution",
+        "No suspension"
+      ],
+      "correctIndex": 0,
+      "explanation": "An actor lets only one task touch its mutable state at a time, so data races on that state become impossible. It is a correctness tool; it does not make the work faster and does not decide which thread runs it.",
+      "whyOthersWrong": [
+        "",
+        "Coordination adds overhead rather than removing it.",
+        "Work may run anywhere; the actor governs exclusivity, not placement.",
+        "Actor methods suspend routinely."
+      ],
+      "reference": {
+        "title": "Swift Book — Actors",
+        "url": "https://docs.swift.org/swift-book/documentation/the-swift-programming-language/concurrency"
+      },
+      "tags": [
+        "actor",
+        "data-race",
+        "isolation"
+      ]
+    },
+    {
+      "id": "concurrency-sendable-meaning-001",
+      "category": "concurrency",
+      "difficulty": 2,
+      "title": "What Sendable promises",
+      "question": "What does conforming to Sendable claim about a type?",
+      "language": "none",
+      "choices": [
+        "Safe to cross tasks",
+        "It is immutable",
+        "It is a value type",
+        "It is thread bound"
+      ],
+      "correctIndex": 0,
+      "explanation": "Sendable says a value can be handed to another concurrency domain without introducing a data race. Immutable value types get it for free; a class can only claim it by protecting its own state, which is why the compiler is strict about it.",
+      "whyOthersWrong": [
+        "",
+        "Immutability is one way to be safe, not the requirement itself.",
+        "Some classes are Sendable, and some value types are not.",
+        "That is closer to the opposite of what it means."
+      ],
+      "reference": {
+        "title": "Swift — Sendable",
+        "url": "https://developer.apple.com/documentation/swift/sendable"
+      },
+      "tags": [
+        "sendable",
+        "concurrency",
+        "data-race"
+      ]
+    },
+    {
+      "id": "concurrency-mainactor-001",
+      "category": "concurrency",
+      "difficulty": 1,
+      "title": "What @MainActor does",
+      "question": "What does marking a type @MainActor mean?",
+      "language": "none",
+      "choices": [
+        "Its members run on main",
+        "It runs first",
+        "It is a singleton",
+        "It cannot suspend"
+      ],
+      "correctIndex": 0,
+      "explanation": "@MainActor isolates the type to the main actor, so its properties and methods are accessed on the main thread and the compiler enforces it. That is how SwiftUI view models stay safe to touch from view code.",
+      "whyOthersWrong": [
+        "",
+        "It says nothing about ordering relative to other work.",
+        "Isolation is unrelated to how many instances exist.",
+        "Main actor code awaits like any other."
+      ],
+      "reference": {
+        "title": "Swift — MainActor",
+        "url": "https://developer.apple.com/documentation/swift/mainactor"
+      },
+      "tags": [
+        "mainactor",
+        "isolation",
+        "ui"
+      ]
+    },
+    {
+      "id": "concurrency-async-let-001",
+      "category": "concurrency",
+      "difficulty": 2,
+      "title": "Running two calls at once",
+      "question": "What does async let do?",
+      "language": "none",
+      "choices": [
+        "Starts work immediately",
+        "Delays until awaited",
+        "Creates a thread",
+        "Retries on failure"
+      ],
+      "correctIndex": 0,
+      "explanation": "async let starts a child task straight away and binds its eventual result, so two independent calls overlap instead of running one after the other. You await the bindings later, at the point where the values are actually needed.",
+      "whyOthersWrong": [
+        "",
+        "Waiting until the await would remove the whole benefit.",
+        "Tasks are scheduled onto a cooperative pool, not given a thread each.",
+        "No retry behaviour is implied."
+      ],
+      "reference": {
+        "title": "Swift Book — Concurrency",
+        "url": "https://docs.swift.org/swift-book/documentation/the-swift-programming-language/concurrency"
+      },
+      "tags": [
+        "async-let",
+        "structured-concurrency"
+      ]
+    },
+    {
+      "id": "concurrency-task-group-001",
+      "category": "concurrency",
+      "difficulty": 2,
+      "title": "When to use a task group",
+      "question": "When do you need a TaskGroup instead of async let?",
+      "language": "none",
+      "choices": [
+        "A count known at runtime",
+        "Only two tasks",
+        "For UI work",
+        "For retries"
+      ],
+      "correctIndex": 0,
+      "explanation": "async let suits a fixed set of child tasks you can write out. A task group handles a count known only at runtime, such as one request per item in an array, while keeping the children scoped to the group.",
+      "whyOthersWrong": [
+        "",
+        "A fixed pair is exactly the async let case.",
+        "Neither construct is about the user interface.",
+        "Retrying is something you write inside a task, not a reason to pick a group."
+      ],
+      "reference": {
+        "title": "Swift — TaskGroup",
+        "url": "https://developer.apple.com/documentation/swift/taskgroup"
+      },
+      "tags": [
+        "taskgroup",
+        "structured-concurrency"
+      ]
+    },
+    {
+      "id": "concurrency-cancellation-001",
+      "category": "concurrency",
+      "difficulty": 2,
+      "title": "How cancellation works",
+      "question": "What happens to a Swift task when it is cancelled?",
+      "language": "none",
+      "choices": [
+        "It is asked to stop",
+        "It stops instantly",
+        "It throws at once",
+        "It is suspended"
+      ],
+      "correctIndex": 0,
+      "explanation": "Cancellation is cooperative: a flag is set and the task keeps running until it checks. Code must call Task.checkCancellation, inspect Task.isCancelled, or use APIs that do so, otherwise a cancelled task runs to completion regardless.",
+      "whyOthersWrong": [
+        "",
+        "Nothing is forcibly killed.",
+        "A throw happens only where your code chooses to check.",
+        "The task keeps running rather than pausing."
+      ],
+      "reference": {
+        "title": "Swift — Task cancellation",
+        "url": "https://developer.apple.com/documentation/swift/task"
+      },
+      "tags": [
+        "cancellation",
+        "task",
+        "cooperative"
+      ]
+    },
+    {
+      "id": "concurrency-detached-task-001",
+      "category": "concurrency",
+      "difficulty": 3,
+      "title": "Task versus Task.detached",
+      "question": "What does Task.detached give up compared to a plain Task?",
+      "language": "none",
+      "choices": [
+        "Inherited context",
+        "Error handling",
+        "Async support",
+        "Cancellation"
+      ],
+      "correctIndex": 0,
+      "explanation": "A plain Task inherits the current actor isolation, priority and task-local values. A detached task deliberately starts with none of that, which is occasionally what you want but usually means losing the isolation you expected to keep.",
+      "whyOthersWrong": [
+        "",
+        "Both propagate thrown errors to whoever awaits the value.",
+        "Both run async work.",
+        "A detached task can still be cancelled through its handle."
+      ],
+      "reference": {
+        "title": "Swift — Task.detached",
+        "url": "https://developer.apple.com/documentation/swift/task/detached(priority:operation:)"
+      },
+      "tags": [
+        "task",
+        "detached",
+        "isolation"
+      ]
+    },
+    {
+      "id": "concurrency-structured-lifetime-001",
+      "category": "concurrency",
+      "difficulty": 3,
+      "title": "What structured means",
+      "question": "What does structured concurrency guarantee about child tasks?",
+      "language": "none",
+      "choices": [
+        "They finish in scope",
+        "They run in order",
+        "They share a thread",
+        "They never fail"
+      ],
+      "correctIndex": 0,
+      "explanation": "A child task cannot outlive the scope that created it: the parent waits for it, and cancelling the parent cancels the children. That is what makes lifetimes and cancellation reason-able, unlike detached tasks that float free.",
+      "whyOthersWrong": [
+        "",
+        "Children run concurrently; completion order is not fixed.",
+        "Thread assignment is the executor's business.",
+        "They can throw like anything else."
+      ],
+      "reference": {
+        "title": "Swift Book — Concurrency",
+        "url": "https://docs.swift.org/swift-book/documentation/the-swift-programming-language/concurrency"
+      },
+      "tags": [
+        "structured-concurrency",
+        "lifetime"
+      ]
+    },
+    {
+      "id": "concurrency-unchecked-sendable-001",
+      "category": "concurrency",
+      "difficulty": 3,
+      "title": "The cost of @unchecked Sendable",
+      "question": "What does @unchecked Sendable actually do?",
+      "language": "none",
+      "choices": [
+        "Silences the checker",
+        "Adds a lock",
+        "Copies the value",
+        "Isolates the type"
+      ],
+      "correctIndex": 0,
+      "explanation": "It tells the compiler to trust you and stop verifying. Nothing is added at runtime, so the safety must come from your own synchronisation. Used carelessly it converts a compile-time error into a data race that appears only under load.",
+      "whyOthersWrong": [
+        "",
+        "No synchronisation is inserted for you.",
+        "Nothing about copying changes.",
+        "Isolation would require an actor or a global actor."
+      ],
+      "reference": {
+        "title": "Swift — Sendable",
+        "url": "https://developer.apple.com/documentation/swift/sendable"
+      },
+      "tags": [
+        "sendable",
+        "unchecked",
+        "pitfall"
+      ]
+    },
+    {
+      "id": "concurrency-actor-isolation-001",
+      "category": "concurrency",
+      "difficulty": 2,
+      "title": "Calling into an actor",
+      "question": "Why does calling an actor's method from outside require await?",
+      "language": "none",
+      "choices": [
+        "It may have to wait",
+        "It is always slow",
+        "It runs on main",
+        "It might throw"
+      ],
+      "correctIndex": 0,
+      "explanation": "The actor may already be busy with another task, so the caller might have to suspend until it is free. Inside the actor, calls to its own members are already isolated and need no await.",
+      "whyOthersWrong": [
+        "",
+        "An uncontended actor call is cheap.",
+        "Only a @MainActor type runs on the main thread.",
+        "Throwing is orthogonal and needs try, not await."
+      ],
+      "reference": {
+        "title": "Swift Book — Actors",
+        "url": "https://docs.swift.org/swift-book/documentation/the-swift-programming-language/concurrency"
+      },
+      "tags": [
+        "actor",
+        "isolation",
+        "await"
+      ]
+    },
+    {
+      "id": "concurrency-async-sequence-001",
+      "category": "concurrency",
+      "difficulty": 2,
+      "title": "Iterating values over time",
+      "question": "Which loop consumes an AsyncSequence?",
+      "language": "none",
+      "choices": [
+        "for try await",
+        "while await",
+        "repeat async",
+        "for each async"
+      ],
+      "correctIndex": 0,
+      "explanation": "for await, or for try await when the sequence can throw, suspends at each iteration until the next element arrives. It is how you consume streams of values delivered over time, such as an AsyncStream of events.",
+      "whyOthersWrong": [
+        "",
+        "There is no such form.",
+        "repeat pairs with while and has no async variant.",
+        "forEach cannot suspend between elements."
+      ],
+      "reference": {
+        "title": "Swift — AsyncSequence",
+        "url": "https://developer.apple.com/documentation/swift/asyncsequence"
+      },
+      "tags": [
+        "asyncsequence",
+        "iteration"
+      ]
+    },
+    {
+      "id": "concurrency-continuation-001",
+      "category": "concurrency",
+      "difficulty": 3,
+      "title": "Bridging a callback API",
+      "question": "What must you guarantee when using withCheckedContinuation?",
+      "language": "none",
+      "choices": [
+        "Resume exactly once",
+        "Resume on main",
+        "Never throw",
+        "Resume immediately"
+      ],
+      "correctIndex": 0,
+      "explanation": "A continuation must be resumed exactly once. Resuming twice traps, and never resuming leaks the awaiting task forever. The checked variant reports these mistakes at runtime, which is why it is preferred while developing.",
+      "whyOthersWrong": [
+        "",
+        "Any thread may resume it.",
+        "The throwing variant exists precisely to deliver errors.",
+        "Resuming later is the entire point."
+      ],
+      "reference": {
+        "title": "Swift — withCheckedContinuation",
+        "url": "https://developer.apple.com/documentation/swift/withcheckedcontinuation(function:_:)"
+      },
+      "tags": [
+        "continuation",
+        "bridging",
+        "callback"
+      ]
+    },
+    {
+      "id": "concurrency-sleep-vs-blocking-001",
+      "category": "concurrency",
+      "difficulty": 2,
+      "title": "Waiting without blocking",
+      "question": "Why prefer Task.sleep over Thread.sleep in async code?",
+      "language": "none",
+      "choices": [
+        "It frees the thread",
+        "It is more precise",
+        "It cannot fail",
+        "It is faster"
+      ],
+      "correctIndex": 0,
+      "explanation": "Task.sleep suspends the task and returns its thread to the cooperative pool, so other work proceeds. Thread.sleep blocks a pooled thread, and blocking enough of them can stall the whole concurrency runtime.",
+      "whyOthersWrong": [
+        "",
+        "Neither promises exact timing.",
+        "Task.sleep throws when the task is cancelled, which is a feature.",
+        "The duration is the same; the difference is what happens to the thread."
+      ],
+      "reference": {
+        "title": "Swift — Task.sleep",
+        "url": "https://developer.apple.com/documentation/swift/task/sleep(nanoseconds:)"
+      },
+      "tags": [
+        "task",
+        "sleep",
+        "blocking"
+      ]
+    },
+    {
+      "id": "concurrency-data-race-definition-001",
+      "category": "concurrency",
+      "difficulty": 1,
+      "title": "What a data race is",
+      "question": "What defines a data race?",
+      "language": "none",
+      "choices": [
+        "Unsynchronised write",
+        "Slow code",
+        "Two threads running",
+        "A deadlock"
+      ],
+      "correctIndex": 0,
+      "explanation": "A data race is concurrent access to the same memory where at least one access writes and nothing orders them. The result is undefined rather than merely unpredictable, which is why Swift 6 aims to rule them out at compile time.",
+      "whyOthersWrong": [
+        "",
+        "Performance is unrelated.",
+        "Concurrency alone is fine as long as access is ordered or read-only.",
+        "A deadlock is the opposite problem: too much waiting."
+      ],
+      "reference": {
+        "title": "Swift — Concurrency safety",
+        "url": "https://developer.apple.com/documentation/swift/adoptingswift6"
+      },
+      "tags": [
+        "data-race",
+        "memory",
+        "safety"
+      ]
+    },
+    {
+      "id": "concurrency-strict-checking-001",
+      "category": "concurrency",
+      "difficulty": 3,
+      "title": "What Swift 6 mode changes",
+      "question": "What does Swift 6 language mode do with data-race warnings?",
+      "language": "none",
+      "choices": [
+        "Makes them errors",
+        "Removes them",
+        "Defers them",
+        "Logs them"
+      ],
+      "correctIndex": 0,
+      "explanation": "Swift 6 turns complete concurrency checking on, so what were warnings in Swift 5 mode become build errors. Migrating usually means adding Sendable conformances and isolation annotations rather than rewriting logic.",
+      "whyOthersWrong": [
+        "",
+        "The checks become stricter, not looser.",
+        "They are enforced at compile time.",
+        "Nothing is postponed to runtime logging."
+      ],
+      "reference": {
+        "title": "Swift — Adopting Swift 6",
+        "url": "https://developer.apple.com/documentation/swift/adoptingswift6"
+      },
+      "tags": [
+        "swift6",
+        "strict-concurrency",
+        "migration"
+      ]
+    },
+    {
+      "id": "swift-error-typed-throws-001",
+      "category": "swift-language",
+      "difficulty": 2,
+      "title": "What try? produces",
+      "question": "What is the type of `r`?",
+      "codeSnippet": "func f() throws -> Int { 1 }\nlet r = try? f()",
+      "language": "swift",
+      "choices": [
+        "Int",
+        "Int?",
+        "Result",
+        "Never"
+      ],
+      "correctIndex": 1,
+      "explanation": "try? converts a thrown error into nil, so a non-optional Int becomes Int?. The error itself is discarded, which is convenient but throws away the reason something failed.",
+      "whyOthersWrong": [
+        "That would be try! which traps on failure instead.",
+        "",
+        "Result is a separate type you would have to build yourself.",
+        "Never is the uninhabited type."
+      ],
+      "reference": {
+        "title": "Swift Book — Error Handling",
+        "url": "https://docs.swift.org/swift-book/documentation/the-swift-programming-language/errorhandling"
+      },
+      "tags": [
+        "error-handling",
+        "optional",
+        "try"
+      ]
+    },
+    {
+      "id": "swift-closure-capture-001",
+      "category": "swift-language",
+      "difficulty": 2,
+      "title": "What a closure captures",
+      "question": "What does this print?",
+      "codeSnippet": "var x = 1\nlet f = { print(x) }\nx = 2\nf()",
+      "language": "swift",
+      "choices": [
+        "1",
+        "2",
+        "Nothing",
+        "Compile error"
+      ],
+      "correctIndex": 1,
+      "explanation": "A closure captures the variable itself, not a snapshot of its value, so it sees the current contents when it runs. Writing [x] in a capture list would copy the value at creation time and print 1 instead.",
+      "whyOthersWrong": [
+        "That would need an explicit capture list.",
+        "",
+        "The closure is called, so it prints.",
+        "This is ordinary, valid Swift."
+      ],
+      "reference": {
+        "title": "Swift Book — Closures",
+        "url": "https://docs.swift.org/swift-book/documentation/the-swift-programming-language/closures"
+      },
+      "tags": [
+        "closure",
+        "capture",
+        "reference"
+      ]
+    },
+    {
+      "id": "swift-inout-semantics-001",
+      "category": "swift-language",
+      "difficulty": 3,
+      "title": "How inout passes a value",
+      "question": "How does an inout parameter give the caller the change back?",
+      "language": "none",
+      "choices": [
+        "Copy in, copy out",
+        "By pointer always",
+        "By reference count",
+        "It does not"
+      ],
+      "correctIndex": 0,
+      "explanation": "The model is copy-in, copy-out: the value is copied in, mutated locally, and written back when the function returns. The compiler may optimise this into direct memory access, but you cannot rely on seeing changes before the call returns.",
+      "whyOthersWrong": [
+        "",
+        "Pointer passing is an optimisation, not the guaranteed semantics.",
+        "Reference counting applies to class instances, not to inout.",
+        "The written-back value is exactly what the caller observes."
+      ],
+      "reference": {
+        "title": "Swift Book — In-Out Parameters",
+        "url": "https://docs.swift.org/swift-book/documentation/the-swift-programming-language/functions"
+      },
+      "tags": [
+        "inout",
+        "parameters",
+        "semantics"
+      ]
+    },
+    {
+      "id": "swift-result-builder-001",
+      "category": "swift-language",
+      "difficulty": 1,
+      "title": "Where result builders show up",
+      "question": "Which language feature lets SwiftUI list views without commas?",
+      "language": "none",
+      "choices": [
+        "Result builders",
+        "Operator overloading",
+        "Property wrappers",
+        "Generics"
+      ],
+      "correctIndex": 0,
+      "explanation": "A result builder rewrites the statements in a closure into a single composed value, which is how a SwiftUI body can read as a plain list of views. @ViewBuilder is the best known one, but you can write your own.",
+      "whyOthersWrong": [
+        "",
+        "No operators are involved.",
+        "Property wrappers power @State, a different piece of the puzzle.",
+        "Generics appear throughout SwiftUI but do not create this syntax."
+      ],
+      "reference": {
+        "title": "Swift Book — Result Builders",
+        "url": "https://docs.swift.org/swift-book/documentation/the-swift-programming-language/advancedoperators"
+      },
+      "tags": [
+        "result-builder",
+        "dsl",
+        "swiftui"
+      ]
     }
   ]
 }
