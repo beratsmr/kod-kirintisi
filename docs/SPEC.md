@@ -51,6 +51,8 @@ Kesin sınır: aşağıdakiler var, **başka hiçbir şey yok**.
 - [ ] **Bugün** — soru kartı, şıklar, cevap sonrası açıklama (kod örnekli), "neden diğerleri yanlış" notu, kaynak linki.
 - [ ] **Arşiv** — geçmiş sorular; kategori/zorluk filtresi, arama, doğru-yanlış işareti.
 - [ ] **İstatistik** — streak, toplam doğru oranı, kategori bazlı başarı grafiği (Swift Charts).
+
+> **Streak kuralı:** Streak **yalnızca doğru cevaplanan günleri** sayar — yanlış cevap seriyi kırar. Cevaplanmamış bugün seriyi bitirmez (gün henüz dolmadı); iki gün üst üste boş geçince sıfırlanır. Gün sınırı kullanıcının takvimine göre (`startOfDay`), yaz saati geçişlerinde de gün tam olarak bir artar.
 - [ ] **Ayarlar** — günlük bildirim saati, dahil edilecek kategoriler, ilerlemeyi sıfırla, hakkında.
 
 ### 5.3 Sistem entegrasyonları
@@ -110,6 +112,8 @@ Backend olmadığı için seçim **deterministik ve saf bir fonksiyon** olmalı 
 2. `installSeed` ile SplitMix64 tabanlı deterministik shuffle → soru indekslerinin sabit bir permütasyonu.
 3. `dayIndex = epoch (2026-01-01) ile bugün arasındaki gün farkı`
 4. `puzzle = permutation[dayIndex % bank.count]`
+
+Epoch'tan önceki tarihler (cihaz saati geriye alınmışsa) 0. güne sabitlenir; widget asla boş kalmaz.
 
 Sonuç: banka tükenene kadar tekrar yok, ağ yok, saat dilimi kullanıcının takvimine göre, %100 test edilebilir.
 

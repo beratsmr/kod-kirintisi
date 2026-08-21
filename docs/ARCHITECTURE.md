@@ -140,10 +140,15 @@ App Group: group.com.beratsumer.kodkirintisi
 public struct DailyPuzzleSelector: Sendable {
     public static let epoch = DateComponents(year: 2026, month: 1, day: 1)
 
-    public init(seed: UInt64, puzzleCount: Int)
+    public init?(seed: UInt64, puzzleCount: Int)   // boş banka → nil
     public func index(for date: Date, calendar: Calendar) -> Int
+    public func dayIndex(for date: Date, calendar: Calendar) -> Int
 }
 ```
+
+Başlatıcı `init?`: boş bir banka üzerinde seçilecek soru yoktur, bu yüzden geçersiz durum çağrı anında elenir ve `index(for:)` opsiyonel dönmek zorunda kalmaz.
+
+Karıştırma `shuffled(using:)` ile değil, elle yazılmış Fisher-Yates ile yapılır — standart kütüphane karıştırma algoritmasının sürümler arası sabit kalacağına söz vermiyor; değişseydi her kullanıcının takvimi bir güncellemeden sonra sessizce kayardı.
 
 Yan etkisi yok, zaman okumuyor (tarih parametre olarak geliyor), rastgelelik tohumlu. **Test edilmesi çok kolay** — bu yüzden bu şekilde tasarlandı.
 
@@ -153,11 +158,20 @@ Test edilmesi gerekenler: aynı gün → aynı sonuç · ardışık `bank.count`
 
 ```swift
 public enum StreakCalculator {
+    public static func day(for date: Date, calendar: Calendar) -> DateComponents
+    public static func correctDays(
+        from records: some Sequence<AnswerRecord>, calendar: Calendar
+    ) -> Set<DateComponents>
     public static func currentStreak(
-        answeredDays: Set<DateComponents>, today: Date, calendar: Calendar
+        correctlyAnsweredDays: Set<DateComponents>, today: Date, calendar: Calendar
+    ) -> Int
+    public static func longestStreak(
+        correctlyAnsweredDays: Set<DateComponents>, calendar: Calendar
     ) -> Int
 }
 ```
+
+Parametre `answeredDays` değil `correctlyAnsweredDays`: SPEC §5.2'deki karara göre yanlış cevap streak'i kırar, yani kümeye yalnızca doğru cevaplanan günler girer. Ad bunu çağrı yerinde görünür kılıyor — yanlış kümeyi geçirmek aksi halde fark edilmesi çok zor bir hata olurdu. Küme anahtarları `day(for:calendar:)` ile üretilmeli.
 
 Sınır durumları: bugün cevaplanmadı ama dün cevaplandı → streak korunur · iki gün boşluk → sıfırlanır · yaz saati geçişi · yılbaşı.
 
