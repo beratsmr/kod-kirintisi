@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "puzzles": [
     {
       "id": "swift-value-semantics-001",
@@ -42,17 +42,17 @@
       "codeSnippet": "protocol G {}\nextension G { func f() { print(\"A\") } }\nstruct S: G { func f() { print(\"B\") } }\nlet g: G = S()\ng.f()",
       "language": "swift",
       "choices": [
-        "A",
-        "B",
         "AB",
+        "B",
+        "A",
         "Compile error"
       ],
-      "correctIndex": 0,
+      "correctIndex": 2,
       "explanation": "`f()` is not a requirement of protocol `G`, it only exists in the extension. Calls through the existential type `G` are statically dispatched to the extension's implementation, so `S.f()` never runs. Adding `func f()` to the protocol body would make it a requirement and print B.",
       "whyOthersWrong": [
-        "",
-        "B would require `f()` to be declared inside `protocol G`, enabling dynamic dispatch.",
         "Only one implementation is called.",
+        "B would require `f()` to be declared inside `protocol G`, enabling dynamic dispatch.",
+        "",
         "The code compiles; shadowing an extension method is legal."
       ],
       "reference": {
@@ -74,16 +74,16 @@
       "codeSnippet": "func f() -> Int {\n  var x = 1\n  defer { x += 1 }\n  return x\n}\nprint(f())",
       "language": "swift",
       "choices": [
-        "1",
         "2",
+        "1",
         "3",
         "Compile error"
       ],
-      "correctIndex": 0,
+      "correctIndex": 1,
       "explanation": "The return value is copied before the `defer` block runs. `defer` executes as the scope exits, mutating the local `x` after its value has already been handed back. With an `inout` parameter or a reference type the mutation would be observable.",
       "whyOthersWrong": [
-        "",
         "The increment happens after the value is captured for return.",
+        "",
         "`defer` runs exactly once.",
         "`defer` inside a function body is valid."
       ],
@@ -107,16 +107,16 @@
       "language": "swift",
       "choices": [
         "Prints 1",
-        "Prints 0",
         "Compile error",
+        "Prints 0",
         "Runtime crash"
       ],
-      "correctIndex": 2,
+      "correctIndex": 1,
       "explanation": "A `mutating` method may only be called on a mutable value. `s` is a `let`, so the compiler rejects the call before the program ever runs. Changing `let` to `var` fixes it.",
       "whyOthersWrong": [
         "Nothing is printed; the code does not compile.",
-        "Nothing is printed; the code does not compile.",
         "",
+        "Nothing is printed; the code does not compile.",
         "This is caught at compile time, not at runtime."
       ],
       "reference": {
@@ -139,17 +139,17 @@
       "language": "swift",
       "choices": [
         "Int",
-        "Int?",
+        "Any",
         "A?",
-        "Any"
+        "Int?"
       ],
-      "correctIndex": 1,
+      "correctIndex": 3,
       "explanation": "Optional chaining always wraps the result in an optional, because the whole expression evaluates to nil when the base is nil. Even though `b` is a non-optional `Int`, `a?.b` is `Int?`.",
       "whyOthersWrong": [
         "Chaining adds a level of optionality; it never returns a plain value.",
-        "",
+        "Swift infers a concrete type here, not `Any`.",
         "`r` holds the property, not the containing value.",
-        "Swift infers a concrete type here, not `Any`."
+        ""
       ],
       "reference": {
         "title": "Swift Book — Optional Chaining",
@@ -169,18 +169,18 @@
       "question": "Which one breaks a strong reference cycle between an object and its stored closure?",
       "language": "none",
       "choices": [
-        "[weak self]",
+        "final class",
         "@escaping",
         "lazy var",
-        "final class"
+        "[weak self]"
       ],
-      "correctIndex": 0,
+      "correctIndex": 3,
       "explanation": "A capture list such as `[weak self]` (or `[unowned self]`) stops the closure from holding a strong reference back to the object, so ARC can deallocate it. The other keywords change escaping semantics, initialization timing or inheritance, none of which affect ownership.",
       "whyOthersWrong": [
-        "",
+        "`final` prevents subclassing and can enable static dispatch; it has no effect on retain counts.",
         "`@escaping` only tells the compiler the closure may outlive the call; it makes cycles more likely, not less.",
         "`lazy` delays initialization; ownership is unchanged.",
-        "`final` prevents subclassing and can enable static dispatch; it has no effect on retain counts."
+        ""
       ],
       "reference": {
         "title": "Swift Book — Automatic Reference Counting",
@@ -202,16 +202,16 @@
       "codeSnippet": "class C {\n  lazy var v: Int = {\n    print(\"init\"); return 1\n  }()\n}\nlet c = C(); print(\"made\"); print(c.v)",
       "language": "swift",
       "choices": [
-        "made",
         "init",
+        "made",
         "1",
         "Nothing"
       ],
-      "correctIndex": 0,
+      "correctIndex": 1,
       "explanation": "A `lazy var` initializer does not run until the property is first read. Creating `C()` prints nothing, so \"made\" comes first, then \"init\" when `c.v` is accessed, then \"1\".",
       "whyOthersWrong": [
-        "",
         "The initializer is deferred until the first access to `v`.",
+        "",
         "The value is printed last, after its initializer runs.",
         "All three lines are printed."
       ],
@@ -234,16 +234,16 @@
       "language": "none",
       "choices": [
         "State stays frozen",
-        "Another call runs",
         "Deadlock",
+        "Another call runs",
         "The method restarts"
       ],
-      "correctIndex": 1,
+      "correctIndex": 2,
       "explanation": "Swift actors are reentrant. Suspending at an `await` releases the actor, so another queued call can enter and mutate state. Any assumption you made about the actor's state before the suspension point must be re-checked afterwards.",
       "whyOthersWrong": [
         "The actor is not held across suspension points; state can change.",
-        "",
         "Reentrancy exists precisely to avoid deadlocks.",
+        "",
         "Execution resumes after the await, it does not start over."
       ],
       "reference": {
@@ -265,18 +265,18 @@
       "codeSnippet": "let s = \"e\\u{301}\"\nprint(s.count)",
       "language": "swift",
       "choices": [
-        "1",
+        "0",
         "2",
         "3",
-        "0"
+        "1"
       ],
-      "correctIndex": 0,
+      "correctIndex": 3,
       "explanation": "Swift's `Character` is an extended grapheme cluster. \"e\" followed by U+0301 (combining acute accent) renders as a single user-perceived character \"é\", so `count` is 1. `s.unicodeScalars.count` would be 2 and `s.utf8.count` would be 3.",
       "whyOthersWrong": [
-        "",
+        "The string is not empty.",
         "That is the number of Unicode scalars, not characters.",
         "That is the UTF-8 byte count.",
-        "The string is not empty."
+        ""
       ],
       "reference": {
         "title": "Swift Book — Strings and Characters",
@@ -297,16 +297,16 @@
       "language": "none",
       "choices": [
         "Insertion order",
-        "Sorted by key",
         "Not guaranteed",
+        "Sorted by key",
         "Sorted by value"
       ],
-      "correctIndex": 2,
+      "correctIndex": 1,
       "explanation": "Dictionary is an unordered collection; its iteration order is an implementation detail and can even differ between runs because of hash seeding. Sort explicitly (`dict.sorted { $0.key < $1.key }`) whenever order matters — especially before rendering a list.",
       "whyOthersWrong": [
         "That is the behaviour of an array of pairs or an ordered dictionary type.",
-        "Keys are hashed, not sorted.",
         "",
+        "Keys are hashed, not sorted.",
         "Values do not influence storage order."
       ],
       "reference": {
@@ -327,16 +327,16 @@
       "question": "What is the time complexity of binary search on a sorted array?",
       "language": "none",
       "choices": [
-        "O(1)",
         "O(log n)",
+        "O(1)",
         "O(n)",
         "O(n log n)"
       ],
-      "correctIndex": 1,
+      "correctIndex": 0,
       "explanation": "Each comparison discards half of the remaining range, so the number of steps is the number of times n can be halved: log2(n). The array must already be sorted; sorting it first would cost O(n log n) and dominate.",
       "whyOthersWrong": [
-        "Constant time would mean the answer is found without depending on the size at all.",
         "",
+        "Constant time would mean the answer is found without depending on the size at all.",
         "Scanning every element is linear search, which is what binary search improves on.",
         "That is the cost of sorting the array, not of searching it."
       ],
@@ -389,17 +389,17 @@
       "question": "What is the average time complexity of looking a key up in a Dictionary?",
       "language": "none",
       "choices": [
-        "O(1)",
-        "O(log n)",
         "O(n)",
+        "O(log n)",
+        "O(1)",
         "Depends on order"
       ],
-      "correctIndex": 0,
+      "correctIndex": 2,
       "explanation": "A dictionary hashes the key to find its bucket directly, so an average lookup does not depend on how many entries exist. With pathological hash collisions it degrades towards O(n), which is why a good Hashable implementation matters.",
       "whyOthersWrong": [
-        "",
-        "That is the cost of searching a balanced tree, not a hash table.",
         "Only in the degenerate case where every key collides into one bucket.",
+        "That is the cost of searching a balanced tree, not a hash table.",
+        "",
         "Dictionaries are unordered; insertion order does not affect lookup cost."
       ],
       "reference": {
@@ -421,16 +421,16 @@
       "language": "none",
       "choices": [
         "O(1)",
-        "O(log n)",
         "O(n)",
+        "O(log n)",
         "O(n squared)"
       ],
-      "correctIndex": 2,
+      "correctIndex": 1,
       "explanation": "Array stores its elements contiguously, so making room at the front means shifting every existing element one slot to the right. When you need cheap insertion at both ends, reach for a deque instead of an array.",
       "whyOthersWrong": [
         "Only appending at the end is constant time.",
-        "No halving happens; every element moves.",
         "",
+        "No halving happens; every element moves.",
         "One insertion is linear; you would need n insertions to reach quadratic."
       ],
       "reference": {
@@ -452,17 +452,17 @@
       "language": "none",
       "choices": [
         "O(n)",
-        "O(n log n)",
+        "O(log n)",
         "O(n squared)",
-        "O(log n)"
+        "O(n log n)"
       ],
-      "correctIndex": 1,
+      "correctIndex": 3,
       "explanation": "Swift uses an introsort-style hybrid whose worst case is O(n log n). That bound is why quicksort alone is not used: its worst case is quadratic, so the standard library falls back to heapsort when recursion runs too deep.",
       "whyOthersWrong": [
         "No comparison sort can beat n log n in the general case.",
-        "",
+        "Sorting must at least look at every element.",
         "That is naive quicksort's worst case, which the standard library avoids.",
-        "Sorting must at least look at every element."
+        ""
       ],
       "reference": {
         "title": "Swift Standard Library — sort()",
@@ -482,17 +482,17 @@
       "language": "none",
       "choices": [
         "Yes, always",
-        "No guarantee",
+        "Only for small arrays",
         "Only for value types",
-        "Only for small arrays"
+        "No guarantee"
       ],
-      "correctIndex": 1,
+      "correctIndex": 3,
       "explanation": "Swift's sort is documented as not guaranteed stable, even though the current implementation happens to be. Relying on it is a bug waiting for a standard library update. When order among equals matters, sort by an explicit tie-breaking key.",
       "whyOthersWrong": [
         "Stability is explicitly not promised by the documentation.",
-        "",
+        "The size of the input does not change what is guaranteed.",
         "Value semantics have nothing to do with sort stability.",
-        "The size of the input does not change what is guaranteed."
+        ""
       ],
       "reference": {
         "title": "Swift Standard Library — sort()",
@@ -574,18 +574,18 @@
       "question": "What does memoising a naive recursive Fibonacci change its complexity to?",
       "language": "none",
       "choices": [
-        "O(n) from O(2^n)",
+        "Nothing changes",
         "O(1) from O(n)",
         "O(n log n) from O(n)",
-        "Nothing changes"
+        "O(n) from O(2^n)"
       ],
-      "correctIndex": 0,
+      "correctIndex": 3,
       "explanation": "The naive recursion recomputes the same subproblems over and over, branching twice per call. Caching each result means every value from 0 to n is computed exactly once, turning exponential work into linear work plus O(n) memory.",
       "whyOthersWrong": [
-        "",
+        "The whole point is that the repeated subproblems disappear.",
         "A single cached call is constant, but computing fib(n) still needs every smaller value.",
         "Memoisation removes work; it never introduces a logarithmic factor.",
-        "The whole point is that the repeated subproblems disappear."
+        ""
       ],
       "reference": {
         "title": "Swift Book — Closures",
@@ -605,17 +605,17 @@
       "question": "What does reaching the n-th element of a singly linked list cost?",
       "language": "none",
       "choices": [
-        "O(1)",
-        "O(log n)",
         "O(n)",
+        "O(log n)",
+        "O(1)",
         "O(n log n)"
       ],
-      "correctIndex": 2,
+      "correctIndex": 0,
       "explanation": "A linked list has no contiguous storage to offset into, so reaching a position means following one pointer at a time from the head. That is the trade for cheap insertion and removal once you already hold a node.",
       "whyOthersWrong": [
-        "Constant-time indexing needs contiguous storage, which is what an array has.",
-        "There is no halving to exploit; the nodes are not ordered by address.",
         "",
+        "There is no halving to exploit; the nodes are not ordered by address.",
+        "Constant-time indexing needs contiguous storage, which is what an array has.",
         "Nothing is being sorted."
       ],
       "reference": {
@@ -637,16 +637,16 @@
       "language": "none",
       "choices": [
         "First in, first out",
-        "Last in, first out",
         "Sorted order",
+        "Last in, first out",
         "Random order"
       ],
-      "correctIndex": 1,
+      "correctIndex": 2,
       "explanation": "A stack removes the most recently added element first, which is exactly what a call stack or an undo history needs. A queue is the other way round: first in, first out, as in a print spool or a task pipeline.",
       "whyOthersWrong": [
         "That describes a queue.",
-        "",
         "Neither structure sorts its contents.",
+        "",
         "Both have a strictly defined order."
       ],
       "reference": {
@@ -667,16 +667,16 @@
       "question": "Which structure gives you a level-by-level traversal of a tree?",
       "language": "none",
       "choices": [
-        "A queue",
         "A stack",
+        "A queue",
         "A set",
         "A dictionary"
       ],
-      "correctIndex": 0,
+      "correctIndex": 1,
       "explanation": "Breadth-first traversal enqueues the children of each node and processes them in arrival order, so a whole level is visited before the next begins. Swapping the queue for a stack turns the same code into a depth-first traversal.",
       "whyOthersWrong": [
-        "",
         "A stack gives depth-first order, diving down one branch first.",
+        "",
         "A set has no order, so it cannot drive a traversal.",
         "A dictionary maps keys to values; it does not sequence the visit."
       ],
@@ -698,16 +698,16 @@
       "question": "When does quicksort degrade to quadratic time?",
       "language": "none",
       "choices": [
-        "On sorted input",
         "On random input",
+        "On sorted input",
         "On short input",
         "On duplicate keys only"
       ],
-      "correctIndex": 0,
+      "correctIndex": 1,
       "explanation": "If the pivot is always the smallest or largest remaining element, each partition peels off one element and recursion depth becomes n. Naive first-element pivots do exactly that on already sorted data, which is why real implementations randomise or use the median of three.",
       "whyOthersWrong": [
-        "",
         "Random input is the case quicksort handles well, averaging n log n.",
+        "",
         "Short inputs are fast regardless of the algorithm.",
         "Duplicates hurt some partition schemes but are not the classic worst case."
       ],
@@ -760,17 +760,17 @@
       "question": "What happens if hash(into:) always feeds the same constant?",
       "language": "none",
       "choices": [
-        "Lookups become O(n)",
-        "Nothing changes",
         "The program crashes",
+        "Nothing changes",
+        "Lookups become O(n)",
         "Equality breaks"
       ],
-      "correctIndex": 0,
+      "correctIndex": 2,
       "explanation": "Every value lands in the same bucket, so the dictionary degenerates into a linear scan through a collision chain. It stays correct because equality still decides matches, but the performance guarantee is gone. Hash quality is a performance contract, not a correctness one.",
       "whyOthersWrong": [
-        "",
-        "Correctness survives, but lookup cost changes dramatically.",
         "A poor hash is legal; it is slow, not fatal.",
+        "Correctness survives, but lookup cost changes dramatically.",
+        "",
         "Equality is defined separately by ==, and is unaffected."
       ],
       "reference": {
@@ -791,18 +791,18 @@
       "question": "Why prefer first(where:) over filter { }.first?",
       "language": "none",
       "choices": [
-        "It stops at the match",
+        "It avoids optionals",
         "It is lazy by default",
         "It sorts first",
-        "It avoids optionals"
+        "It stops at the match"
       ],
-      "correctIndex": 0,
+      "correctIndex": 3,
       "explanation": "first(where:) returns as soon as an element matches, while filter walks the entire collection and builds a new array only to discard all but one element. On a large collection that is wasted time and wasted allocation.",
       "whyOthersWrong": [
-        "",
+        "Both hand back an optional, because there may be no match.",
         "Laziness is a separate feature reached through the lazy property.",
         "Neither call sorts anything.",
-        "Both hand back an optional, because there may be no match."
+        ""
       ],
       "reference": {
         "title": "Swift Standard Library — first(where:)",
@@ -822,16 +822,16 @@
       "question": "Why is reduce(into:) preferred when accumulating into an array or dictionary?",
       "language": "none",
       "choices": [
-        "It avoids copies",
         "It is parallel",
+        "It avoids copies",
         "It is lazy",
         "It keeps order"
       ],
-      "correctIndex": 0,
+      "correctIndex": 1,
       "explanation": "Plain reduce passes the accumulator by value and returns a new one each step, which can copy the whole collection on every element. reduce(into:) mutates one accumulator in place, so building a dictionary from n items stays linear instead of quadratic.",
       "whyOthersWrong": [
-        "",
         "Neither form runs concurrently.",
+        "",
         "Both are eager; laziness comes from the lazy view.",
         "Both visit elements in the same order."
       ],
@@ -854,17 +854,17 @@
       "codeSnippet": "let s = \"hello\"\nlet c = s[2]",
       "language": "swift",
       "choices": [
-        "Prints l",
-        "Returns a Character",
         "Compile error",
+        "Returns a Character",
+        "Prints l",
         "Runtime crash"
       ],
-      "correctIndex": 2,
+      "correctIndex": 0,
       "explanation": "String is not indexed by Int, because characters are variable-width grapheme clusters and a numeric offset would not be a constant-time position. You need String.Index, for example s[s.index(s.startIndex, offsetBy: 2)].",
       "whyOthersWrong": [
-        "Nothing is printed; the code does not compile.",
-        "It would return a Character only if an Int subscript existed, which it does not.",
         "",
+        "It would return a Character only if an Int subscript existed, which it does not.",
+        "Nothing is printed; the code does not compile.",
         "The compiler rejects it before the program can run."
       ],
       "reference": {
@@ -886,16 +886,16 @@
       "codeSnippet": "enum Suit: String {\n  case hearts, spades\n}\nlet d = Suit(rawValue: \"hearts\")",
       "language": "swift",
       "choices": [
-        "Suit",
         "Suit?",
+        "Suit",
         "String",
         "Never"
       ],
-      "correctIndex": 1,
+      "correctIndex": 0,
       "explanation": "The raw value initialiser is failable: the string might not match any case, so it returns an optional. Only the plain case reference, such as Suit.hearts, gives you a non-optional value.",
       "whyOthersWrong": [
-        "That would require the initialiser to be non-failable.",
         "",
+        "That would require the initialiser to be non-failable.",
         "The raw value is the input, not the result.",
         "Never is the uninhabited type, returned by functions that do not return."
       ],
@@ -918,16 +918,16 @@
       "language": "none",
       "choices": [
         "Inside the else block",
-        "After the guard",
         "Only on that line",
+        "After the guard",
         "Nowhere"
       ],
-      "correctIndex": 1,
+      "correctIndex": 2,
       "explanation": "guard binds the unwrapped value in the enclosing scope, so it stays available for the rest of the function. That is the difference from if let, whose binding lives only inside the if body, and it is why guard suits early returns.",
       "whyOthersWrong": [
         "The else block runs when the unwrap failed, so there is nothing to use there.",
-        "",
         "The binding outlives its own line; that is the whole point.",
+        "",
         "It is very much in scope afterwards."
       ],
       "reference": {
@@ -948,17 +948,17 @@
       "question": "How does a button inside a widget perform an action without opening the app?",
       "language": "none",
       "choices": [
-        "With an AppIntent",
-        "With a closure",
         "With a delegate",
+        "With a closure",
+        "With an AppIntent",
         "It cannot"
       ],
-      "correctIndex": 0,
+      "correctIndex": 2,
       "explanation": "Widgets are rendered by a separate process from archived views, so there is no live code to run a closure. Interactive widgets on iOS 17 and later use Button(intent:) with an AppIntent, which the system executes on your behalf.",
       "whyOthersWrong": [
-        "",
-        "A closure would need the view's code to still be alive, which it is not.",
         "Widgets have no delegate callbacks for user taps.",
+        "A closure would need the view's code to still be alive, which it is not.",
+        "",
         "It works from iOS 17 onwards, through App Intents."
       ],
       "reference": {
@@ -979,18 +979,18 @@
       "question": "How does an app share stored data with its widget extension?",
       "language": "none",
       "choices": [
-        "An App Group",
+        "NotificationCenter",
         "A shared singleton",
         "Static properties",
-        "NotificationCenter"
+        "An App Group"
       ],
-      "correctIndex": 0,
+      "correctIndex": 3,
       "explanation": "The app and its extension are separate processes with separate sandboxes. An App Group grants both a shared container directory, which is the only supported way to put a file or a UserDefaults suite where both can reach it.",
       "whyOthersWrong": [
-        "",
+        "NotificationCenter does not cross process boundaries.",
         "A singleton lives in one process's memory; the extension has its own copy.",
         "Static state is per process too, for the same reason.",
-        "NotificationCenter does not cross process boundaries."
+        ""
       ],
       "reference": {
         "title": "Sharing data with your containing app",
@@ -1041,16 +1041,16 @@
       "question": "What do you call after writing new data so the widget redraws?",
       "language": "none",
       "choices": [
-        "WidgetCenter reload",
         "setNeedsDisplay",
+        "WidgetCenter reload",
         "objectWillChange",
         "viewDidLoad"
       ],
-      "correctIndex": 0,
+      "correctIndex": 1,
       "explanation": "WidgetCenter.shared.reloadTimelines(ofKind:) asks the system to rebuild that widget's timeline. Reloading a single kind is preferred over reloadAllTimelines, because every reload draws from the same limited refresh budget.",
       "whyOthersWrong": [
-        "",
         "setNeedsDisplay is a UIKit call inside one process; widgets are archived remotely.",
+        "",
         "objectWillChange drives SwiftUI inside a live app, not an extension's timeline.",
         "viewDidLoad is a UIViewController lifecycle method."
       ],
@@ -1105,16 +1105,16 @@
       "choices": [
         "iOS 16",
         "iOS 17",
-        "iOS 18",
-        "iOS 15"
+        "iOS 15",
+        "iOS 18"
       ],
-      "correctIndex": 2,
+      "correctIndex": 3,
       "explanation": "ControlWidget arrived in iOS 18, letting apps ship buttons and toggles into Control Center and the Lock Screen. Interactive home screen widgets came one release earlier, in iOS 17, which is a common source of confusion.",
       "whyOthersWrong": [
         "iOS 16 brought Lock Screen widgets, not Control Center controls.",
         "iOS 17 brought interactive widgets and StandBy.",
-        "",
-        "iOS 15 predates all of this."
+        "iOS 15 predates all of this.",
+        ""
       ],
       "reference": {
         "title": "WidgetKit — ControlWidget",
@@ -1134,16 +1134,16 @@
       "question": "Which widget family renders as a rectangle on the Lock Screen?",
       "language": "none",
       "choices": [
-        "systemSmall",
         "accessoryRectangular",
+        "systemSmall",
         "systemMedium",
         "accessoryCircular"
       ],
-      "correctIndex": 1,
+      "correctIndex": 0,
       "explanation": "The accessory families are the Lock Screen ones: accessoryRectangular, accessoryCircular and accessoryInline. The system families are for the Home Screen. Accessory widgets are also rendered with a vibrant, largely monochrome treatment.",
       "whyOthersWrong": [
-        "systemSmall is a Home Screen family.",
         "",
+        "systemSmall is a Home Screen family.",
         "systemMedium is the wider Home Screen family.",
         "That one is the small circular gauge, not a rectangle."
       ],
@@ -1165,16 +1165,16 @@
       "question": "What makes an App Intent available as a Siri phrase without user setup?",
       "language": "none",
       "choices": [
-        "AppShortcutsProvider",
         "Info.plist entry",
+        "AppShortcutsProvider",
         "A URL scheme",
         "Spotlight indexing"
       ],
-      "correctIndex": 0,
+      "correctIndex": 1,
       "explanation": "Conforming a type to AppShortcutsProvider declares shortcuts with spoken phrases that are available as soon as the app is installed. Plain App Intents still work in the Shortcuts app, but the user has to build the shortcut themselves.",
       "whyOthersWrong": [
-        "",
         "No plist key registers an intent phrase.",
+        "",
         "URL schemes open the app; they do not create Siri phrases.",
         "Spotlight surfaces content in search, not spoken shortcuts."
       ],
@@ -1196,17 +1196,17 @@
       "question": "Which framework indexes app content for the system search field?",
       "language": "none",
       "choices": [
-        "CoreSpotlight",
-        "CoreData",
         "CoreServices",
+        "CoreData",
+        "CoreSpotlight",
         "SearchKit"
       ],
-      "correctIndex": 0,
+      "correctIndex": 2,
       "explanation": "CoreSpotlight lets an app donate CSSearchableItem records so its content appears in system search. Tapping a result launches the app with the item identifier, which you use to navigate straight to that content.",
       "whyOthersWrong": [
-        "",
-        "CoreData is persistence; it does not index for system search.",
         "CoreServices is a broad low-level framework, not the search index API.",
+        "CoreData is persistence; it does not index for system search.",
+        "",
         "SearchKit is an older macOS text indexing API."
       ],
       "reference": {
@@ -1227,18 +1227,18 @@
       "question": "Does scheduling a local notification require the user's permission?",
       "language": "none",
       "choices": [
-        "Yes",
+        "Only in the background",
         "No",
         "Only if it has sound",
-        "Only in the background"
+        "Yes"
       ],
-      "correctIndex": 0,
+      "correctIndex": 3,
       "explanation": "Local and remote notifications both need authorisation through UNUserNotificationCenter. Without it, a scheduled request is accepted but nothing is presented to the user, which makes the failure easy to miss during development.",
       "whyOthersWrong": [
-        "",
+        "The requirement holds regardless of app state.",
         "Being local does not exempt it from authorisation.",
         "Sound is one of the options you request, not what triggers the requirement.",
-        "The requirement holds regardless of app state."
+        ""
       ],
       "reference": {
         "title": "UserNotifications — Asking permission",
@@ -1257,17 +1257,17 @@
       "question": "What does the iOS deployment target setting control?",
       "language": "none",
       "choices": [
-        "Oldest OS supported",
-        "Newest SDK used",
         "Simulator version",
+        "Newest SDK used",
+        "Oldest OS supported",
         "Swift version"
       ],
-      "correctIndex": 0,
+      "correctIndex": 2,
       "explanation": "The deployment target is the earliest OS version the app will install and run on. The SDK you build against is separate and is usually newer, which is why newer APIs need an availability check to stay usable on older systems.",
       "whyOthersWrong": [
-        "",
-        "That is the base SDK, chosen by the Xcode version.",
         "Simulators are limited by the installed runtimes, not by this setting.",
+        "That is the base SDK, chosen by the Xcode version.",
+        "",
         "The Swift language version is its own build setting."
       ],
       "reference": {
@@ -1288,18 +1288,18 @@
       "question": "How do you call an iOS 18 API in an app that also supports iOS 17?",
       "language": "none",
       "choices": [
-        "if #available",
+        "Optional chaining",
         "try?",
         "@objc",
-        "Optional chaining"
+        "if #available"
       ],
-      "correctIndex": 0,
+      "correctIndex": 3,
       "explanation": "if #available(iOS 18, *) asks the runtime whether the API exists and lets you provide a fallback. The compiler enforces this: calling a newer symbol without a check, or without an @available annotation, is a build error.",
       "whyOthersWrong": [
-        "",
+        "Optional chaining is about nil values, not API availability.",
         "try? handles thrown errors, not missing symbols.",
         "@objc concerns Objective-C interoperability.",
-        "Optional chaining is about nil values, not API availability."
+        ""
       ],
       "reference": {
         "title": "Swift Book — Checking API Availability",
@@ -1320,17 +1320,17 @@
       "language": "none",
       "choices": [
         "Yes",
-        "No, it is read-only",
+        "Only small files",
         "Only in debug",
-        "Only small files"
+        "No, it is read-only"
       ],
-      "correctIndex": 1,
+      "correctIndex": 3,
       "explanation": "The bundle is signed and mounted read-only; writing there would invalidate the signature. Runtime data belongs in the container directories instead, typically Documents for user data and Caches or Application Support for regenerable files.",
       "whyOthersWrong": [
         "The signature makes this impossible on device.",
-        "",
+        "Size is irrelevant; the location is what is forbidden.",
         "Build configuration does not change the sandbox rules.",
-        "Size is irrelevant; the location is what is forbidden."
+        ""
       ],
       "reference": {
         "title": "File System Basics",
@@ -1351,17 +1351,17 @@
       "language": "none",
       "choices": [
         "standard",
-        "A suite name",
+        "None",
         "A keychain group",
-        "None"
+        "A suite name"
       ],
-      "correctIndex": 1,
+      "correctIndex": 3,
       "explanation": "UserDefaults(suiteName:) with the App Group identifier gives both processes the same store. UserDefaults.standard is per sandbox, so the app and the extension each get their own and silently disagree.",
       "whyOthersWrong": [
         "standard is not shared across the sandbox boundary.",
-        "",
+        "Sharing is possible through the App Group suite.",
         "Keychain groups share credentials, not defaults.",
-        "Sharing is possible through the App Group suite."
+        ""
       ],
       "reference": {
         "title": "Foundation — UserDefaults",
@@ -1381,16 +1381,16 @@
       "question": "Which store can outlive deleting and reinstalling an app?",
       "language": "none",
       "choices": [
-        "Keychain",
         "UserDefaults",
+        "Keychain",
         "Documents",
         "Caches"
       ],
-      "correctIndex": 0,
+      "correctIndex": 1,
       "explanation": "Keychain items can persist after an app is deleted, which is why credentials sometimes reappear on reinstall. Everything inside the app container, defaults included, is removed with the app. Treat this as a real behaviour to handle, not a feature to rely on.",
       "whyOthersWrong": [
-        "",
         "Defaults live in the container and go with it.",
+        "",
         "The Documents directory is part of the container.",
         "Caches can be purged even while the app is installed."
       ],
@@ -1443,16 +1443,16 @@
       "question": "On which thread must UIKit and SwiftUI views be updated?",
       "language": "none",
       "choices": [
-        "Any thread",
         "The main thread",
+        "Any thread",
         "A background queue",
         "The render thread"
       ],
-      "correctIndex": 1,
+      "correctIndex": 0,
       "explanation": "UI work must happen on the main thread. Swift Concurrency expresses this with the @MainActor annotation, which the compiler checks, replacing the older habit of remembering to hop to DispatchQueue.main by hand.",
       "whyOthersWrong": [
-        "Touching views off the main thread causes unpredictable failures.",
         "",
+        "Touching views off the main thread causes unpredictable failures.",
         "Background queues are for work that does not touch the UI.",
         "The render server is internal and not somewhere you dispatch to."
       ],
@@ -1567,16 +1567,16 @@
       "question": "What kind of value should a SwiftUI view keep in @State?",
       "language": "none",
       "choices": [
-        "Its own private value",
         "Shared app state",
+        "Its own private value",
         "A network client",
         "A singleton"
       ],
-      "correctIndex": 0,
+      "correctIndex": 1,
       "explanation": "@State is storage the view owns, kept alive by SwiftUI across body recomputations. It is meant to be private and local; state that outlives or is shared between views belongs somewhere with a longer life, passed in instead.",
       "whyOthersWrong": [
-        "",
         "Shared state should be owned higher up and passed down or put in the environment.",
+        "",
         "Services are dependencies to inject, not view-local values.",
         "A singleton already exists globally; wrapping it in @State gains nothing."
       ],
@@ -1598,16 +1598,16 @@
       "question": "What does a @Binding provide to a child view?",
       "language": "none",
       "choices": [
-        "A copy of a value",
         "Read and write access",
+        "A copy of a value",
         "Read-only access",
         "A new source of truth"
       ],
-      "correctIndex": 1,
+      "correctIndex": 0,
       "explanation": "A binding is a two-way reference to state owned somewhere else, so the child can read and write without owning it. That keeps one source of truth: the parent's @State stays authoritative while the child edits it.",
       "whyOthersWrong": [
-        "A copy would let the two drift apart.",
         "",
+        "A copy would let the two drift apart.",
         "Read-only would be a plain let property.",
         "It deliberately avoids creating a second source of truth."
       ],
@@ -1630,17 +1630,17 @@
       "language": "none",
       "choices": [
         "Once per view",
-        "Often, unpredictably",
+        "Once per second",
         "Only on appear",
-        "Once per second"
+        "Often, unpredictably"
       ],
-      "correctIndex": 1,
+      "correctIndex": 3,
       "explanation": "SwiftUI re-evaluates body whenever it decides the view may have changed, and that can happen far more often than you expect. body must therefore be cheap and free of side effects; put work in .task or .onAppear instead.",
       "whyOthersWrong": [
         "Views are value types recreated constantly; body is not a one-time setup.",
-        "",
+        "There is no fixed cadence.",
         "Appearance is one trigger among many.",
-        "There is no fixed cadence."
+        ""
       ],
       "reference": {
         "title": "SwiftUI — View",
@@ -1660,16 +1660,16 @@
       "question": "Do .padding().background(.red) and .background(.red).padding() look the same?",
       "language": "none",
       "choices": [
-        "Yes, always",
         "No, order matters",
+        "Yes, always",
         "Only for text",
         "Only in a stack"
       ],
-      "correctIndex": 1,
+      "correctIndex": 0,
       "explanation": "Each modifier wraps the view it is applied to, so order decides what is being wrapped. Padding first makes the background cover the padded area; background first paints only the original bounds and the padding stays outside it.",
       "whyOthersWrong": [
-        "The two produce visibly different results.",
         "",
+        "The two produce visibly different results.",
         "The rule applies to every view, not just text.",
         "Containers do not change how wrapping works."
       ],
@@ -1692,17 +1692,17 @@
       "language": "none",
       "choices": [
         "The first one",
-        "The last one",
+        "The opaque one",
         "The largest one",
-        "The opaque one"
+        "The last one"
       ],
-      "correctIndex": 1,
+      "correctIndex": 3,
       "explanation": "A ZStack draws its children in source order, so each one is painted over the previous and the last is closest to the viewer. Use .zIndex when you need a different order without moving the code.",
       "whyOthersWrong": [
         "The first is drawn first and ends up furthest back.",
-        "",
+        "Opacity does not affect ordering either.",
         "Size does not affect layering.",
-        "Opacity does not affect ordering either."
+        ""
       ],
       "reference": {
         "title": "SwiftUI — ZStack",
@@ -1722,17 +1722,17 @@
       "question": "What happens when you change a view's .id() value?",
       "language": "none",
       "choices": [
-        "It is replaced",
-        "It is updated",
         "Nothing",
+        "It is updated",
+        "It is replaced",
         "It animates smoothly"
       ],
-      "correctIndex": 0,
+      "correctIndex": 2,
       "explanation": "Identity tells SwiftUI whether two renders are the same view. A new id means the old view is torn down and a new one is inserted, so its @State resets and transitions run instead of animating in place. That is sometimes exactly what you want.",
       "whyOthersWrong": [
-        "",
-        "An in-place update happens when the identity stays the same.",
         "Identity changes are one of the most consequential things you can do.",
+        "An in-place update happens when the identity stays the same.",
+        "",
         "You get an insertion and removal, which is rarely a smooth in-place animation."
       ],
       "reference": {
@@ -1753,16 +1753,16 @@
       "question": "What advantage does @Observable have over ObservableObject?",
       "language": "none",
       "choices": [
-        "Tracks used properties",
         "Requires no class",
+        "Tracks used properties",
         "Works without SwiftUI",
         "Is thread safe"
       ],
-      "correctIndex": 0,
+      "correctIndex": 1,
       "explanation": "@Observable tracks which properties a view actually read, so only views depending on a changed property are invalidated. ObservableObject republishes for the whole object, waking up views that never touched the property that changed.",
       "whyOthersWrong": [
-        "",
         "@Observable is still applied to a class.",
+        "",
         "Observation is a separate framework, but the benefit here is finer invalidation.",
         "It provides no concurrency guarantees on its own."
       ],
@@ -1784,16 +1784,16 @@
       "question": "What goes wrong if you create an object in @ObservedObject instead of @StateObject?",
       "language": "none",
       "choices": [
-        "It is recreated",
         "It never updates",
+        "It is recreated",
         "It leaks",
         "It crashes"
       ],
-      "correctIndex": 0,
+      "correctIndex": 1,
       "explanation": "@StateObject makes SwiftUI own the object and keep it across body recomputations. @ObservedObject does not own it, so an object constructed inline is thrown away and rebuilt every time the view is re-evaluated, silently resetting its state.",
       "whyOthersWrong": [
-        "",
         "Updates still arrive; the problem is that the object keeps starting over.",
+        "",
         "The old instance is released, so this is lost state rather than a leak.",
         "It is a correctness bug, not a crash."
       ],
@@ -1815,18 +1815,18 @@
       "question": "What problem does the SwiftUI environment solve?",
       "language": "none",
       "choices": [
-        "Passing values down",
+        "Navigation",
         "Persisting data",
         "Background work",
-        "Navigation"
+        "Passing values down"
       ],
-      "correctIndex": 0,
+      "correctIndex": 3,
       "explanation": "The environment carries values implicitly down the view tree, so a deep child can read something without every intermediate view forwarding it. It holds both system values, such as colour scheme, and your own custom keys.",
       "whyOthersWrong": [
-        "",
+        "Navigation has its own dedicated APIs.",
         "Nothing in the environment is written to disk.",
         "It does not schedule work.",
-        "Navigation has its own dedicated APIs."
+        ""
       ],
       "reference": {
         "title": "SwiftUI — Environment",
@@ -1908,16 +1908,16 @@
       "question": "What does the @ViewBuilder attribute enable?",
       "language": "none",
       "choices": [
-        "Multiple child views",
         "Lazy rendering",
+        "Multiple child views",
         "Automatic layout",
         "View caching"
       ],
-      "correctIndex": 0,
+      "correctIndex": 1,
       "explanation": "@ViewBuilder is a result builder that turns several statements, and if or switch branches, into one composed view value. Without it a closure could only return a single expression, which is why custom container views annotate their content parameter with it.",
       "whyOthersWrong": [
-        "",
         "Laziness comes from containers like LazyVStack.",
+        "",
         "Layout is decided by the containers themselves.",
         "No caching is implied."
       ],
@@ -1939,16 +1939,16 @@
       "question": "What does LazyVStack do differently from VStack?",
       "language": "none",
       "choices": [
-        "Creates rows on demand",
         "Scrolls by itself",
+        "Creates rows on demand",
         "Reuses views",
         "Sorts children"
       ],
-      "correctIndex": 0,
+      "correctIndex": 1,
       "explanation": "A VStack builds every child immediately, which is fine for a handful and wasteful for thousands. A LazyVStack creates children only as they are about to become visible, which is why it belongs inside a ScrollView.",
       "whyOthersWrong": [
-        "",
         "Scrolling still comes from an enclosing ScrollView.",
+        "",
         "It creates lazily rather than recycling cells the way UITableView did.",
         "Neither reorders its children."
       ],
@@ -1970,17 +1970,17 @@
       "question": "How does a GeometryReader size itself in its parent?",
       "language": "none",
       "choices": [
-        "It takes all the space",
-        "It hugs its content",
         "It is zero sized",
+        "It hugs its content",
+        "It takes all the space",
         "It matches its child"
       ],
-      "correctIndex": 0,
+      "correctIndex": 2,
       "explanation": "GeometryReader accepts all the space its parent offers so it can report those dimensions, which often makes surrounding layout collapse unexpectedly. Reach for it only where you truly need measurements, and prefer layout that adapts on its own.",
       "whyOthersWrong": [
-        "",
-        "Hugging content is what most views do, and precisely what this one does not.",
         "It is greedy, not empty.",
+        "Hugging content is what most views do, and precisely what this one does not.",
+        "",
         "Its own size is independent of the child it builds."
       ],
       "reference": {
@@ -2001,18 +2001,18 @@
       "question": "What does withAnimation actually animate?",
       "language": "none",
       "choices": [
-        "State changes inside it",
+        "Nothing by itself",
         "The whole screen",
         "Only opacity",
-        "Nothing by itself"
+        "State changes inside it"
       ],
-      "correctIndex": 0,
+      "correctIndex": 3,
       "explanation": "withAnimation marks the state changes made inside its closure, and SwiftUI animates whatever views depend on them from their old values to their new ones. It animates the consequences of a state change rather than any particular view.",
       "whyOthersWrong": [
-        "",
+        "It very much does something, given a state change.",
         "Only the views affected by that state take part.",
         "Any animatable property can change, not just opacity.",
-        "It very much does something, given a state change."
+        ""
       ],
       "reference": {
         "title": "SwiftUI — withAnimation",
@@ -2063,17 +2063,17 @@
       "question": "Which modifier lets a background extend under the notch and home indicator?",
       "language": "none",
       "choices": [
-        "ignoresSafeArea",
-        "frame(maxWidth:)",
         "padding(0)",
+        "frame(maxWidth:)",
+        "ignoresSafeArea",
         "clipped()"
       ],
-      "correctIndex": 0,
+      "correctIndex": 2,
       "explanation": ".ignoresSafeArea() lets a view draw into the insets the system normally reserves. Use it for backgrounds rather than for content, since text or controls under the notch become hard to read or hard to tap.",
       "whyOthersWrong": [
-        "",
-        "A flexible frame still stops at the safe area.",
         "Zero padding does not override safe area insets.",
+        "A flexible frame still stops at the safe area.",
+        "",
         "Clipping trims a view; it does not extend it."
       ],
       "reference": {
@@ -2094,18 +2094,18 @@
       "question": "What does adding .lazy before a map do?",
       "language": "none",
       "choices": [
-        "Defers the work",
+        "Sorts the output",
         "Runs it in parallel",
         "Caches results",
-        "Sorts the output"
+        "Defers the work"
       ],
-      "correctIndex": 0,
+      "correctIndex": 3,
       "explanation": "A lazy view computes each element only as it is consumed, so chained transforms avoid building intermediate arrays. Combined with first(where:) it can stop early, though for small collections the extra indirection may not pay for itself.",
       "whyOthersWrong": [
-        "",
+        "Order is preserved, not changed.",
         "Laziness is about when work happens, not on how many threads.",
         "Elements are recomputed on each traversal rather than cached.",
-        "Order is preserved, not changed."
+        ""
       ],
       "reference": {
         "title": "Swift Standard Library — lazy",
@@ -2125,16 +2125,16 @@
       "question": "What does `some Shape` mean compared to `any Shape`?",
       "language": "none",
       "choices": [
-        "One fixed unknown type",
         "Any type each time",
+        "One fixed unknown type",
         "A class only",
         "A generic class"
       ],
-      "correctIndex": 0,
+      "correctIndex": 1,
       "explanation": "`some` is an opaque type: one concrete type the caller cannot name but which stays the same, so no boxing is needed. `any` is an existential that can hold a different conforming type at each assignment, at the cost of dynamic dispatch.",
       "whyOthersWrong": [
-        "",
         "That describes `any`.",
+        "",
         "Both work with structs, enums and classes alike.",
         "Neither implies a class."
       ],
@@ -2156,17 +2156,17 @@
       "question": "What is the main reason to choose a class over a struct?",
       "language": "none",
       "choices": [
-        "Reference semantics",
-        "Better performance",
         "Fewer lines",
+        "Better performance",
+        "Reference semantics",
         "Codable support"
       ],
-      "correctIndex": 0,
+      "correctIndex": 2,
       "explanation": "Pick a class when you genuinely need one shared instance that several places observe or mutate, or when you need inheritance or deinit. Otherwise a struct's value semantics remove a whole category of aliasing bugs.",
       "whyOthersWrong": [
-        "",
-        "Structs are often faster, avoiding allocation and reference counting.",
         "The syntax is nearly identical.",
+        "Structs are often faster, avoiding allocation and reference counting.",
+        "",
         "Both can conform to Codable."
       ],
       "reference": {
@@ -2217,18 +2217,18 @@
       "question": "What does declaring a type as an actor guarantee?",
       "language": "none",
       "choices": [
-        "Serialised state access",
+        "No suspension",
         "Faster execution",
         "Background execution",
-        "No suspension"
+        "Serialised state access"
       ],
-      "correctIndex": 0,
+      "correctIndex": 3,
       "explanation": "An actor lets only one task touch its mutable state at a time, so data races on that state become impossible. It is a correctness tool; it does not make the work faster and does not decide which thread runs it.",
       "whyOthersWrong": [
-        "",
+        "Actor methods suspend routinely.",
         "Coordination adds overhead rather than removing it.",
         "Work may run anywhere; the actor governs exclusivity, not placement.",
-        "Actor methods suspend routinely."
+        ""
       ],
       "reference": {
         "title": "Swift Book — Actors",
@@ -2248,17 +2248,17 @@
       "question": "What does conforming to Sendable claim about a type?",
       "language": "none",
       "choices": [
-        "Safe to cross tasks",
-        "It is immutable",
         "It is a value type",
+        "It is immutable",
+        "Safe to cross tasks",
         "It is thread bound"
       ],
-      "correctIndex": 0,
+      "correctIndex": 2,
       "explanation": "Sendable says a value can be handed to another concurrency domain without introducing a data race. Immutable value types get it for free; a class can only claim it by protecting its own state, which is why the compiler is strict about it.",
       "whyOthersWrong": [
-        "",
-        "Immutability is one way to be safe, not the requirement itself.",
         "Some classes are Sendable, and some value types are not.",
+        "Immutability is one way to be safe, not the requirement itself.",
+        "",
         "That is closer to the opposite of what it means."
       ],
       "reference": {
@@ -2310,16 +2310,16 @@
       "question": "What does async let do?",
       "language": "none",
       "choices": [
-        "Starts work immediately",
         "Delays until awaited",
+        "Starts work immediately",
         "Creates a thread",
         "Retries on failure"
       ],
-      "correctIndex": 0,
+      "correctIndex": 1,
       "explanation": "async let starts a child task straight away and binds its eventual result, so two independent calls overlap instead of running one after the other. You await the bindings later, at the point where the values are actually needed.",
       "whyOthersWrong": [
-        "",
         "Waiting until the await would remove the whole benefit.",
+        "",
         "Tasks are scheduled onto a cooperative pool, not given a thread each.",
         "No retry behaviour is implied."
       ],
@@ -2340,16 +2340,16 @@
       "question": "When do you need a TaskGroup instead of async let?",
       "language": "none",
       "choices": [
-        "A count known at runtime",
         "Only two tasks",
+        "A count known at runtime",
         "For UI work",
         "For retries"
       ],
-      "correctIndex": 0,
+      "correctIndex": 1,
       "explanation": "async let suits a fixed set of child tasks you can write out. A task group handles a count known only at runtime, such as one request per item in an array, while keeping the children scoped to the group.",
       "whyOthersWrong": [
-        "",
         "A fixed pair is exactly the async let case.",
+        "",
         "Neither construct is about the user interface.",
         "Retrying is something you write inside a task, not a reason to pick a group."
       ],
@@ -2401,17 +2401,17 @@
       "question": "What does Task.detached give up compared to a plain Task?",
       "language": "none",
       "choices": [
-        "Inherited context",
-        "Error handling",
         "Async support",
+        "Error handling",
+        "Inherited context",
         "Cancellation"
       ],
-      "correctIndex": 0,
+      "correctIndex": 2,
       "explanation": "A plain Task inherits the current actor isolation, priority and task-local values. A detached task deliberately starts with none of that, which is occasionally what you want but usually means losing the isolation you expected to keep.",
       "whyOthersWrong": [
-        "",
-        "Both propagate thrown errors to whoever awaits the value.",
         "Both run async work.",
+        "Both propagate thrown errors to whoever awaits the value.",
+        "",
         "A detached task can still be cancelled through its handle."
       ],
       "reference": {
@@ -2432,16 +2432,16 @@
       "question": "What does structured concurrency guarantee about child tasks?",
       "language": "none",
       "choices": [
-        "They finish in scope",
         "They run in order",
+        "They finish in scope",
         "They share a thread",
         "They never fail"
       ],
-      "correctIndex": 0,
+      "correctIndex": 1,
       "explanation": "A child task cannot outlive the scope that created it: the parent waits for it, and cancelling the parent cancels the children. That is what makes lifetimes and cancellation reason-able, unlike detached tasks that float free.",
       "whyOthersWrong": [
-        "",
         "Children run concurrently; completion order is not fixed.",
+        "",
         "Thread assignment is the executor's business.",
         "They can throw like anything else."
       ],
@@ -2462,17 +2462,17 @@
       "question": "What does @unchecked Sendable actually do?",
       "language": "none",
       "choices": [
-        "Silences the checker",
-        "Adds a lock",
         "Copies the value",
+        "Adds a lock",
+        "Silences the checker",
         "Isolates the type"
       ],
-      "correctIndex": 0,
+      "correctIndex": 2,
       "explanation": "It tells the compiler to trust you and stop verifying. Nothing is added at runtime, so the safety must come from your own synchronisation. Used carelessly it converts a compile-time error into a data race that appears only under load.",
       "whyOthersWrong": [
-        "",
-        "No synchronisation is inserted for you.",
         "Nothing about copying changes.",
+        "No synchronisation is inserted for you.",
+        "",
         "Isolation would require an actor or a global actor."
       ],
       "reference": {
@@ -2493,17 +2493,17 @@
       "question": "Why does calling an actor's method from outside require await?",
       "language": "none",
       "choices": [
-        "It may have to wait",
-        "It is always slow",
         "It runs on main",
+        "It is always slow",
+        "It may have to wait",
         "It might throw"
       ],
-      "correctIndex": 0,
+      "correctIndex": 2,
       "explanation": "The actor may already be busy with another task, so the caller might have to suspend until it is free. Inside the actor, calls to its own members are already isolated and need no await.",
       "whyOthersWrong": [
-        "",
-        "An uncontended actor call is cheap.",
         "Only a @MainActor type runs on the main thread.",
+        "An uncontended actor call is cheap.",
+        "",
         "Throwing is orthogonal and needs try, not await."
       ],
       "reference": {
@@ -2524,17 +2524,17 @@
       "question": "Which loop consumes an AsyncSequence?",
       "language": "none",
       "choices": [
-        "for try await",
-        "while await",
         "repeat async",
+        "while await",
+        "for try await",
         "for each async"
       ],
-      "correctIndex": 0,
+      "correctIndex": 2,
       "explanation": "for await, or for try await when the sequence can throw, suspends at each iteration until the next element arrives. It is how you consume streams of values delivered over time, such as an AsyncStream of events.",
       "whyOthersWrong": [
-        "",
-        "There is no such form.",
         "repeat pairs with while and has no async variant.",
+        "There is no such form.",
+        "",
         "forEach cannot suspend between elements."
       ],
       "reference": {
@@ -2554,18 +2554,18 @@
       "question": "What must you guarantee when using withCheckedContinuation?",
       "language": "none",
       "choices": [
-        "Resume exactly once",
+        "Resume immediately",
         "Resume on main",
         "Never throw",
-        "Resume immediately"
+        "Resume exactly once"
       ],
-      "correctIndex": 0,
+      "correctIndex": 3,
       "explanation": "A continuation must be resumed exactly once. Resuming twice traps, and never resuming leaks the awaiting task forever. The checked variant reports these mistakes at runtime, which is why it is preferred while developing.",
       "whyOthersWrong": [
-        "",
+        "Resuming later is the entire point.",
         "Any thread may resume it.",
         "The throwing variant exists precisely to deliver errors.",
-        "Resuming later is the entire point."
+        ""
       ],
       "reference": {
         "title": "Swift — withCheckedContinuation",
@@ -2585,18 +2585,18 @@
       "question": "Why prefer Task.sleep over Thread.sleep in async code?",
       "language": "none",
       "choices": [
-        "It frees the thread",
+        "It is faster",
         "It is more precise",
         "It cannot fail",
-        "It is faster"
+        "It frees the thread"
       ],
-      "correctIndex": 0,
+      "correctIndex": 3,
       "explanation": "Task.sleep suspends the task and returns its thread to the cooperative pool, so other work proceeds. Thread.sleep blocks a pooled thread, and blocking enough of them can stall the whole concurrency runtime.",
       "whyOthersWrong": [
-        "",
+        "The duration is the same; the difference is what happens to the thread.",
         "Neither promises exact timing.",
         "Task.sleep throws when the task is cancelled, which is a feature.",
-        "The duration is the same; the difference is what happens to the thread."
+        ""
       ],
       "reference": {
         "title": "Swift — Task.sleep",
@@ -2616,18 +2616,18 @@
       "question": "What defines a data race?",
       "language": "none",
       "choices": [
-        "Unsynchronised write",
+        "A deadlock",
         "Slow code",
         "Two threads running",
-        "A deadlock"
+        "Unsynchronised write"
       ],
-      "correctIndex": 0,
+      "correctIndex": 3,
       "explanation": "A data race is concurrent access to the same memory where at least one access writes and nothing orders them. The result is undefined rather than merely unpredictable, which is why Swift 6 aims to rule them out at compile time.",
       "whyOthersWrong": [
-        "",
+        "A deadlock is the opposite problem: too much waiting.",
         "Performance is unrelated.",
         "Concurrency alone is fine as long as access is ordered or read-only.",
-        "A deadlock is the opposite problem: too much waiting."
+        ""
       ],
       "reference": {
         "title": "Swift — Concurrency safety",
@@ -2680,16 +2680,16 @@
       "language": "swift",
       "choices": [
         "Int",
-        "Int?",
         "Result",
+        "Int?",
         "Never"
       ],
-      "correctIndex": 1,
+      "correctIndex": 2,
       "explanation": "try? converts a thrown error into nil, so a non-optional Int becomes Int?. The error itself is discarded, which is convenient but throws away the reason something failed.",
       "whyOthersWrong": [
         "That would be try! which traps on failure instead.",
-        "",
         "Result is a separate type you would have to build yourself.",
+        "",
         "Never is the uninhabited type."
       ],
       "reference": {
@@ -2742,16 +2742,16 @@
       "question": "How does an inout parameter give the caller the change back?",
       "language": "none",
       "choices": [
-        "Copy in, copy out",
         "By pointer always",
+        "Copy in, copy out",
         "By reference count",
         "It does not"
       ],
-      "correctIndex": 0,
+      "correctIndex": 1,
       "explanation": "The model is copy-in, copy-out: the value is copied in, mutated locally, and written back when the function returns. The compiler may optimise this into direct memory access, but you cannot rely on seeing changes before the call returns.",
       "whyOthersWrong": [
-        "",
         "Pointer passing is an optimisation, not the guaranteed semantics.",
+        "",
         "Reference counting applies to class instances, not to inout.",
         "The written-back value is exactly what the caller observes."
       ],
@@ -2773,18 +2773,18 @@
       "question": "Which language feature lets SwiftUI list views without commas?",
       "language": "none",
       "choices": [
-        "Result builders",
+        "Generics",
         "Operator overloading",
         "Property wrappers",
-        "Generics"
+        "Result builders"
       ],
-      "correctIndex": 0,
+      "correctIndex": 3,
       "explanation": "A result builder rewrites the statements in a closure into a single composed value, which is how a SwiftUI body can read as a plain list of views. @ViewBuilder is the best known one, but you can write your own.",
       "whyOthersWrong": [
-        "",
+        "Generics appear throughout SwiftUI but do not create this syntax.",
         "No operators are involved.",
         "Property wrappers power @State, a different piece of the puzzle.",
-        "Generics appear throughout SwiftUI but do not create this syntax."
+        ""
       ],
       "reference": {
         "title": "Swift Book — Result Builders",
@@ -2794,6 +2794,938 @@
         "result-builder",
         "dsl",
         "swiftui"
+      ]
+    },
+    {
+      "id": "memory-arc-basics-001",
+      "category": "memory-arc",
+      "difficulty": 1,
+      "title": "When ARC frees an object",
+      "question": "When does ARC deallocate a class instance?",
+      "language": "none",
+      "choices": [
+        "At zero strong refs",
+        "At the end of scope",
+        "On a timer",
+        "When memory is low"
+      ],
+      "correctIndex": 0,
+      "explanation": "ARC keeps a count of strong references and frees the instance the moment it reaches zero. Weak and unowned references do not contribute to that count, which is exactly why they can break a cycle.",
+      "whyOthersWrong": [
+        "",
+        "Leaving a scope only releases that scope's reference; others may remain.",
+        "There is no periodic collector; ARC is deterministic.",
+        "Deallocation does not wait for memory pressure."
+      ],
+      "reference": {
+        "title": "Swift Book — Automatic Reference Counting",
+        "url": "https://docs.swift.org/swift-book/documentation/the-swift-programming-language/automaticreferencecounting"
+      },
+      "tags": [
+        "arc",
+        "memory",
+        "deallocation"
+      ]
+    },
+    {
+      "id": "memory-weak-optional-001",
+      "category": "memory-arc",
+      "difficulty": 1,
+      "title": "Why weak is optional",
+      "question": "Why must a weak reference always be optional?",
+      "language": "none",
+      "choices": [
+        "It is unowned",
+        "It is a var",
+        "It is lazy",
+        "It can become nil"
+      ],
+      "correctIndex": 3,
+      "explanation": "The referenced object can be deallocated at any time, and ARC sets the reference to nil when that happens. A non-optional weak reference could therefore be observed with no value, which the type system does not allow.",
+      "whyOthersWrong": [
+        "unowned is the alternative that is not optional, and traps instead.",
+        "Being mutable is a consequence of this, not the reason.",
+        "Laziness is unrelated.",
+        ""
+      ],
+      "reference": {
+        "title": "Swift Book — Weak References",
+        "url": "https://docs.swift.org/swift-book/documentation/the-swift-programming-language/automaticreferencecounting"
+      },
+      "tags": [
+        "weak",
+        "optional",
+        "arc"
+      ]
+    },
+    {
+      "id": "memory-unowned-crash-001",
+      "category": "memory-arc",
+      "difficulty": 2,
+      "title": "What unowned risks",
+      "question": "What happens when you use an unowned reference after its object is gone?",
+      "language": "none",
+      "choices": [
+        "It is recreated",
+        "It is nil",
+        "A crash",
+        "Nothing"
+      ],
+      "correctIndex": 2,
+      "explanation": "unowned promises the object outlives the reference. If it does not, the access traps at runtime. Use it only when the lifetimes are genuinely tied, such as a child that cannot exist without its parent; otherwise prefer weak.",
+      "whyOthersWrong": [
+        "ARC never resurrects a deallocated instance.",
+        "Only weak references become nil.",
+        "",
+        "The failure is loud, not silent."
+      ],
+      "reference": {
+        "title": "Swift Book — Unowned References",
+        "url": "https://docs.swift.org/swift-book/documentation/the-swift-programming-language/automaticreferencecounting"
+      },
+      "tags": [
+        "unowned",
+        "arc",
+        "crash"
+      ]
+    },
+    {
+      "id": "memory-cycle-two-objects-001",
+      "category": "memory-arc",
+      "difficulty": 2,
+      "title": "Two objects holding each other",
+      "question": "What happens when two classes hold strong references to each other?",
+      "language": "none",
+      "choices": [
+        "A crash",
+        "Both are freed",
+        "One is freed",
+        "Neither is freed"
+      ],
+      "correctIndex": 3,
+      "explanation": "Each keeps the other's count above zero, so neither can ever reach zero even after everything else lets go. The memory is leaked. Making one side weak or unowned breaks the cycle and lets both deallocate.",
+      "whyOthersWrong": [
+        "A leak is silent, not a crash.",
+        "That is what happens once the cycle is broken.",
+        "The cycle is symmetric; neither side can win.",
+        ""
+      ],
+      "reference": {
+        "title": "Swift Book — Strong Reference Cycles",
+        "url": "https://docs.swift.org/swift-book/documentation/the-swift-programming-language/automaticreferencecounting"
+      },
+      "tags": [
+        "retain-cycle",
+        "arc",
+        "leak"
+      ]
+    },
+    {
+      "id": "memory-delegate-weak-001",
+      "category": "memory-arc",
+      "difficulty": 1,
+      "title": "Why delegates are weak",
+      "question": "Why is a delegate property usually declared weak?",
+      "language": "none",
+      "choices": [
+        "It is faster",
+        "The owner holds it",
+        "It is required",
+        "To allow nil"
+      ],
+      "correctIndex": 1,
+      "explanation": "The delegate is typically the object that owns the one calling back, so a strong delegate would complete a cycle. Declaring it weak lets the owner be released normally while the child still calls back while it exists.",
+      "whyOthersWrong": [
+        "The performance difference is not the point.",
+        "",
+        "The compiler does not require it; convention and correctness do.",
+        "Being optional is a side effect of weak, not the motivation."
+      ],
+      "reference": {
+        "title": "Swift Book — Automatic Reference Counting",
+        "url": "https://docs.swift.org/swift-book/documentation/the-swift-programming-language/automaticreferencecounting"
+      },
+      "tags": [
+        "delegate",
+        "weak",
+        "retain-cycle"
+      ]
+    },
+    {
+      "id": "memory-struct-no-arc-001",
+      "category": "memory-arc",
+      "difficulty": 2,
+      "title": "Do structs get retain cycles?",
+      "question": "Can two structs form a strong reference cycle with each other?",
+      "language": "none",
+      "choices": [
+        "Only if nested",
+        "Yes, always",
+        "No, they are values",
+        "Only with closures"
+      ],
+      "correctIndex": 2,
+      "explanation": "Value types are copied rather than referenced, so there is nothing to retain and no cycle to form. A struct can still take part indirectly, for example by storing a closure that captures a class instance strongly.",
+      "whyOthersWrong": [
+        "Nesting values just copies them.",
+        "Cycles need reference semantics.",
+        "",
+        "That is the indirect case, and the cycle is then between the closure and a class."
+      ],
+      "reference": {
+        "title": "Swift Book — Structures and Classes",
+        "url": "https://docs.swift.org/swift-book/documentation/the-swift-programming-language/classesandstructures"
+      },
+      "tags": [
+        "struct",
+        "value-type",
+        "retain-cycle"
+      ]
+    },
+    {
+      "id": "memory-capture-list-value-001",
+      "category": "memory-arc",
+      "difficulty": 3,
+      "title": "What a capture list copies",
+      "question": "What does this print?",
+      "codeSnippet": "var n = 1\nlet f = { [n] in print(n) }\nn = 2\nf()",
+      "language": "swift",
+      "choices": [
+        "1",
+        "2",
+        "Nothing",
+        "Compile error"
+      ],
+      "correctIndex": 0,
+      "explanation": "A capture list copies the value at the moment the closure is created, so later changes to the variable are invisible inside it. Without the list the closure would capture the variable itself and print 2.",
+      "whyOthersWrong": [
+        "",
+        "That is the behaviour without the capture list.",
+        "The closure is called and prints.",
+        "Capture lists on value types are perfectly legal."
+      ],
+      "reference": {
+        "title": "Swift Book — Capture Lists",
+        "url": "https://docs.swift.org/swift-book/documentation/the-swift-programming-language/closures"
+      },
+      "tags": [
+        "capture-list",
+        "closure",
+        "value"
+      ]
+    },
+    {
+      "id": "memory-weak-self-guard-001",
+      "category": "memory-arc",
+      "difficulty": 2,
+      "title": "guard let self in a closure",
+      "question": "What does `guard let self else { return }` inside a closure do?",
+      "language": "none",
+      "choices": [
+        "Keeps self forever",
+        "Creates a cycle",
+        "Keeps self for the body",
+        "Nothing"
+      ],
+      "correctIndex": 2,
+      "explanation": "It promotes the weakly captured self to a strong reference for the duration of the closure body, so it cannot disappear halfway through. The strong reference ends when the closure returns, so no cycle is created.",
+      "whyOthersWrong": [
+        "The strong reference lasts for one execution, not forever.",
+        "The capture is still weak; only the body holds it briefly.",
+        "",
+        "It prevents self vanishing mid-body, which matters."
+      ],
+      "reference": {
+        "title": "Swift Book — Resolving Strong Reference Cycles",
+        "url": "https://docs.swift.org/swift-book/documentation/the-swift-programming-language/automaticreferencecounting"
+      },
+      "tags": [
+        "weak-self",
+        "closure",
+        "guard"
+      ]
+    },
+    {
+      "id": "memory-deinit-timing-001",
+      "category": "memory-arc",
+      "difficulty": 1,
+      "title": "When deinit runs",
+      "question": "When does a class's deinit run?",
+      "language": "none",
+      "choices": [
+        "On the next loop",
+        "At app exit",
+        "Just before deallocation",
+        "When set to nil"
+      ],
+      "correctIndex": 2,
+      "explanation": "deinit runs immediately before the instance's memory is released, once the last strong reference is gone. Setting one variable to nil triggers it only if that variable held the final strong reference.",
+      "whyOthersWrong": [
+        "There is no deferred sweep; ARC is immediate.",
+        "Objects are freed as soon as they are unreferenced, long before exit.",
+        "",
+        "Only if that was the last strong reference."
+      ],
+      "reference": {
+        "title": "Swift Book — Deinitialization",
+        "url": "https://docs.swift.org/swift-book/documentation/the-swift-programming-language/deinitialization"
+      },
+      "tags": [
+        "deinit",
+        "arc",
+        "lifecycle"
+      ]
+    },
+    {
+      "id": "memory-cow-buffer-001",
+      "category": "memory-arc",
+      "difficulty": 3,
+      "title": "How copy on write decides",
+      "question": "What makes a copy-on-write type actually copy its buffer?",
+      "language": "none",
+      "choices": [
+        "A mutation while shared",
+        "Any assignment",
+        "Any read",
+        "Going out of scope"
+      ],
+      "correctIndex": 0,
+      "explanation": "The type checks whether its storage is uniquely referenced. If another value shares it and a mutation arrives, it copies first; if the reference is unique, it mutates in place. That is why assignment alone is cheap.",
+      "whyOthersWrong": [
+        "",
+        "Assignment only shares the existing buffer.",
+        "Reads never copy.",
+        "Scope exit releases a reference rather than duplicating one."
+      ],
+      "reference": {
+        "title": "Swift Standard Library — Array",
+        "url": "https://developer.apple.com/documentation/swift/array"
+      },
+      "tags": [
+        "copy-on-write",
+        "memory",
+        "buffer"
+      ]
+    },
+    {
+      "id": "memory-closure-escaping-001",
+      "category": "memory-arc",
+      "difficulty": 2,
+      "title": "What @escaping signals",
+      "question": "What does marking a closure parameter @escaping mean?",
+      "language": "none",
+      "choices": [
+        "It is async",
+        "It runs later always",
+        "It may outlive the call",
+        "It is weak"
+      ],
+      "correctIndex": 2,
+      "explanation": "@escaping says the closure may be stored and called after the function returns, so it must keep whatever it captured alive. That is why escaping closures are where retain cycles usually appear and where capture lists matter.",
+      "whyOthersWrong": [
+        "Async functions are a separate feature.",
+        "It may also be called immediately; escaping only permits outliving.",
+        "",
+        "Captures are strong unless a capture list says otherwise."
+      ],
+      "reference": {
+        "title": "Swift Book — Escaping Closures",
+        "url": "https://docs.swift.org/swift-book/documentation/the-swift-programming-language/closures"
+      },
+      "tags": [
+        "escaping",
+        "closure",
+        "arc"
+      ]
+    },
+    {
+      "id": "memory-leak-vs-cycle-001",
+      "category": "memory-arc",
+      "difficulty": 2,
+      "title": "Leaks without cycles",
+      "question": "Can memory grow without any retain cycle?",
+      "language": "none",
+      "choices": [
+        "Only with closures",
+        "No, cycles only",
+        "Yes, by accumulating",
+        "Only in classes"
+      ],
+      "correctIndex": 2,
+      "explanation": "An ever-growing cache or an array you never trim keeps everything reachable and alive on purpose. ARC is behaving correctly; the design is what holds the memory. Cycles are one cause of growth, not the only one.",
+      "whyOthersWrong": [
+        "A plain array is enough.",
+        "Unbounded but reachable storage grows just as effectively.",
+        "",
+        "A growing collection of values also consumes memory."
+      ],
+      "reference": {
+        "title": "Swift Book — Automatic Reference Counting",
+        "url": "https://docs.swift.org/swift-book/documentation/the-swift-programming-language/automaticreferencecounting"
+      },
+      "tags": [
+        "memory",
+        "leak",
+        "cache"
+      ]
+    },
+    {
+      "id": "memory-unowned-vs-weak-001",
+      "category": "memory-arc",
+      "difficulty": 1,
+      "title": "Choosing weak or unowned",
+      "question": "When is unowned preferable to weak?",
+      "language": "none",
+      "choices": [
+        "When it is optional",
+        "When it cannot outlive",
+        "When it is faster",
+        "Never"
+      ],
+      "correctIndex": 1,
+      "explanation": "Use unowned when the referenced object is guaranteed to live at least as long as the reference, which avoids the optional and the unwrapping. If that guarantee is not airtight, weak is the safe choice because it degrades to nil instead of trapping.",
+      "whyOthersWrong": [
+        "weak is the optional one.",
+        "",
+        "It is marginally cheaper, but that is not the deciding factor.",
+        "It has a legitimate place when lifetimes are genuinely nested."
+      ],
+      "reference": {
+        "title": "Swift Book — Unowned References",
+        "url": "https://docs.swift.org/swift-book/documentation/the-swift-programming-language/automaticreferencecounting"
+      },
+      "tags": [
+        "weak",
+        "unowned",
+        "lifetime"
+      ]
+    },
+    {
+      "id": "memory-class-copy-001",
+      "category": "memory-arc",
+      "difficulty": 1,
+      "title": "Assigning a class instance",
+      "question": "What does this print?",
+      "codeSnippet": "class C { var x = 0 }\nlet a = C()\nlet b = a\nb.x = 5\nprint(a.x)",
+      "language": "swift",
+      "choices": [
+        "0",
+        "nil",
+        "5",
+        "Compile error"
+      ],
+      "correctIndex": 2,
+      "explanation": "Classes have reference semantics, so a and b name the same instance and a change through one is visible through the other. Note that mutating a property is allowed even though both are let, because the reference itself never changes.",
+      "whyOthersWrong": [
+        "That would be the answer for a struct.",
+        "x has a default value and is not optional.",
+        "",
+        "Mutating a var property through a let reference is legal."
+      ],
+      "reference": {
+        "title": "Swift Book — Structures and Classes",
+        "url": "https://docs.swift.org/swift-book/documentation/the-swift-programming-language/classesandstructures"
+      },
+      "tags": [
+        "class",
+        "reference-type",
+        "mutation"
+      ]
+    },
+    {
+      "id": "memory-timer-cycle-001",
+      "category": "memory-arc",
+      "difficulty": 2,
+      "title": "A repeating timer that never dies",
+      "question": "Why can a repeating Timer keep its owner alive?",
+      "language": "none",
+      "choices": [
+        "It copies self",
+        "Timers are static",
+        "The run loop retains it",
+        "It never fires"
+      ],
+      "correctIndex": 2,
+      "explanation": "The run loop holds the timer and the timer holds its target or closure, so a strong capture of self keeps the owner alive indefinitely. Invalidate the timer when you are done, and capture self weakly.",
+      "whyOthersWrong": [
+        "A closure captures a reference, not a copy of the object.",
+        "Timer instances are ordinary objects.",
+        "",
+        "It fires exactly as scheduled; that is the problem."
+      ],
+      "reference": {
+        "title": "Foundation — Timer",
+        "url": "https://developer.apple.com/documentation/foundation/timer"
+      },
+      "tags": [
+        "timer",
+        "retain-cycle",
+        "runloop"
+      ]
+    },
+    {
+      "id": "foundation-date-nature-001",
+      "category": "foundation",
+      "difficulty": 1,
+      "title": "What a Date holds",
+      "question": "What does a Foundation Date actually represent?",
+      "language": "none",
+      "choices": [
+        "A point in time",
+        "A calendar day",
+        "A local time",
+        "A formatted string"
+      ],
+      "correctIndex": 0,
+      "explanation": "A Date is an instant on a universal timeline, stored as an offset from a reference date. It carries no time zone and no calendar; turning it into a day or an hour requires a Calendar, and displaying it requires a formatter.",
+      "whyOthersWrong": [
+        "",
+        "Days come from applying a calendar to the instant.",
+        "There is no zone attached to the value.",
+        "Formatting is a separate step."
+      ],
+      "reference": {
+        "title": "Foundation — Date",
+        "url": "https://developer.apple.com/documentation/foundation/date"
+      },
+      "tags": [
+        "date",
+        "time",
+        "foundation"
+      ]
+    },
+    {
+      "id": "foundation-calendar-day-001",
+      "category": "foundation",
+      "difficulty": 2,
+      "title": "Comparing two days",
+      "question": "What is the right way to check whether two Dates fall on the same day?",
+      "language": "none",
+      "choices": [
+        "Compare timestamps",
+        "Calendar isDate same day",
+        "Compare descriptions",
+        "Divide by 86400"
+      ],
+      "correctIndex": 1,
+      "explanation": "Calendar.isDate(_:inSameDayAs:) applies the user's calendar and time zone, which is the only thing that defines a day. Arithmetic on seconds breaks across daylight saving changes, where a day is 23 or 25 hours long.",
+      "whyOthersWrong": [
+        "Two instants on the same day differ in timestamp.",
+        "",
+        "Description strings depend on formatting and locale.",
+        "Not every day has 86400 seconds."
+      ],
+      "reference": {
+        "title": "Foundation — Calendar",
+        "url": "https://developer.apple.com/documentation/foundation/calendar"
+      },
+      "tags": [
+        "calendar",
+        "date",
+        "dst"
+      ]
+    },
+    {
+      "id": "foundation-dst-day-length-001",
+      "category": "foundation",
+      "difficulty": 3,
+      "title": "How long is a day?",
+      "question": "Can adding 86400 seconds to a Date land on the same wall-clock hour?",
+      "language": "none",
+      "choices": [
+        "Only in UTC leap years",
+        "Always",
+        "Not always",
+        "Never"
+      ],
+      "correctIndex": 2,
+      "explanation": "On a daylight saving transition the local day is 23 or 25 hours, so adding a fixed 86400 seconds shifts the wall clock by an hour. Adding one day through Calendar.date(byAdding:) respects the transition and keeps the hour.",
+      "whyOthersWrong": [
+        "Leap years add a day; they do not change a day's length.",
+        "It holds only where no transition occurs.",
+        "",
+        "In a zone without daylight saving it works fine."
+      ],
+      "reference": {
+        "title": "Foundation — Calendar.date(byAdding:)",
+        "url": "https://developer.apple.com/documentation/foundation/calendar"
+      },
+      "tags": [
+        "dst",
+        "calendar",
+        "date-math"
+      ]
+    },
+    {
+      "id": "foundation-codable-keys-001",
+      "category": "foundation",
+      "difficulty": 1,
+      "title": "Renaming a JSON key",
+      "question": "How do you map a JSON key to a differently named property?",
+      "language": "none",
+      "choices": [
+        "An extension",
+        "A computed property",
+        "A typealias",
+        "CodingKeys"
+      ],
+      "correctIndex": 3,
+      "explanation": "A CodingKeys enum with a raw value for the property gives the encoder and decoder the on-the-wire name. Alternatively a key decoding strategy can convert whole conventions, such as snake_case to camelCase, in one place.",
+      "whyOthersWrong": [
+        "An extension cannot change the synthesised keys by itself.",
+        "Computed properties are not encoded at all.",
+        "A typealias only renames a type.",
+        ""
+      ],
+      "reference": {
+        "title": "Swift — CodingKey",
+        "url": "https://developer.apple.com/documentation/swift/codingkey"
+      },
+      "tags": [
+        "codable",
+        "json",
+        "codingkeys"
+      ]
+    },
+    {
+      "id": "foundation-decode-missing-key-001",
+      "category": "foundation",
+      "difficulty": 2,
+      "title": "A key that might be absent",
+      "question": "What happens when decoding a non-optional property whose key is missing?",
+      "language": "none",
+      "choices": [
+        "It is skipped",
+        "It is nil",
+        "It uses a default",
+        "It throws"
+      ],
+      "correctIndex": 3,
+      "explanation": "The decoder throws a keyNotFound error, because a non-optional property has no valid value to fall back on. Making the property optional, or writing a custom initialiser that uses decodeIfPresent, handles the absence explicitly.",
+      "whyOthersWrong": [
+        "Nothing is silently ignored.",
+        "A non-optional property cannot hold nil.",
+        "Swift property defaults are not consulted by the synthesised decoder.",
+        ""
+      ],
+      "reference": {
+        "title": "Swift — DecodingError",
+        "url": "https://developer.apple.com/documentation/swift/decodingerror"
+      },
+      "tags": [
+        "codable",
+        "decoding",
+        "error"
+      ]
+    },
+    {
+      "id": "foundation-json-key-order-001",
+      "category": "foundation",
+      "difficulty": 2,
+      "title": "Key order in encoded JSON",
+      "question": "Is the key order of JSONEncoder output guaranteed?",
+      "language": "none",
+      "choices": [
+        "No, unless sorted",
+        "Yes, declaration order",
+        "Yes, alphabetical",
+        "Yes, random"
+      ],
+      "correctIndex": 0,
+      "explanation": "Key order is unspecified unless you set the sortedKeys output formatting option. That option is what makes encoded output reproducible, which matters when you compare files or write snapshot tests.",
+      "whyOthersWrong": [
+        "",
+        "Property order is not a promise of the encoder.",
+        "Alphabetical order only happens with sortedKeys.",
+        "It is not deliberately randomised either."
+      ],
+      "reference": {
+        "title": "Foundation — JSONEncoder.OutputFormatting",
+        "url": "https://developer.apple.com/documentation/foundation/jsonencoder/outputformatting"
+      },
+      "tags": [
+        "json",
+        "encoding",
+        "determinism"
+      ]
+    },
+    {
+      "id": "foundation-string-utf8-count-001",
+      "category": "foundation",
+      "difficulty": 2,
+      "title": "Three ways to count a string",
+      "question": "For the emoji flag string, which count is usually the largest?",
+      "language": "none",
+      "choices": [
+        "count",
+        "utf8.count",
+        "unicodeScalars.count",
+        "They are equal"
+      ],
+      "correctIndex": 1,
+      "explanation": "A flag is one Character built from two regional indicator scalars, each of which needs four UTF-8 bytes. So count is 1, unicodeScalars.count is 2, and utf8.count is 8. Pick the view that matches what you are measuring.",
+      "whyOthersWrong": [
+        "count measures user-perceived characters and is the smallest here.",
+        "",
+        "Scalars sit between characters and bytes.",
+        "They differ for anything outside plain ASCII."
+      ],
+      "reference": {
+        "title": "Swift Book — Strings and Characters",
+        "url": "https://docs.swift.org/swift-book/documentation/the-swift-programming-language/stringsandcharacters"
+      },
+      "tags": [
+        "string",
+        "unicode",
+        "utf8"
+      ]
+    },
+    {
+      "id": "foundation-locale-uppercase-001",
+      "category": "foundation",
+      "difficulty": 3,
+      "title": "Uppercasing in Turkish",
+      "question": "Why can uppercasing a string differ between locales?",
+      "language": "none",
+      "choices": [
+        "Font differences",
+        "Different encodings",
+        "Locale-specific casing",
+        "It cannot"
+      ],
+      "correctIndex": 2,
+      "explanation": "Turkish maps lowercase i to a dotted uppercase I, unlike English. That is why comparing identifiers with a locale-aware uppercase can produce surprises, and why case-insensitive matching of machine strings should be locale independent.",
+      "whyOthersWrong": [
+        "Rendering does not change the underlying characters.",
+        "The encoding is the same; the mapping rules differ.",
+        "",
+        "It is a well known real difference."
+      ],
+      "reference": {
+        "title": "Foundation — Locale",
+        "url": "https://developer.apple.com/documentation/foundation/locale"
+      },
+      "tags": [
+        "locale",
+        "string",
+        "internationalisation"
+      ]
+    },
+    {
+      "id": "foundation-url-path-append-001",
+      "category": "foundation",
+      "difficulty": 1,
+      "title": "Building a file URL",
+      "question": "Which is the right way to add a file name to a directory URL?",
+      "language": "none",
+      "choices": [
+        "absoluteString",
+        "String concatenation",
+        "appendingPathExtension",
+        "appendingPathComponent"
+      ],
+      "correctIndex": 3,
+      "explanation": "appendingPathComponent handles separators and escaping for you. Gluing strings together produces doubled or missing slashes and breaks on characters that need percent encoding.",
+      "whyOthersWrong": [
+        "absoluteString reads a URL rather than extending one.",
+        "Manual string building is where path bugs come from.",
+        "That adds a file extension, not a component.",
+        ""
+      ],
+      "reference": {
+        "title": "Foundation — URL",
+        "url": "https://developer.apple.com/documentation/foundation/url"
+      },
+      "tags": [
+        "url",
+        "filesystem",
+        "path"
+      ]
+    },
+    {
+      "id": "foundation-measurement-formatting-001",
+      "category": "foundation",
+      "difficulty": 1,
+      "title": "Showing a number to a user",
+      "question": "Why format numbers with a formatter instead of string interpolation?",
+      "language": "none",
+      "choices": [
+        "It rounds better",
+        "It is faster",
+        "It avoids optionals",
+        "It respects the locale"
+      ],
+      "correctIndex": 3,
+      "explanation": "Decimal separators, grouping and currency placement differ by locale. A formatter applies the user's conventions, whereas interpolation always produces the programmer's. Machine-readable output is the opposite case and should stay locale independent.",
+      "whyOthersWrong": [
+        "Rounding is configurable in both, and not the main reason.",
+        "Formatters do more work, not less.",
+        "Optionality is unrelated.",
+        ""
+      ],
+      "reference": {
+        "title": "Foundation — FormatStyle",
+        "url": "https://developer.apple.com/documentation/foundation/formatstyle"
+      },
+      "tags": [
+        "formatting",
+        "locale",
+        "numbers"
+      ]
+    },
+    {
+      "id": "foundation-notification-center-001",
+      "category": "foundation",
+      "difficulty": 2,
+      "title": "What NotificationCenter is",
+      "question": "What does NotificationCenter provide?",
+      "language": "none",
+      "choices": [
+        "Push delivery",
+        "User alerts",
+        "Cross-process events",
+        "In-process broadcast"
+      ],
+      "correctIndex": 3,
+      "explanation": "It is a broadcast mechanism inside one process: observers register for a name and get called when something posts it. It has nothing to do with the alerts users see, which come from the UserNotifications framework.",
+      "whyOthersWrong": [
+        "Push delivery involves APNs.",
+        "Visible alerts are UserNotifications, a different framework with a similar name.",
+        "It does not cross process boundaries.",
+        ""
+      ],
+      "reference": {
+        "title": "Foundation — NotificationCenter",
+        "url": "https://developer.apple.com/documentation/foundation/notificationcenter"
+      },
+      "tags": [
+        "notificationcenter",
+        "observer",
+        "foundation"
+      ]
+    },
+    {
+      "id": "foundation-uuid-uniqueness-001",
+      "category": "foundation",
+      "difficulty": 1,
+      "title": "What a UUID gives you",
+      "question": "What does UUID() guarantee?",
+      "language": "none",
+      "choices": [
+        "Sortability",
+        "Practical uniqueness",
+        "Shortness",
+        "Readability"
+      ],
+      "correctIndex": 1,
+      "explanation": "A random version 4 UUID has enough entropy that collisions are not a practical concern, without needing a central authority. It is not ordered, so it makes a poor sort key when you need chronological order.",
+      "whyOthersWrong": [
+        "Random UUIDs carry no time ordering.",
+        "",
+        "At 36 characters they are quite long.",
+        "They are not meant for people to read."
+      ],
+      "reference": {
+        "title": "Foundation — UUID",
+        "url": "https://developer.apple.com/documentation/foundation/uuid"
+      },
+      "tags": [
+        "uuid",
+        "identifier",
+        "foundation"
+      ]
+    },
+    {
+      "id": "foundation-filemanager-exists-001",
+      "category": "foundation",
+      "difficulty": 3,
+      "title": "Checking before reading",
+      "question": "Why is checking fileExists before opening a file unreliable?",
+      "language": "none",
+      "choices": [
+        "It needs permission",
+        "It is slow",
+        "It can change between",
+        "It caches"
+      ],
+      "correctIndex": 2,
+      "explanation": "The file can be deleted or created in the gap between the check and the use, a classic time-of-check to time-of-use race. Attempting the operation and handling the error is both simpler and correct.",
+      "whyOthersWrong": [
+        "Permission applies to the read either way.",
+        "The speed is not the problem.",
+        "",
+        "No caching is involved."
+      ],
+      "reference": {
+        "title": "Foundation — FileManager",
+        "url": "https://developer.apple.com/documentation/foundation/filemanager"
+      },
+      "tags": [
+        "filemanager",
+        "race",
+        "filesystem"
+      ]
+    },
+    {
+      "id": "foundation-data-vs-string-001",
+      "category": "foundation",
+      "difficulty": 1,
+      "title": "Data versus String",
+      "question": "What is the difference between Data and String?",
+      "language": "none",
+      "choices": [
+        "Size only",
+        "Bytes versus text",
+        "Mutability",
+        "Nothing"
+      ],
+      "correctIndex": 1,
+      "explanation": "Data is a buffer of raw bytes with no meaning attached; String is text with a defined encoding. Converting from Data to String can fail when the bytes are not valid in that encoding, which is why that initialiser is failable.",
+      "whyOthersWrong": [
+        "Both can hold anything from a few bytes to very large contents.",
+        "",
+        "Both have mutable and immutable forms through var and let.",
+        "They are genuinely different abstractions."
+      ],
+      "reference": {
+        "title": "Foundation — Data",
+        "url": "https://developer.apple.com/documentation/foundation/data"
+      },
+      "tags": [
+        "data",
+        "string",
+        "encoding"
+      ]
+    },
+    {
+      "id": "foundation-optional-map-001",
+      "category": "foundation",
+      "difficulty": 1,
+      "title": "Transforming a value that may be missing",
+      "question": "What does map on an Optional do when the value is nil?",
+      "language": "none",
+      "choices": [
+        "Returns nil",
+        "Crashes",
+        "Returns a default",
+        "Calls the closure"
+      ],
+      "correctIndex": 0,
+      "explanation": "Optional.map applies the transform only when there is a value, and passes nil straight through untouched. It saves an explicit if let when all you want is to convert whatever happens to be there.",
+      "whyOthersWrong": [
+        "",
+        "Nothing is force unwrapped, so there is nothing to trap on.",
+        "Defaults come from the nil-coalescing operator instead.",
+        "The closure is skipped entirely when there is no value."
+      ],
+      "reference": {
+        "title": "Swift Standard Library — Optional.map",
+        "url": "https://developer.apple.com/documentation/swift/optional/map(_:)"
+      },
+      "tags": [
+        "optional",
+        "map",
+        "functional"
       ]
     }
   ]
