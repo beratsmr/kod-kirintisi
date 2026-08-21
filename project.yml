@@ -1,0 +1,134 @@
+# XcodeGen proje tanımı.
+# .xcodeproj bu dosyadan üretilir ve git'e commit EDİLMEZ.
+#   xcodegen generate
+#
+# Yeni bir kaynak dosya eklerken: dosyayı doğru klasöre koy, hepsi bu.
+# sources yol bazlı çalışır, dosyaları tek tek listelemek gerekmez.
+
+name: KodKirintisi
+
+options:
+  bundleIdPrefix: com.beratsumer
+  deploymentTarget:
+    iOS: "18.0"
+  createIntermediateGroups: true
+  groupSortPosition: top
+  generateEmptyDirectories: true
+  findCarthageFrameworks: false
+
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    SWIFT_STRICT_CONCURRENCY: complete
+    SWIFT_UPCOMING_FEATURE_EXISTENTIAL_ANY: YES
+    CODE_SIGN_STYLE: Automatic
+    DEVELOPMENT_TEAM: "" # Xcode'da Signing & Capabilities'ten seç
+    MARKETING_VERSION: "1.0.0"
+    CURRENT_PROJECT_VERSION: "1"
+    ENABLE_USER_SCRIPT_SANDBOXING: YES
+    GCC_TREAT_WARNINGS_AS_ERRORS: YES
+    SWIFT_TREAT_WARNINGS_AS_ERRORS: NO # CI'da YES'e çekilebilir
+    TARGETED_DEVICE_FAMILY: "1" # sadece iPhone
+
+packages:
+  KodKirintisiCore:
+    path: Core
+
+targets:
+  # ─────────────────────────────────────────────────────────
+  KodKirintisi:
+    type: application
+    platform: iOS
+    sources:
+      - path: App/Sources
+      - path: App/Resources
+      - path: Shared
+    dependencies:
+      - package: KodKirintisiCore
+        product: KodKirintisiCore
+      - target: KodKirintisiWidget
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.beratsumer.kodkirintisi
+        PRODUCT_NAME: Kod Kırıntısı
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+    info:
+      path: App/Info.plist
+      properties:
+        CFBundleDisplayName: Kod Kırıntısı
+        CFBundleDevelopmentRegion: en
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        UILaunchScreen: {}
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+        UIUserInterfaceStyle: Automatic
+        CFBundleLocalizations:
+          - en
+          - tr
+        NSSupportsLiveActivities: false
+        ITSAppUsesNonExemptEncryption: false
+    entitlements:
+      path: App/KodKirintisi.entitlements
+      properties:
+        com.apple.security.application-groups:
+          - group.com.beratsumer.kodkirintisi
+
+  # ─────────────────────────────────────────────────────────
+  KodKirintisiWidget:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: Widget/Sources
+      - path: Shared
+    dependencies:
+      - package: KodKirintisiCore
+        product: KodKirintisiCore
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.beratsumer.kodkirintisi.widget
+        PRODUCT_NAME: KodKirintisiWidget
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+    info:
+      path: Widget/Info.plist
+      properties:
+        CFBundleDisplayName: Kod Kırıntısı
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension
+    entitlements:
+      path: Widget/KodKirintisiWidget.entitlements
+      properties:
+        com.apple.security.application-groups:
+          - group.com.beratsumer.kodkirintisi
+
+  # ─────────────────────────────────────────────────────────
+  KodKirintisiTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: App/Tests
+    dependencies:
+      - target: KodKirintisi
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.beratsumer.kodkirintisi.tests
+        GENERATE_INFOPLIST_FILE: YES
+
+schemes:
+  KodKirintisi:
+    build:
+      targets:
+        KodKirintisi: all
+        KodKirintisiWidget: all
+    run:
+      config: Debug
+    test:
+      config: Debug
+      gatherCoverageData: true
+      targets:
+        - KodKirintisiTests
+    archive:
+      config: Release

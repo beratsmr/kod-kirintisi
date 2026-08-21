@@ -1,0 +1,105 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kodkirintisi.app/schemas/puzzles.schema.json",
+  "title": "Kod Kırıntısı puzzle bank",
+  "type": "object",
+  "required": ["version", "puzzles"],
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Bump when puzzles are appended. Used to invalidate the Spotlight index."
+    },
+    "puzzles": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/puzzle" }
+    }
+  },
+  "$defs": {
+    "puzzle": {
+      "type": "object",
+      "required": [
+        "id",
+        "category",
+        "difficulty",
+        "title",
+        "question",
+        "choices",
+        "correctIndex",
+        "explanation",
+        "whyOthersWrong",
+        "tags"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*-[0-9]{3}$",
+          "description": "Permanent slug. NEVER change or reuse. Example: swift-value-semantics-001"
+        },
+        "category": {
+          "enum": [
+            "swift-language",
+            "concurrency",
+            "memory-arc",
+            "swiftui",
+            "foundation",
+            "algorithms",
+            "ios-platform"
+          ]
+        },
+        "difficulty": { "type": "integer", "minimum": 1, "maximum": 3 },
+        "title": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 60,
+          "description": "Shown in the small widget and in Spotlight."
+        },
+        "question": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 120,
+          "description": "Must fit the medium widget."
+        },
+        "codeSnippet": {
+          "type": "string",
+          "maxLength": 240,
+          "description": "Optional. Max 6 lines, max 44 characters per line."
+        },
+        "language": { "enum": ["swift", "objc", "none"], "default": "swift" },
+        "choices": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 4,
+          "items": { "type": "string", "minLength": 1, "maxLength": 24 }
+        },
+        "correctIndex": { "type": "integer", "minimum": 0, "maximum": 3 },
+        "explanation": { "type": "string", "minLength": 20, "maxLength": 600 },
+        "whyOthersWrong": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 4,
+          "items": { "type": "string" },
+          "description": "Same length as choices. The entry at correctIndex must be an empty string."
+        },
+        "reference": {
+          "type": "object",
+          "required": ["title", "url"],
+          "additionalProperties": false,
+          "properties": {
+            "title": { "type": "string" },
+            "url": { "type": "string", "format": "uri" }
+          }
+        },
+        "tags": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 5,
+          "items": { "type": "string", "pattern": "^[a-z0-9-]+$" }
+        }
+      }
+    }
+  }
+}
