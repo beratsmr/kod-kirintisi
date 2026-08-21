@@ -9,7 +9,12 @@
       "question": "What does this print?",
       "codeSnippet": "struct P { var x = 0 }\nvar a = P()\nvar b = a\nb.x = 5\nprint(a.x)",
       "language": "swift",
-      "choices": ["0", "5", "nil", "Compile error"],
+      "choices": [
+        "0",
+        "5",
+        "nil",
+        "Compile error"
+      ],
       "correctIndex": 0,
       "explanation": "Structs are value types. `var b = a` copies the value, so mutating `b` cannot affect `a`. Had `P` been a class, both names would point at the same instance and the answer would be 5.",
       "whyOthersWrong": [
@@ -22,7 +27,11 @@
         "title": "Swift Book — Structures and Classes",
         "url": "https://docs.swift.org/swift-book/documentation/the-swift-programming-language/classesandstructures"
       },
-      "tags": ["value-type", "struct", "copy"]
+      "tags": [
+        "value-type",
+        "struct",
+        "copy"
+      ]
     },
     {
       "id": "swift-protocol-dispatch-001",
@@ -32,7 +41,12 @@
       "question": "What does this print?",
       "codeSnippet": "protocol G {}\nextension G { func f() { print(\"A\") } }\nstruct S: G { func f() { print(\"B\") } }\nlet g: G = S()\ng.f()",
       "language": "swift",
-      "choices": ["A", "B", "AB", "Compile error"],
+      "choices": [
+        "A",
+        "B",
+        "AB",
+        "Compile error"
+      ],
       "correctIndex": 0,
       "explanation": "`f()` is not a requirement of protocol `G`, it only exists in the extension. Calls through the existential type `G` are statically dispatched to the extension's implementation, so `S.f()` never runs. Adding `func f()` to the protocol body would make it a requirement and print B.",
       "whyOthersWrong": [
@@ -45,7 +59,11 @@
         "title": "Swift Book — Protocol Extensions",
         "url": "https://docs.swift.org/swift-book/documentation/the-swift-programming-language/protocols"
       },
-      "tags": ["protocol", "dispatch", "extension"]
+      "tags": [
+        "protocol",
+        "dispatch",
+        "extension"
+      ]
     },
     {
       "id": "swift-defer-return-001",
@@ -55,7 +73,12 @@
       "question": "What does this print?",
       "codeSnippet": "func f() -> Int {\n  var x = 1\n  defer { x += 1 }\n  return x\n}\nprint(f())",
       "language": "swift",
-      "choices": ["1", "2", "3", "Compile error"],
+      "choices": [
+        "1",
+        "2",
+        "3",
+        "Compile error"
+      ],
       "correctIndex": 0,
       "explanation": "The return value is copied before the `defer` block runs. `defer` executes as the scope exits, mutating the local `x` after its value has already been handed back. With an `inout` parameter or a reference type the mutation would be observable.",
       "whyOthersWrong": [
@@ -68,7 +91,11 @@
         "title": "Swift Book — Deferred Actions",
         "url": "https://docs.swift.org/swift-book/documentation/the-swift-programming-language/controlflow"
       },
-      "tags": ["defer", "control-flow", "return"]
+      "tags": [
+        "defer",
+        "control-flow",
+        "return"
+      ]
     },
     {
       "id": "swift-mutating-let-001",
@@ -78,7 +105,12 @@
       "question": "What happens here?",
       "codeSnippet": "struct S {\n  var x = 0\n  mutating func bump() { x += 1 }\n}\nlet s = S()\ns.bump()",
       "language": "swift",
-      "choices": ["Prints 1", "Prints 0", "Compile error", "Runtime crash"],
+      "choices": [
+        "Prints 1",
+        "Prints 0",
+        "Compile error",
+        "Runtime crash"
+      ],
       "correctIndex": 2,
       "explanation": "A `mutating` method may only be called on a mutable value. `s` is a `let`, so the compiler rejects the call before the program ever runs. Changing `let` to `var` fixes it.",
       "whyOthersWrong": [
@@ -91,7 +123,11 @@
         "title": "Swift Book — Mutating Methods",
         "url": "https://docs.swift.org/swift-book/documentation/the-swift-programming-language/methods"
       },
-      "tags": ["mutating", "struct", "let"]
+      "tags": [
+        "mutating",
+        "struct",
+        "let"
+      ]
     },
     {
       "id": "swift-optional-chain-type-001",
@@ -101,7 +137,12 @@
       "question": "What is the type of `r`?",
       "codeSnippet": "struct A { var b: Int = 1 }\nlet a: A? = A()\nlet r = a?.b",
       "language": "swift",
-      "choices": ["Int", "Int?", "A?", "Any"],
+      "choices": [
+        "Int",
+        "Int?",
+        "A?",
+        "Any"
+      ],
       "correctIndex": 1,
       "explanation": "Optional chaining always wraps the result in an optional, because the whole expression evaluates to nil when the base is nil. Even though `b` is a non-optional `Int`, `a?.b` is `Int?`.",
       "whyOthersWrong": [
@@ -114,7 +155,11 @@
         "title": "Swift Book — Optional Chaining",
         "url": "https://docs.swift.org/swift-book/documentation/the-swift-programming-language/optionalchaining"
       },
-      "tags": ["optional", "chaining", "type-inference"]
+      "tags": [
+        "optional",
+        "chaining",
+        "type-inference"
+      ]
     },
     {
       "id": "memory-closure-cycle-001",
@@ -123,7 +168,12 @@
       "title": "Breaking a closure retain cycle",
       "question": "Which one breaks a strong reference cycle between an object and its stored closure?",
       "language": "none",
-      "choices": ["[weak self]", "@escaping", "lazy var", "final class"],
+      "choices": [
+        "[weak self]",
+        "@escaping",
+        "lazy var",
+        "final class"
+      ],
       "correctIndex": 0,
       "explanation": "A capture list such as `[weak self]` (or `[unowned self]`) stops the closure from holding a strong reference back to the object, so ARC can deallocate it. The other keywords change escaping semantics, initialization timing or inheritance, none of which affect ownership.",
       "whyOthersWrong": [
@@ -136,7 +186,12 @@
         "title": "Swift Book — Automatic Reference Counting",
         "url": "https://docs.swift.org/swift-book/documentation/the-swift-programming-language/automaticreferencecounting"
       },
-      "tags": ["arc", "closure", "weak", "retain-cycle"]
+      "tags": [
+        "arc",
+        "closure",
+        "weak",
+        "retain-cycle"
+      ]
     },
     {
       "id": "memory-lazy-init-001",
@@ -146,7 +201,12 @@
       "question": "What is printed first?",
       "codeSnippet": "class C {\n  lazy var v: Int = {\n    print(\"init\"); return 1\n  }()\n}\nlet c = C(); print(\"made\"); print(c.v)",
       "language": "swift",
-      "choices": ["made", "init", "1", "Nothing"],
+      "choices": [
+        "made",
+        "init",
+        "1",
+        "Nothing"
+      ],
       "correctIndex": 0,
       "explanation": "A `lazy var` initializer does not run until the property is first read. Creating `C()` prints nothing, so \"made\" comes first, then \"init\" when `c.v` is accessed, then \"1\".",
       "whyOthersWrong": [
@@ -159,7 +219,11 @@
         "title": "Swift Book — Lazy Stored Properties",
         "url": "https://docs.swift.org/swift-book/documentation/the-swift-programming-language/properties"
       },
-      "tags": ["lazy", "initialization", "properties"]
+      "tags": [
+        "lazy",
+        "initialization",
+        "properties"
+      ]
     },
     {
       "id": "concurrency-actor-reentrancy-001",
@@ -186,7 +250,11 @@
         "title": "Swift Book — Actors",
         "url": "https://docs.swift.org/swift-book/documentation/the-swift-programming-language/concurrency"
       },
-      "tags": ["actor", "reentrancy", "await"]
+      "tags": [
+        "actor",
+        "reentrancy",
+        "await"
+      ]
     },
     {
       "id": "foundation-grapheme-count-001",
@@ -196,7 +264,12 @@
       "question": "What does this print?",
       "codeSnippet": "let s = \"e\\u{301}\"\nprint(s.count)",
       "language": "swift",
-      "choices": ["1", "2", "3", "0"],
+      "choices": [
+        "1",
+        "2",
+        "3",
+        "0"
+      ],
       "correctIndex": 0,
       "explanation": "Swift's `Character` is an extended grapheme cluster. \"e\" followed by U+0301 (combining acute accent) renders as a single user-perceived character \"é\", so `count` is 1. `s.unicodeScalars.count` would be 2 and `s.utf8.count` would be 3.",
       "whyOthersWrong": [
@@ -209,7 +282,11 @@
         "title": "Swift Book — Strings and Characters",
         "url": "https://docs.swift.org/swift-book/documentation/the-swift-programming-language/stringsandcharacters"
       },
-      "tags": ["string", "unicode", "grapheme"]
+      "tags": [
+        "string",
+        "unicode",
+        "grapheme"
+      ]
     },
     {
       "id": "foundation-dictionary-order-001",
@@ -218,7 +295,12 @@
       "title": "Iterating a Dictionary",
       "question": "What is the iteration order of a Swift Dictionary?",
       "language": "none",
-      "choices": ["Insertion order", "Sorted by key", "Not guaranteed", "Sorted by value"],
+      "choices": [
+        "Insertion order",
+        "Sorted by key",
+        "Not guaranteed",
+        "Sorted by value"
+      ],
       "correctIndex": 2,
       "explanation": "Dictionary is an unordered collection; its iteration order is an implementation detail and can even differ between runs because of hash seeding. Sort explicitly (`dict.sorted { $0.key < $1.key }`) whenever order matters — especially before rendering a list.",
       "whyOthersWrong": [
@@ -231,7 +313,1251 @@
         "title": "Swift Standard Library — Dictionary",
         "url": "https://developer.apple.com/documentation/swift/dictionary"
       },
-      "tags": ["dictionary", "ordering", "collections"]
+      "tags": [
+        "dictionary",
+        "ordering",
+        "collections"
+      ]
+    },
+    {
+      "id": "algorithms-binary-search-001",
+      "category": "algorithms",
+      "difficulty": 1,
+      "title": "Cost of binary search",
+      "question": "What is the time complexity of binary search on a sorted array?",
+      "language": "none",
+      "choices": [
+        "O(1)",
+        "O(log n)",
+        "O(n)",
+        "O(n log n)"
+      ],
+      "correctIndex": 1,
+      "explanation": "Each comparison discards half of the remaining range, so the number of steps is the number of times n can be halved: log2(n). The array must already be sorted; sorting it first would cost O(n log n) and dominate.",
+      "whyOthersWrong": [
+        "Constant time would mean the answer is found without depending on the size at all.",
+        "",
+        "Scanning every element is linear search, which is what binary search improves on.",
+        "That is the cost of sorting the array, not of searching it."
+      ],
+      "reference": {
+        "title": "Swift Algorithms — Binary Search",
+        "url": "https://developer.apple.com/documentation/swift/array"
+      },
+      "tags": [
+        "complexity",
+        "search",
+        "binary-search"
+      ]
+    },
+    {
+      "id": "algorithms-array-append-001",
+      "category": "algorithms",
+      "difficulty": 2,
+      "title": "Appending to an Array",
+      "question": "What is the amortised cost of appending one element to a Swift Array?",
+      "language": "none",
+      "choices": [
+        "O(1)",
+        "O(log n)",
+        "O(n)",
+        "O(n log n)"
+      ],
+      "correctIndex": 0,
+      "explanation": "Array over-allocates capacity and doubles it when full. Most appends write into spare capacity in constant time; the occasional reallocation copies n elements, but spread over all the appends that cost averages out to O(1) per append.",
+      "whyOthersWrong": [
+        "",
+        "Nothing is being halved or searched here.",
+        "A single reallocation is O(n), but that is the worst case, not the amortised one.",
+        "That is a sorting cost, unrelated to appending."
+      ],
+      "reference": {
+        "title": "Swift Standard Library — Array",
+        "url": "https://developer.apple.com/documentation/swift/array"
+      },
+      "tags": [
+        "complexity",
+        "array",
+        "amortised"
+      ]
+    },
+    {
+      "id": "algorithms-dictionary-lookup-001",
+      "category": "algorithms",
+      "difficulty": 1,
+      "title": "Dictionary lookup cost",
+      "question": "What is the average time complexity of looking a key up in a Dictionary?",
+      "language": "none",
+      "choices": [
+        "O(1)",
+        "O(log n)",
+        "O(n)",
+        "Depends on order"
+      ],
+      "correctIndex": 0,
+      "explanation": "A dictionary hashes the key to find its bucket directly, so an average lookup does not depend on how many entries exist. With pathological hash collisions it degrades towards O(n), which is why a good Hashable implementation matters.",
+      "whyOthersWrong": [
+        "",
+        "That is the cost of searching a balanced tree, not a hash table.",
+        "Only in the degenerate case where every key collides into one bucket.",
+        "Dictionaries are unordered; insertion order does not affect lookup cost."
+      ],
+      "reference": {
+        "title": "Swift Standard Library — Dictionary",
+        "url": "https://developer.apple.com/documentation/swift/dictionary"
+      },
+      "tags": [
+        "complexity",
+        "dictionary",
+        "hashing"
+      ]
+    },
+    {
+      "id": "algorithms-insert-at-front-001",
+      "category": "algorithms",
+      "difficulty": 2,
+      "title": "Inserting at the front",
+      "question": "What does inserting an element at index 0 of an Array cost?",
+      "language": "none",
+      "choices": [
+        "O(1)",
+        "O(log n)",
+        "O(n)",
+        "O(n squared)"
+      ],
+      "correctIndex": 2,
+      "explanation": "Array stores its elements contiguously, so making room at the front means shifting every existing element one slot to the right. When you need cheap insertion at both ends, reach for a deque instead of an array.",
+      "whyOthersWrong": [
+        "Only appending at the end is constant time.",
+        "No halving happens; every element moves.",
+        "",
+        "One insertion is linear; you would need n insertions to reach quadratic."
+      ],
+      "reference": {
+        "title": "Swift Standard Library — Array",
+        "url": "https://developer.apple.com/documentation/swift/array"
+      },
+      "tags": [
+        "complexity",
+        "array",
+        "insertion"
+      ]
+    },
+    {
+      "id": "algorithms-sort-cost-001",
+      "category": "algorithms",
+      "difficulty": 1,
+      "title": "Cost of sorting",
+      "question": "What is the worst-case complexity of Swift's sort() on an array?",
+      "language": "none",
+      "choices": [
+        "O(n)",
+        "O(n log n)",
+        "O(n squared)",
+        "O(log n)"
+      ],
+      "correctIndex": 1,
+      "explanation": "Swift uses an introsort-style hybrid whose worst case is O(n log n). That bound is why quicksort alone is not used: its worst case is quadratic, so the standard library falls back to heapsort when recursion runs too deep.",
+      "whyOthersWrong": [
+        "No comparison sort can beat n log n in the general case.",
+        "",
+        "That is naive quicksort's worst case, which the standard library avoids.",
+        "Sorting must at least look at every element."
+      ],
+      "reference": {
+        "title": "Swift Standard Library — sort()",
+        "url": "https://developer.apple.com/documentation/swift/array/sort()"
+      },
+      "tags": [
+        "complexity",
+        "sorting"
+      ]
+    },
+    {
+      "id": "algorithms-sort-stability-001",
+      "category": "algorithms",
+      "difficulty": 3,
+      "title": "Is sort() stable?",
+      "question": "Does Swift guarantee that sort() keeps equal elements in their original order?",
+      "language": "none",
+      "choices": [
+        "Yes, always",
+        "No guarantee",
+        "Only for value types",
+        "Only for small arrays"
+      ],
+      "correctIndex": 1,
+      "explanation": "Swift's sort is documented as not guaranteed stable, even though the current implementation happens to be. Relying on it is a bug waiting for a standard library update. When order among equals matters, sort by an explicit tie-breaking key.",
+      "whyOthersWrong": [
+        "Stability is explicitly not promised by the documentation.",
+        "",
+        "Value semantics have nothing to do with sort stability.",
+        "The size of the input does not change what is guaranteed."
+      ],
+      "reference": {
+        "title": "Swift Standard Library — sort()",
+        "url": "https://developer.apple.com/documentation/swift/array/sort()"
+      },
+      "tags": [
+        "sorting",
+        "stability",
+        "pitfall"
+      ]
+    },
+    {
+      "id": "algorithms-set-membership-001",
+      "category": "algorithms",
+      "difficulty": 1,
+      "title": "Array contains vs Set contains",
+      "question": "Why is Set.contains usually faster than Array.contains for large collections?",
+      "language": "none",
+      "choices": [
+        "It hashes the value",
+        "It is sorted",
+        "It caches results",
+        "It uses less memory"
+      ],
+      "correctIndex": 0,
+      "explanation": "A set hashes the value and jumps straight to the right bucket, giving an average O(1) test. An array has no such index, so it compares elements one by one until it finds a match, which is O(n).",
+      "whyOthersWrong": [
+        "",
+        "Sets are unordered; being sorted is not how they find elements.",
+        "No caching is involved; each lookup is computed afresh.",
+        "A hash table usually uses more memory, not less, in exchange for speed."
+      ],
+      "reference": {
+        "title": "Swift Standard Library — Set",
+        "url": "https://developer.apple.com/documentation/swift/set"
+      },
+      "tags": [
+        "complexity",
+        "set",
+        "hashing"
+      ]
+    },
+    {
+      "id": "algorithms-two-sum-001",
+      "category": "algorithms",
+      "difficulty": 2,
+      "title": "Finding a pair that sums to a target",
+      "question": "What is the best average complexity for finding two numbers that add to a target?",
+      "language": "none",
+      "choices": [
+        "O(n)",
+        "O(n log n)",
+        "O(n squared)",
+        "O(1)"
+      ],
+      "correctIndex": 0,
+      "explanation": "One pass storing each seen value in a dictionary lets you ask whether target minus the current value has already appeared. Each lookup is average O(1), so the whole scan is O(n), at the cost of O(n) extra memory.",
+      "whyOthersWrong": [
+        "",
+        "Sorting first and using two pointers works, but the sort dominates at n log n.",
+        "That is the brute force of comparing every pair.",
+        "Every element has to be examined at least once."
+      ],
+      "reference": {
+        "title": "Swift Standard Library — Dictionary",
+        "url": "https://developer.apple.com/documentation/swift/dictionary"
+      },
+      "tags": [
+        "complexity",
+        "dictionary",
+        "two-pointer"
+      ]
+    },
+    {
+      "id": "algorithms-memoization-001",
+      "category": "algorithms",
+      "difficulty": 2,
+      "title": "Why memoise Fibonacci?",
+      "question": "What does memoising a naive recursive Fibonacci change its complexity to?",
+      "language": "none",
+      "choices": [
+        "O(n) from O(2^n)",
+        "O(1) from O(n)",
+        "O(n log n) from O(n)",
+        "Nothing changes"
+      ],
+      "correctIndex": 0,
+      "explanation": "The naive recursion recomputes the same subproblems over and over, branching twice per call. Caching each result means every value from 0 to n is computed exactly once, turning exponential work into linear work plus O(n) memory.",
+      "whyOthersWrong": [
+        "",
+        "A single cached call is constant, but computing fib(n) still needs every smaller value.",
+        "Memoisation removes work; it never introduces a logarithmic factor.",
+        "The whole point is that the repeated subproblems disappear."
+      ],
+      "reference": {
+        "title": "Swift Book — Closures",
+        "url": "https://docs.swift.org/swift-book/documentation/the-swift-programming-language/closures"
+      },
+      "tags": [
+        "recursion",
+        "memoisation",
+        "complexity"
+      ]
+    },
+    {
+      "id": "algorithms-linked-list-index-001",
+      "category": "algorithms",
+      "difficulty": 2,
+      "title": "Indexing a linked list",
+      "question": "What does reaching the n-th element of a singly linked list cost?",
+      "language": "none",
+      "choices": [
+        "O(1)",
+        "O(log n)",
+        "O(n)",
+        "O(n log n)"
+      ],
+      "correctIndex": 2,
+      "explanation": "A linked list has no contiguous storage to offset into, so reaching a position means following one pointer at a time from the head. That is the trade for cheap insertion and removal once you already hold a node.",
+      "whyOthersWrong": [
+        "Constant-time indexing needs contiguous storage, which is what an array has.",
+        "There is no halving to exploit; the nodes are not ordered by address.",
+        "",
+        "Nothing is being sorted."
+      ],
+      "reference": {
+        "title": "Swift Standard Library — Collection",
+        "url": "https://developer.apple.com/documentation/swift/collection"
+      },
+      "tags": [
+        "linked-list",
+        "complexity",
+        "data-structure"
+      ]
+    },
+    {
+      "id": "algorithms-stack-order-001",
+      "category": "algorithms",
+      "difficulty": 1,
+      "title": "Stack versus queue",
+      "question": "Which order does a stack use?",
+      "language": "none",
+      "choices": [
+        "First in, first out",
+        "Last in, first out",
+        "Sorted order",
+        "Random order"
+      ],
+      "correctIndex": 1,
+      "explanation": "A stack removes the most recently added element first, which is exactly what a call stack or an undo history needs. A queue is the other way round: first in, first out, as in a print spool or a task pipeline.",
+      "whyOthersWrong": [
+        "That describes a queue.",
+        "",
+        "Neither structure sorts its contents.",
+        "Both have a strictly defined order."
+      ],
+      "reference": {
+        "title": "Swift Standard Library — Array",
+        "url": "https://developer.apple.com/documentation/swift/array"
+      },
+      "tags": [
+        "stack",
+        "queue",
+        "data-structure"
+      ]
+    },
+    {
+      "id": "algorithms-tree-traversal-001",
+      "category": "algorithms",
+      "difficulty": 2,
+      "title": "Visiting a tree level by level",
+      "question": "Which structure gives you a level-by-level traversal of a tree?",
+      "language": "none",
+      "choices": [
+        "A queue",
+        "A stack",
+        "A set",
+        "A dictionary"
+      ],
+      "correctIndex": 0,
+      "explanation": "Breadth-first traversal enqueues the children of each node and processes them in arrival order, so a whole level is visited before the next begins. Swapping the queue for a stack turns the same code into a depth-first traversal.",
+      "whyOthersWrong": [
+        "",
+        "A stack gives depth-first order, diving down one branch first.",
+        "A set has no order, so it cannot drive a traversal.",
+        "A dictionary maps keys to values; it does not sequence the visit."
+      ],
+      "reference": {
+        "title": "Swift Standard Library — Collection",
+        "url": "https://developer.apple.com/documentation/swift/collection"
+      },
+      "tags": [
+        "tree",
+        "traversal",
+        "queue"
+      ]
+    },
+    {
+      "id": "algorithms-quicksort-worst-001",
+      "category": "algorithms",
+      "difficulty": 3,
+      "title": "Quicksort's bad day",
+      "question": "When does quicksort degrade to quadratic time?",
+      "language": "none",
+      "choices": [
+        "On sorted input",
+        "On random input",
+        "On short input",
+        "On duplicate keys only"
+      ],
+      "correctIndex": 0,
+      "explanation": "If the pivot is always the smallest or largest remaining element, each partition peels off one element and recursion depth becomes n. Naive first-element pivots do exactly that on already sorted data, which is why real implementations randomise or use the median of three.",
+      "whyOthersWrong": [
+        "",
+        "Random input is the case quicksort handles well, averaging n log n.",
+        "Short inputs are fast regardless of the algorithm.",
+        "Duplicates hurt some partition schemes but are not the classic worst case."
+      ],
+      "reference": {
+        "title": "Swift Standard Library — sort()",
+        "url": "https://developer.apple.com/documentation/swift/array/sort()"
+      },
+      "tags": [
+        "sorting",
+        "quicksort",
+        "complexity"
+      ]
+    },
+    {
+      "id": "algorithms-space-complexity-001",
+      "category": "algorithms",
+      "difficulty": 2,
+      "title": "In-place or not",
+      "question": "What does it mean for an algorithm to run in place?",
+      "language": "none",
+      "choices": [
+        "It uses O(1) extra space",
+        "It never copies",
+        "It runs on one thread",
+        "It is faster"
+      ],
+      "correctIndex": 0,
+      "explanation": "In place means the extra memory used does not grow with the input, beyond a constant number of variables. It says nothing about speed: an in-place algorithm can be slower than one that buys time with a large auxiliary buffer.",
+      "whyOthersWrong": [
+        "",
+        "Individual elements are still swapped and copied; only the extra allocation is bounded.",
+        "Threading is a separate concern entirely.",
+        "Using less memory does not imply using less time."
+      ],
+      "reference": {
+        "title": "Swift Standard Library — Array",
+        "url": "https://developer.apple.com/documentation/swift/array"
+      },
+      "tags": [
+        "complexity",
+        "memory",
+        "in-place"
+      ]
+    },
+    {
+      "id": "algorithms-hash-quality-001",
+      "category": "algorithms",
+      "difficulty": 3,
+      "title": "A bad Hashable implementation",
+      "question": "What happens if hash(into:) always feeds the same constant?",
+      "language": "none",
+      "choices": [
+        "Lookups become O(n)",
+        "Nothing changes",
+        "The program crashes",
+        "Equality breaks"
+      ],
+      "correctIndex": 0,
+      "explanation": "Every value lands in the same bucket, so the dictionary degenerates into a linear scan through a collision chain. It stays correct because equality still decides matches, but the performance guarantee is gone. Hash quality is a performance contract, not a correctness one.",
+      "whyOthersWrong": [
+        "",
+        "Correctness survives, but lookup cost changes dramatically.",
+        "A poor hash is legal; it is slow, not fatal.",
+        "Equality is defined separately by ==, and is unaffected."
+      ],
+      "reference": {
+        "title": "Swift Standard Library — Hashable",
+        "url": "https://developer.apple.com/documentation/swift/hashable"
+      },
+      "tags": [
+        "hashing",
+        "hashable",
+        "complexity"
+      ]
+    },
+    {
+      "id": "algorithms-early-exit-001",
+      "category": "algorithms",
+      "difficulty": 1,
+      "title": "first(where:) versus filter",
+      "question": "Why prefer first(where:) over filter { }.first?",
+      "language": "none",
+      "choices": [
+        "It stops at the match",
+        "It is lazy by default",
+        "It sorts first",
+        "It avoids optionals"
+      ],
+      "correctIndex": 0,
+      "explanation": "first(where:) returns as soon as an element matches, while filter walks the entire collection and builds a new array only to discard all but one element. On a large collection that is wasted time and wasted allocation.",
+      "whyOthersWrong": [
+        "",
+        "Laziness is a separate feature reached through the lazy property.",
+        "Neither call sorts anything.",
+        "Both hand back an optional, because there may be no match."
+      ],
+      "reference": {
+        "title": "Swift Standard Library — first(where:)",
+        "url": "https://developer.apple.com/documentation/swift/sequence/first(where:)"
+      },
+      "tags": [
+        "collections",
+        "performance",
+        "idiom"
+      ]
+    },
+    {
+      "id": "algorithms-reduce-into-001",
+      "category": "algorithms",
+      "difficulty": 3,
+      "title": "reduce versus reduce(into:)",
+      "question": "Why is reduce(into:) preferred when accumulating into an array or dictionary?",
+      "language": "none",
+      "choices": [
+        "It avoids copies",
+        "It is parallel",
+        "It is lazy",
+        "It keeps order"
+      ],
+      "correctIndex": 0,
+      "explanation": "Plain reduce passes the accumulator by value and returns a new one each step, which can copy the whole collection on every element. reduce(into:) mutates one accumulator in place, so building a dictionary from n items stays linear instead of quadratic.",
+      "whyOthersWrong": [
+        "",
+        "Neither form runs concurrently.",
+        "Both are eager; laziness comes from the lazy view.",
+        "Both visit elements in the same order."
+      ],
+      "reference": {
+        "title": "Swift Standard Library — reduce(into:_:)",
+        "url": "https://developer.apple.com/documentation/swift/sequence/reduce(into:_:)"
+      },
+      "tags": [
+        "collections",
+        "performance",
+        "reduce"
+      ]
+    },
+    {
+      "id": "swift-string-index-001",
+      "category": "swift-language",
+      "difficulty": 2,
+      "title": "Subscripting a String",
+      "question": "What does this code do?",
+      "codeSnippet": "let s = \"hello\"\nlet c = s[2]",
+      "language": "swift",
+      "choices": [
+        "Prints l",
+        "Returns a Character",
+        "Compile error",
+        "Runtime crash"
+      ],
+      "correctIndex": 2,
+      "explanation": "String is not indexed by Int, because characters are variable-width grapheme clusters and a numeric offset would not be a constant-time position. You need String.Index, for example s[s.index(s.startIndex, offsetBy: 2)].",
+      "whyOthersWrong": [
+        "Nothing is printed; the code does not compile.",
+        "It would return a Character only if an Int subscript existed, which it does not.",
+        "",
+        "The compiler rejects it before the program can run."
+      ],
+      "reference": {
+        "title": "Swift Book — Strings and Characters",
+        "url": "https://docs.swift.org/swift-book/documentation/the-swift-programming-language/stringsandcharacters"
+      },
+      "tags": [
+        "string",
+        "index",
+        "subscript"
+      ]
+    },
+    {
+      "id": "swift-enum-raw-value-001",
+      "category": "swift-language",
+      "difficulty": 1,
+      "title": "Creating an enum from a raw value",
+      "question": "What is the type of `d`?",
+      "codeSnippet": "enum Suit: String {\n  case hearts, spades\n}\nlet d = Suit(rawValue: \"hearts\")",
+      "language": "swift",
+      "choices": [
+        "Suit",
+        "Suit?",
+        "String",
+        "Never"
+      ],
+      "correctIndex": 1,
+      "explanation": "The raw value initialiser is failable: the string might not match any case, so it returns an optional. Only the plain case reference, such as Suit.hearts, gives you a non-optional value.",
+      "whyOthersWrong": [
+        "That would require the initialiser to be non-failable.",
+        "",
+        "The raw value is the input, not the result.",
+        "Never is the uninhabited type, returned by functions that do not return."
+      ],
+      "reference": {
+        "title": "Swift Book — Enumerations",
+        "url": "https://docs.swift.org/swift-book/documentation/the-swift-programming-language/enumerations"
+      },
+      "tags": [
+        "enum",
+        "raw-value",
+        "optional"
+      ]
+    },
+    {
+      "id": "swift-guard-scope-001",
+      "category": "swift-language",
+      "difficulty": 1,
+      "title": "What guard let unwraps into",
+      "question": "Where is a value bound by guard let available?",
+      "language": "none",
+      "choices": [
+        "Inside the else block",
+        "After the guard",
+        "Only on that line",
+        "Nowhere"
+      ],
+      "correctIndex": 1,
+      "explanation": "guard binds the unwrapped value in the enclosing scope, so it stays available for the rest of the function. That is the difference from if let, whose binding lives only inside the if body, and it is why guard suits early returns.",
+      "whyOthersWrong": [
+        "The else block runs when the unwrap failed, so there is nothing to use there.",
+        "",
+        "The binding outlives its own line; that is the whole point.",
+        "It is very much in scope afterwards."
+      ],
+      "reference": {
+        "title": "Swift Book — Early Exit",
+        "url": "https://docs.swift.org/swift-book/documentation/the-swift-programming-language/controlflow"
+      },
+      "tags": [
+        "guard",
+        "optional",
+        "scope"
+      ]
+    },
+    {
+      "id": "ios-widget-interactive-001",
+      "category": "ios-platform",
+      "difficulty": 2,
+      "title": "Making a widget button work",
+      "question": "How does a button inside a widget perform an action without opening the app?",
+      "language": "none",
+      "choices": [
+        "With an AppIntent",
+        "With a closure",
+        "With a delegate",
+        "It cannot"
+      ],
+      "correctIndex": 0,
+      "explanation": "Widgets are rendered by a separate process from archived views, so there is no live code to run a closure. Interactive widgets on iOS 17 and later use Button(intent:) with an AppIntent, which the system executes on your behalf.",
+      "whyOthersWrong": [
+        "",
+        "A closure would need the view's code to still be alive, which it is not.",
+        "Widgets have no delegate callbacks for user taps.",
+        "It works from iOS 17 onwards, through App Intents."
+      ],
+      "reference": {
+        "title": "WidgetKit — Adding interactivity",
+        "url": "https://developer.apple.com/documentation/widgetkit/adding-interactivity-to-widgets-and-live-activities"
+      },
+      "tags": [
+        "widget",
+        "appintents",
+        "interactive"
+      ]
+    },
+    {
+      "id": "ios-app-group-sharing-001",
+      "category": "ios-platform",
+      "difficulty": 2,
+      "title": "Sharing data with a widget",
+      "question": "How does an app share stored data with its widget extension?",
+      "language": "none",
+      "choices": [
+        "An App Group",
+        "A shared singleton",
+        "Static properties",
+        "NotificationCenter"
+      ],
+      "correctIndex": 0,
+      "explanation": "The app and its extension are separate processes with separate sandboxes. An App Group grants both a shared container directory, which is the only supported way to put a file or a UserDefaults suite where both can reach it.",
+      "whyOthersWrong": [
+        "",
+        "A singleton lives in one process's memory; the extension has its own copy.",
+        "Static state is per process too, for the same reason.",
+        "NotificationCenter does not cross process boundaries."
+      ],
+      "reference": {
+        "title": "Sharing data with your containing app",
+        "url": "https://developer.apple.com/documentation/xcode/configuring-app-groups"
+      },
+      "tags": [
+        "app-group",
+        "widget",
+        "sandbox"
+      ]
+    },
+    {
+      "id": "ios-widget-refresh-budget-001",
+      "category": "ios-platform",
+      "difficulty": 3,
+      "title": "Why a widget stops updating",
+      "question": "Why might a widget stop refreshing as often as its timeline asks?",
+      "language": "none",
+      "choices": [
+        "The system budget",
+        "A memory leak",
+        "Low storage",
+        "Dark mode"
+      ],
+      "correctIndex": 0,
+      "explanation": "WidgetKit gives each widget a daily refresh budget based on how the user actually engages with it. Asking for frequent entries does not guarantee them, so timelines should stay cheap and reload only when something meaningful changed.",
+      "whyOthersWrong": [
+        "",
+        "A leak would show as a crash or termination, not as throttling.",
+        "Storage pressure does not govern refresh scheduling.",
+        "Appearance has nothing to do with the refresh budget."
+      ],
+      "reference": {
+        "title": "WidgetKit — Keeping a widget up to date",
+        "url": "https://developer.apple.com/documentation/widgetkit/keeping-a-widget-up-to-date"
+      },
+      "tags": [
+        "widget",
+        "timeline",
+        "budget"
+      ]
+    },
+    {
+      "id": "ios-widget-reload-001",
+      "category": "ios-platform",
+      "difficulty": 2,
+      "title": "Refreshing a widget after a change",
+      "question": "What do you call after writing new data so the widget redraws?",
+      "language": "none",
+      "choices": [
+        "WidgetCenter reload",
+        "setNeedsDisplay",
+        "objectWillChange",
+        "viewDidLoad"
+      ],
+      "correctIndex": 0,
+      "explanation": "WidgetCenter.shared.reloadTimelines(ofKind:) asks the system to rebuild that widget's timeline. Reloading a single kind is preferred over reloadAllTimelines, because every reload draws from the same limited refresh budget.",
+      "whyOthersWrong": [
+        "",
+        "setNeedsDisplay is a UIKit call inside one process; widgets are archived remotely.",
+        "objectWillChange drives SwiftUI inside a live app, not an extension's timeline.",
+        "viewDidLoad is a UIViewController lifecycle method."
+      ],
+      "reference": {
+        "title": "WidgetKit — WidgetCenter",
+        "url": "https://developer.apple.com/documentation/widgetkit/widgetcenter"
+      },
+      "tags": [
+        "widget",
+        "widgetcenter",
+        "reload"
+      ]
+    },
+    {
+      "id": "ios-widget-timeline-entry-001",
+      "category": "ios-platform",
+      "difficulty": 2,
+      "title": "What a timeline holds",
+      "question": "What does a WidgetKit timeline consist of?",
+      "language": "none",
+      "choices": [
+        "Dated entries",
+        "A refresh interval",
+        "A view hierarchy",
+        "A background task"
+      ],
+      "correctIndex": 0,
+      "explanation": "A timeline is a list of entries, each carrying a date and the data to show from that moment, plus a policy for when to ask for more. The system renders the right entry as its date arrives without waking your extension again.",
+      "whyOthersWrong": [
+        "",
+        "The reload policy hints at timing, but the timeline itself carries entries.",
+        "Views are built from an entry; they are not what the timeline stores.",
+        "Widgets do not run background tasks of their own."
+      ],
+      "reference": {
+        "title": "WidgetKit — Timeline",
+        "url": "https://developer.apple.com/documentation/widgetkit/timeline"
+      },
+      "tags": [
+        "widget",
+        "timeline",
+        "entry"
+      ]
+    },
+    {
+      "id": "ios-control-widget-001",
+      "category": "ios-platform",
+      "difficulty": 3,
+      "title": "Control Center controls",
+      "question": "Which iOS version introduced ControlWidget for Control Center?",
+      "language": "none",
+      "choices": [
+        "iOS 16",
+        "iOS 17",
+        "iOS 18",
+        "iOS 15"
+      ],
+      "correctIndex": 2,
+      "explanation": "ControlWidget arrived in iOS 18, letting apps ship buttons and toggles into Control Center and the Lock Screen. Interactive home screen widgets came one release earlier, in iOS 17, which is a common source of confusion.",
+      "whyOthersWrong": [
+        "iOS 16 brought Lock Screen widgets, not Control Center controls.",
+        "iOS 17 brought interactive widgets and StandBy.",
+        "",
+        "iOS 15 predates all of this."
+      ],
+      "reference": {
+        "title": "WidgetKit — ControlWidget",
+        "url": "https://developer.apple.com/documentation/widgetkit/controlwidget"
+      },
+      "tags": [
+        "widget",
+        "control-center",
+        "ios18"
+      ]
+    },
+    {
+      "id": "ios-lock-screen-family-001",
+      "category": "ios-platform",
+      "difficulty": 2,
+      "title": "Lock Screen widget families",
+      "question": "Which widget family renders as a rectangle on the Lock Screen?",
+      "language": "none",
+      "choices": [
+        "systemSmall",
+        "accessoryRectangular",
+        "systemMedium",
+        "accessoryCircular"
+      ],
+      "correctIndex": 1,
+      "explanation": "The accessory families are the Lock Screen ones: accessoryRectangular, accessoryCircular and accessoryInline. The system families are for the Home Screen. Accessory widgets are also rendered with a vibrant, largely monochrome treatment.",
+      "whyOthersWrong": [
+        "systemSmall is a Home Screen family.",
+        "",
+        "systemMedium is the wider Home Screen family.",
+        "That one is the small circular gauge, not a rectangle."
+      ],
+      "reference": {
+        "title": "WidgetKit — WidgetFamily",
+        "url": "https://developer.apple.com/documentation/widgetkit/widgetfamily"
+      },
+      "tags": [
+        "widget",
+        "lock-screen",
+        "family"
+      ]
+    },
+    {
+      "id": "ios-app-intents-shortcut-001",
+      "category": "ios-platform",
+      "difficulty": 2,
+      "title": "Exposing an action to Siri",
+      "question": "What makes an App Intent available as a Siri phrase without user setup?",
+      "language": "none",
+      "choices": [
+        "AppShortcutsProvider",
+        "Info.plist entry",
+        "A URL scheme",
+        "Spotlight indexing"
+      ],
+      "correctIndex": 0,
+      "explanation": "Conforming a type to AppShortcutsProvider declares shortcuts with spoken phrases that are available as soon as the app is installed. Plain App Intents still work in the Shortcuts app, but the user has to build the shortcut themselves.",
+      "whyOthersWrong": [
+        "",
+        "No plist key registers an intent phrase.",
+        "URL schemes open the app; they do not create Siri phrases.",
+        "Spotlight surfaces content in search, not spoken shortcuts."
+      ],
+      "reference": {
+        "title": "App Intents — AppShortcutsProvider",
+        "url": "https://developer.apple.com/documentation/appintents/appshortcutsprovider"
+      },
+      "tags": [
+        "appintents",
+        "siri",
+        "shortcuts"
+      ]
+    },
+    {
+      "id": "ios-spotlight-index-001",
+      "category": "ios-platform",
+      "difficulty": 2,
+      "title": "Making content searchable",
+      "question": "Which framework indexes app content for the system search field?",
+      "language": "none",
+      "choices": [
+        "CoreSpotlight",
+        "CoreData",
+        "CoreServices",
+        "SearchKit"
+      ],
+      "correctIndex": 0,
+      "explanation": "CoreSpotlight lets an app donate CSSearchableItem records so its content appears in system search. Tapping a result launches the app with the item identifier, which you use to navigate straight to that content.",
+      "whyOthersWrong": [
+        "",
+        "CoreData is persistence; it does not index for system search.",
+        "CoreServices is a broad low-level framework, not the search index API.",
+        "SearchKit is an older macOS text indexing API."
+      ],
+      "reference": {
+        "title": "Core Spotlight",
+        "url": "https://developer.apple.com/documentation/corespotlight"
+      },
+      "tags": [
+        "spotlight",
+        "search",
+        "indexing"
+      ]
+    },
+    {
+      "id": "ios-notification-permission-001",
+      "category": "ios-platform",
+      "difficulty": 1,
+      "title": "Local notifications and permission",
+      "question": "Does scheduling a local notification require the user's permission?",
+      "language": "none",
+      "choices": [
+        "Yes",
+        "No",
+        "Only if it has sound",
+        "Only in the background"
+      ],
+      "correctIndex": 0,
+      "explanation": "Local and remote notifications both need authorisation through UNUserNotificationCenter. Without it, a scheduled request is accepted but nothing is presented to the user, which makes the failure easy to miss during development.",
+      "whyOthersWrong": [
+        "",
+        "Being local does not exempt it from authorisation.",
+        "Sound is one of the options you request, not what triggers the requirement.",
+        "The requirement holds regardless of app state."
+      ],
+      "reference": {
+        "title": "UserNotifications — Asking permission",
+        "url": "https://developer.apple.com/documentation/usernotifications/asking-permission-to-use-notifications"
+      },
+      "tags": [
+        "notifications",
+        "permissions"
+      ]
+    },
+    {
+      "id": "ios-deployment-target-001",
+      "category": "ios-platform",
+      "difficulty": 1,
+      "title": "What the deployment target means",
+      "question": "What does the iOS deployment target setting control?",
+      "language": "none",
+      "choices": [
+        "Oldest OS supported",
+        "Newest SDK used",
+        "Simulator version",
+        "Swift version"
+      ],
+      "correctIndex": 0,
+      "explanation": "The deployment target is the earliest OS version the app will install and run on. The SDK you build against is separate and is usually newer, which is why newer APIs need an availability check to stay usable on older systems.",
+      "whyOthersWrong": [
+        "",
+        "That is the base SDK, chosen by the Xcode version.",
+        "Simulators are limited by the installed runtimes, not by this setting.",
+        "The Swift language version is its own build setting."
+      ],
+      "reference": {
+        "title": "Xcode — Deployment target",
+        "url": "https://developer.apple.com/documentation/xcode/configuring-a-new-target-in-your-project"
+      },
+      "tags": [
+        "deployment-target",
+        "availability",
+        "xcode"
+      ]
+    },
+    {
+      "id": "ios-availability-check-001",
+      "category": "ios-platform",
+      "difficulty": 2,
+      "title": "Using a newer API safely",
+      "question": "How do you call an iOS 18 API in an app that also supports iOS 17?",
+      "language": "none",
+      "choices": [
+        "if #available",
+        "try?",
+        "@objc",
+        "Optional chaining"
+      ],
+      "correctIndex": 0,
+      "explanation": "if #available(iOS 18, *) asks the runtime whether the API exists and lets you provide a fallback. The compiler enforces this: calling a newer symbol without a check, or without an @available annotation, is a build error.",
+      "whyOthersWrong": [
+        "",
+        "try? handles thrown errors, not missing symbols.",
+        "@objc concerns Objective-C interoperability.",
+        "Optional chaining is about nil values, not API availability."
+      ],
+      "reference": {
+        "title": "Swift Book — Checking API Availability",
+        "url": "https://docs.swift.org/swift-book/documentation/the-swift-programming-language/controlflow"
+      },
+      "tags": [
+        "availability",
+        "api",
+        "compatibility"
+      ]
+    },
+    {
+      "id": "ios-bundle-vs-container-001",
+      "category": "ios-platform",
+      "difficulty": 3,
+      "title": "Writing next to your resources",
+      "question": "Can an app write files into its own app bundle at runtime?",
+      "language": "none",
+      "choices": [
+        "Yes",
+        "No, it is read-only",
+        "Only in debug",
+        "Only small files"
+      ],
+      "correctIndex": 1,
+      "explanation": "The bundle is signed and mounted read-only; writing there would invalidate the signature. Runtime data belongs in the container directories instead, typically Documents for user data and Caches or Application Support for regenerable files.",
+      "whyOthersWrong": [
+        "The signature makes this impossible on device.",
+        "",
+        "Build configuration does not change the sandbox rules.",
+        "Size is irrelevant; the location is what is forbidden."
+      ],
+      "reference": {
+        "title": "File System Basics",
+        "url": "https://developer.apple.com/documentation/foundation/filemanager"
+      },
+      "tags": [
+        "bundle",
+        "sandbox",
+        "filesystem"
+      ]
+    },
+    {
+      "id": "ios-userdefaults-suite-001",
+      "category": "ios-platform",
+      "difficulty": 2,
+      "title": "UserDefaults across an extension",
+      "question": "Which UserDefaults does an extension share with its app?",
+      "language": "none",
+      "choices": [
+        "standard",
+        "A suite name",
+        "A keychain group",
+        "None"
+      ],
+      "correctIndex": 1,
+      "explanation": "UserDefaults(suiteName:) with the App Group identifier gives both processes the same store. UserDefaults.standard is per sandbox, so the app and the extension each get their own and silently disagree.",
+      "whyOthersWrong": [
+        "standard is not shared across the sandbox boundary.",
+        "",
+        "Keychain groups share credentials, not defaults.",
+        "Sharing is possible through the App Group suite."
+      ],
+      "reference": {
+        "title": "Foundation — UserDefaults",
+        "url": "https://developer.apple.com/documentation/foundation/userdefaults"
+      },
+      "tags": [
+        "userdefaults",
+        "app-group",
+        "extension"
+      ]
+    },
+    {
+      "id": "ios-keychain-persistence-001",
+      "category": "ios-platform",
+      "difficulty": 3,
+      "title": "What survives a reinstall",
+      "question": "Which store can outlive deleting and reinstalling an app?",
+      "language": "none",
+      "choices": [
+        "Keychain",
+        "UserDefaults",
+        "Documents",
+        "Caches"
+      ],
+      "correctIndex": 0,
+      "explanation": "Keychain items can persist after an app is deleted, which is why credentials sometimes reappear on reinstall. Everything inside the app container, defaults included, is removed with the app. Treat this as a real behaviour to handle, not a feature to rely on.",
+      "whyOthersWrong": [
+        "",
+        "Defaults live in the container and go with it.",
+        "The Documents directory is part of the container.",
+        "Caches can be purged even while the app is installed."
+      ],
+      "reference": {
+        "title": "Security — Keychain services",
+        "url": "https://developer.apple.com/documentation/security/keychain-services"
+      },
+      "tags": [
+        "keychain",
+        "persistence",
+        "sandbox"
+      ]
+    },
+    {
+      "id": "ios-atomic-write-001",
+      "category": "ios-platform",
+      "difficulty": 3,
+      "title": "Why write atomically",
+      "question": "What does Data.write with the atomic option protect against?",
+      "language": "none",
+      "choices": [
+        "A partial file",
+        "Data races",
+        "Disk encryption",
+        "Slow writes"
+      ],
+      "correctIndex": 0,
+      "explanation": "An atomic write goes to a temporary file first and is then moved into place in one step. If the process is killed midway, the old file survives intact instead of leaving a half-written one, which matters when two processes share a container.",
+      "whyOthersWrong": [
+        "",
+        "It orders nothing between threads; that needs actual synchronisation.",
+        "Encryption is governed by file protection classes.",
+        "It is slightly slower, not faster."
+      ],
+      "reference": {
+        "title": "Foundation — Data.WritingOptions",
+        "url": "https://developer.apple.com/documentation/foundation/data/writingoptions"
+      },
+      "tags": [
+        "filesystem",
+        "atomic",
+        "data"
+      ]
+    },
+    {
+      "id": "ios-main-thread-ui-001",
+      "category": "ios-platform",
+      "difficulty": 1,
+      "title": "Where UI updates belong",
+      "question": "On which thread must UIKit and SwiftUI views be updated?",
+      "language": "none",
+      "choices": [
+        "Any thread",
+        "The main thread",
+        "A background queue",
+        "The render thread"
+      ],
+      "correctIndex": 1,
+      "explanation": "UI work must happen on the main thread. Swift Concurrency expresses this with the @MainActor annotation, which the compiler checks, replacing the older habit of remembering to hop to DispatchQueue.main by hand.",
+      "whyOthersWrong": [
+        "Touching views off the main thread causes unpredictable failures.",
+        "",
+        "Background queues are for work that does not touch the UI.",
+        "The render server is internal and not somewhere you dispatch to."
+      ],
+      "reference": {
+        "title": "Swift — MainActor",
+        "url": "https://developer.apple.com/documentation/swift/mainactor"
+      },
+      "tags": [
+        "main-thread",
+        "mainactor",
+        "ui"
+      ]
+    },
+    {
+      "id": "ios-dynamic-type-001",
+      "category": "ios-platform",
+      "difficulty": 2,
+      "title": "Text that respects the user's size",
+      "question": "What makes text scale with the user's preferred content size?",
+      "language": "none",
+      "choices": [
+        "A fixed point size",
+        "A text style",
+        "A custom font file",
+        "A frame height"
+      ],
+      "correctIndex": 1,
+      "explanation": "Semantic text styles such as .body or .headline carry Dynamic Type scaling, so text follows the size the user chose in Settings. A hard-coded point size ignores that entirely and is a common accessibility failure.",
+      "whyOthersWrong": [
+        "A fixed size is exactly what does not scale.",
+        "",
+        "A custom font still needs a scaling metric to participate.",
+        "Constraining height fights the scaling rather than enabling it."
+      ],
+      "reference": {
+        "title": "Human Interface Guidelines — Typography",
+        "url": "https://developer.apple.com/design/human-interface-guidelines/typography"
+      },
+      "tags": [
+        "accessibility",
+        "dynamic-type",
+        "typography"
+      ]
+    },
+    {
+      "id": "swift-typealias-vs-type-001",
+      "category": "swift-language",
+      "difficulty": 1,
+      "title": "What a typealias creates",
+      "question": "Does a typealias create a new, distinct type?",
+      "language": "none",
+      "choices": [
+        "Yes",
+        "No, just a name",
+        "Only for structs",
+        "Only for protocols"
+      ],
+      "correctIndex": 1,
+      "explanation": "A typealias is only another spelling for an existing type, so the two are interchangeable everywhere. When you want the compiler to keep two things apart, such as a UserID and an OrderID, wrap the value in a struct instead.",
+      "whyOthersWrong": [
+        "No new type is introduced, so no type safety is gained.",
+        "",
+        "The behaviour is the same whatever kind of type is aliased.",
+        "Protocol aliases behave the same way."
+      ],
+      "reference": {
+        "title": "Swift Book — Type Aliases",
+        "url": "https://docs.swift.org/swift-book/documentation/the-swift-programming-language/thebasics"
+      },
+      "tags": [
+        "typealias",
+        "types"
+      ]
+    },
+    {
+      "id": "swift-array-copy-cow-001",
+      "category": "swift-language",
+      "difficulty": 3,
+      "title": "When an Array actually copies",
+      "question": "What does this print?",
+      "codeSnippet": "var a = [1, 2, 3]\nvar b = a\nb.append(4)\nprint(a.count, b.count)",
+      "language": "swift",
+      "choices": [
+        "3 4",
+        "4 4",
+        "3 3",
+        "Compile error"
+      ],
+      "correctIndex": 0,
+      "explanation": "Array has value semantics implemented with copy on write: assigning shares the buffer, and the copy happens only when one side mutates while the buffer is shared. So b grows to four elements while a still has three.",
+      "whyOthersWrong": [
+        "",
+        "That would be reference semantics, which arrays do not have.",
+        "The append did happen, so b must be longer.",
+        "The code is valid Swift."
+      ],
+      "reference": {
+        "title": "Swift Standard Library — Array",
+        "url": "https://developer.apple.com/documentation/swift/array"
+      },
+      "tags": [
+        "array",
+        "copy-on-write",
+        "value-type"
+      ]
     }
   ]
 }
