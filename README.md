@@ -1,6 +1,6 @@
 # Kod Kırıntısı
 
-[![CI](https://github.com/KULLANICI_ADIN/kod-kirintisi/actions/workflows/ci.yml/badge.svg)](https://github.com/KULLANICI_ADIN/kod-kirintisi/actions/workflows/ci.yml)
+[![CI](https://github.com/beratsmr/kod-kirintisi/actions/workflows/ci.yml/badge.svg)](https://github.com/beratsmr/kod-kirintisi/actions/workflows/ci.yml)
 ![Swift 6](https://img.shields.io/badge/Swift-6.0-orange)
 ![iOS 18+](https://img.shields.io/badge/iOS-18%2B-blue)
 
@@ -8,7 +8,16 @@
 
 Kod Kırıntısı puts a small Swift/algorithm question on your Home Screen every morning. You answer it with interactive widget buttons in about four seconds. Open the app only when you want the full explanation.
 
-<!-- TODO: widget etkileşiminin ekran kaydını (GIF) buraya ekle — README'nin en etkili parçası bu olacak -->
+<!--
+  Record with ./scripts/record-widget.sh, which writes docs/widget.gif.
+  Uncomment once the file exists — a broken image is worse than none.
+
+![Answering the daily puzzle from the Home Screen widget](docs/widget.gif)
+-->
+
+| Today | Archive | Explanation | Statistics |
+|---|---|---|---|
+| ![Today](docs/screenshots/01-today.png) | ![Archive](docs/screenshots/02-archive.png) | ![Explanation](docs/screenshots/03-explanation.png) | ![Statistics](docs/screenshots/04-statistics.png) |
 
 ## Why
 
@@ -16,26 +25,38 @@ Daily practice apps fail because opening them is the hard part. This one removes
 
 ## Architecture
 
+```mermaid
+flowchart TB
+    subgraph targets [" "]
+        direction LR
+        App["<b>App</b> · SwiftUI<br/>Today · Archive<br/>Stats · Settings"]
+        Widget["<b>Widget</b> · WidgetKit<br/>Interactive AppIntents<br/>Control Center widget"]
+    end
+
+    Shared["<b>Shared/</b> — compiled into both targets<br/>AppGroup · Intents · DesignSystem"]
+
+    Core["<b>KodKirintisiCore</b> — SPM package, Foundation only<br/>Models · PuzzleBank · DailyPuzzleSelector<br/>StreakCalculator · ProgressStore (actor)<br/><i>builds and tests on Linux</i>"]
+
+    Container[("App Group container<br/>progress.json")]
+
+    App --> Shared
+    Widget --> Shared
+    Shared --> Core
+    Shared --> Container
+
+    style Core fill:#1b2340,color:#eef1f8
+    style Container fill:#ff9f45,color:#1b2340
+    style targets fill:transparent,stroke:transparent
 ```
-┌──────────────────────────────────────────────┐
-│ App (SwiftUI)        Widget (WidgetKit)      │
-│ Today · Archive      Interactive AppIntents  │
-│ Stats · Settings     Control Center widget   │
-└─────────────────┬────────────────────────────┘
-                  │ Shared/ (App Group, Intents, DS)
-┌─────────────────▼────────────────────────────┐
-│ KodKirintisiCore — pure Swift, Foundation    │
-│ only. Builds and tests on Linux.             │
-│ Models · PuzzleBank · DailyPuzzleSelector    │
-│ StreakCalculator · ProgressStore (actor)     │
-└──────────────────────────────────────────────┘
-```
+
+Both processes read the same container and compute the day's puzzle independently — there is no scheduler process and no server to disagree with.
 
 All business logic lives in a platform-independent SPM package, so the test suite runs on Linux CI in seconds and the UI layer stays thin. Details in [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 
 **Notable decisions**
 
-- The daily puzzle is chosen by a **pure, deterministic function** (seeded SplitMix64 permutation over the day index) — the app and the widget compute the same answer independently, with no shared scheduler and no backend.
+- The daily puzzle is chosen by a **pure, deterministic function** — a SplitMix64 permutation seeded per install and anchored to the install date, so the app and the widget compute the same answer independently with no shared scheduler and no backend.
+- The bank is shuffled **in blocks of 30 rather than as a whole**, which is what makes it safe to grow. A single shuffle of the entire bank looked equivalent and was not: adding ten puzzles to a bank of 120 changed the puzzle on all 120 days users had already lived through.
 - The Xcode project is **generated from `project.yml`** with XcodeGen and is not committed, so there are no `.pbxproj` merge conflicts and the project layout is reviewable.
 - **Zero third-party dependencies.** Apple frameworks only.
 - Swift 6 language mode with `strict concurrency = complete`.
@@ -65,7 +86,24 @@ Full environment notes (including how to develop this without Xcode installed): 
 
 ## Contributing puzzles
 
-Puzzles live in `Core/Sources/KodKirintisiCore/Resources/puzzles.json` and are validated by `PuzzleBankIntegrityTests` in CI. Append only — never reorder or delete, since the daily selection is derived from index positions.
+Puzzles live in `Core/Sources/KodKirintisiCore/Resources/puzzles.json` and are validated by `PuzzleBankIntegrityTests` in CI.
+
+Two rules, both enforced by that suite, because the daily schedule is derived from index positions:
+
+- **Append only.** Reordering or deleting changes which puzzle a user already saw on a given day.
+- **Append in whole blocks of 30.** The schedule is shuffled one block at a time, so a release that leaves the last block half full and a later one that fills it would reorder the days inside it — for users who had already seen them.
+
+## Scripts
+
+Everything generated in this repo is generated by a committed script, so the output can be reviewed and reproduced rather than taken on trust.
+
+| Script | What it does |
+|---|---|
+| [`scripts/run-simulator.sh`](scripts/run-simulator.sh) | Builds and launches the app on a simulator |
+| [`scripts/make-app-icon.swift`](scripts/make-app-icon.swift) | Renders the app icon PNG with CoreGraphics |
+| [`scripts/make-screenshots.sh`](scripts/make-screenshots.sh) | Captures the App Store screenshots by driving the real app |
+| [`scripts/record-widget.sh`](scripts/record-widget.sh) | Records the Home Screen widget and writes the README GIF |
+| [`scripts/movie-to-gif.swift`](scripts/movie-to-gif.swift) | Converts a screen recording to an animated GIF, no ffmpeg needed |
 
 ## License
 
