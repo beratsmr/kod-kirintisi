@@ -76,6 +76,18 @@ struct DailyPuzzleService: Sendable {
         )
     }
 
+    /// Every puzzle revealed through `date`, oldest first — the data behind
+    /// the Archive screen. See ``PuzzleArchive`` for what "revealed" means.
+    func archive(
+        through date: Date = .now,
+        calendar: Calendar = .current
+    ) async throws -> [PuzzleArchive.Entry] {
+        guard let store else { throw Failure.containerUnavailable }
+        let progress = try await store.progress()
+        let bank = try PuzzleBank.shared()
+        return PuzzleArchive.entries(bank: bank, progress: progress, through: date, calendar: calendar)
+    }
+
     private func digest(
         for date: Date,
         calendar: Calendar,
