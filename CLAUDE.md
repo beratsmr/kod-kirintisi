@@ -8,15 +8,15 @@ Bu dosya bu repoda çalışan her AI ajanı için bağlayıcıdır. Kod yazmadan
 
 Detaylar: `docs/SPEC.md` (ürün) · `docs/ARCHITECTURE.md` (teknik) · `docs/SETUP.md` (ortam)
 
-## Ortam Kısıtı — Bunu Anlamadan Kod Yazma
+## Ortam — Bunu Anlamadan Kod Yazma
 
-Geliştirici makinesinde **Xcode kurulu değil**. Sadece Swift Command Line Tools var. Bunun üç sonucu var:
+Geliştirici makinesinde **Xcode 26.6 kurulu** (2026-08-25 itibarıyla). iOS 26.5 SDK ve simülatörler mevcut, `xcodebuild` ile derleyip test koşabiliyoruz. Buna rağmen üç kural değişmedi:
 
-1. **`.xcodeproj` / `.pbxproj` dosyası oluşturma, düzenleme veya commit etme.** Proje `project.yml`'den XcodeGen ile üretilir ve `.gitignore`'dadır. Bir target'a dosya eklemen gerekiyorsa dosyayı doğru klasöre koy; `project.yml` yol bazlı çalıştığı için çoğu durumda başka bir şey gerekmez.
+1. **`.xcodeproj` / `.pbxproj` dosyasını elle oluşturma veya düzenleme, asla commit etme.** Proje `project.yml`'den XcodeGen ile üretilir ve `.gitignore`'dadır — `App/Info.plist`, `Widget/Info.plist` ve `.entitlements` dosyaları da öyle. Bir target'a dosya eklemen gerekiyorsa dosyayı doğru klasöre koy; `project.yml` yol bazlı çalıştığı için çoğu durumda başka bir şey gerekmez. `xcodegen generate` çalıştırmak serbesttir.
 
-2. **`Core/` paketi Linux'ta derlenmeli ve test edilmeli.** `Core/Sources` altında şu import'lar **YASAK**: `UIKit`, `SwiftUI`, `WidgetKit`, `AppIntents`, `CoreSpotlight`, `UserNotifications`, `Combine`. Sadece `Foundation`. SwiftLint'te bunu zorlayan bir kural var.
+2. **`Core/` paketi Linux'ta derlenmeli ve test edilmeli.** Bu bir ortam kısıtı değil, mimari bir karar: hızlı ve platformsuz doğrulama döngüsü. `Core/Sources` altında şu import'lar **YASAK**: `UIKit`, `SwiftUI`, `WidgetKit`, `AppIntents`, `CoreSpotlight`, `UserNotifications`, `Combine`. Sadece `Foundation`. SwiftLint'te bunu zorlayan bir kural var.
 
-3. **UI kodunu derleyerek doğrulayamayız.** Bu yüzden UI katmanı mümkün olduğunca **ince** olmalı; her türlü hesaplama, karar ve dönüşüm `Core`'a taşınmalı. UI kodu yazarken ekstra dikkatli ol — anında geri bildirim yok.
+3. **UI katmanı yine de ince olmalı.** Hesaplama, karar ve dönüşüm `Core`'a taşınır; view'lar `Core`'un ürettiği değerin saf bir fonksiyonu olur. Artık derleyerek doğrulayabiliyoruz ama SwiftUI'da derlenen kod doğru görünen kod demek değil — simülatörde gözle bak.
 
 ## Komutlar
 

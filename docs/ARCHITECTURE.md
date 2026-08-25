@@ -211,8 +211,10 @@ Karar: **Sadece Core testleri zorunlu.** UI testleri yavaş, kırılgan ve Mac g
 xcodegen generate
 ```
 
+`project.yml`'in `info:` ve `entitlements:` blokları da dosya üretir — `App/Info.plist`, `Widget/Info.plist` ve iki `.entitlements` dosyası. Bunlar da türetilmiş çıktıdır ve `.gitignore`'dadır; elle düzenlenmez, kaynakları `project.yml`'dir.
+
 Bunun anlamı:
-- Xcode'suz makinede yeni dosya eklemek mümkün — dosyayı doğru klasöre koy, gerekirse `project.yml`'i güncelle.
+- Yeni dosya eklemek için Xcode'u açmak gerekmez — dosyayı doğru klasöre koy, `sources` yol bazlı olduğu için çoğu durumda yeter.
 - `.pbxproj` merge çakışması diye bir sorun yok.
 - Proje yapısı okunabilir ve code review edilebilir.
 

@@ -1,40 +1,52 @@
-# Kurulum — Xcode'suz Mac + VS Code Akışı
+# Kurulum
 
-Senin durumun: **Mac var, Xcode kurulu değil, VS Code var.** İyi haber — bu projenin %90'ını Xcode olmadan yazıp test edebilirsin. Xcode sadece uygulamayı simülatörde çalıştırmak ve App Store'a yüklemek için gerekiyor.
+Bu proje iki farklı doğrulama döngüsü kullanır:
+
+| Döngü | Neyi doğrular | Gereken |
+|---|---|---|
+| `swift test --package-path Core` | Uygulamanın tüm mantığı | Sadece Swift toolchain (saniyeler sürer) |
+| `xcodebuild` + simülatör | Widget, ekranlar, sistem entegrasyonları | Xcode |
+
+Günlük geliştirmenin çoğu birincisinde geçer. İkincisi bir milestone'u kapatmadan önce çalıştırılır.
 
 ---
 
-## Adım 1 — Command Line Tools (Xcode DEĞİL)
+## Adım 1 — Swift Toolchain
 
-Bu ~2 GB, Xcode ise ~20 GB. Sana Swift derleyicisini ve `swift` CLI'ı veriyor:
+Xcode kuruluysa toolchain de var, ekstra bir şey gerekmez. Değilse Command Line Tools yeterli:
 
 ```bash
 xcode-select --install
-```
-
-Kurulum bitince doğrula:
-
-```bash
 swift --version   # Swift 6.x görmelisin
 ```
 
-> `swift` komutu çalışıyorsa `Core/` paketini derleyebilir ve test edebilirsin. Günlük geliştirmenin tamamı burada geçecek.
+> **Not:** Bu makinede Xcode 26.6 kurulu (2026-08-25). `/usr/bin/swift` CLT 6.3.3'e bakıyor ve `Core/` paketi için yeterli.
+> Geçmişte `~/.zshrc` içinde `DEVELOPER_DIR` ve `XCODE_DEFAULT_TOOLCHAIN_OVERRIDE` değişkenleri Command Line Tools'a sabitlenmişti; bunlar `xcodebuild`'i tamamen bozuyordu ve kaldırıldı. Benzer bir şey eklemeden önce iki kez düşün.
 
-## Adım 2 — Homebrew ve Araçlar
+## Adım 2 — Yardımcı Araçlar
 
 ```bash
-# Homebrew yoksa:
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-
 brew install xcodegen swiftlint swiftformat gh
 ```
 
 | Araç | Ne işe yarıyor |
 |---|---|
-| `xcodegen` | `project.yml`'den `.xcodeproj` üretir — Xcode'suz proje tanımlamanı sağlayan şey bu |
+| `xcodegen` | `project.yml`'den `.xcodeproj` üretir — proje dosyası git'te tutulmadığı için şart |
 | `swiftlint` | Kod stil denetimi |
 | `swiftformat` | Otomatik formatlama |
 | `gh` | GitHub CLI (repo oluşturma, PR) |
+
+**Homebrew yoksa** (bu makinede yok) XcodeGen'i kaynaktan kurabilirsin:
+
+```bash
+git clone https://github.com/yonaskolb/XcodeGen.git /tmp/XcodeGen
+cd /tmp/XcodeGen && swift build -c release
+mkdir -p ~/.local/bin ~/.local/share/xcodegen
+cp .build/release/xcodegen ~/.local/bin/
+cp -R SettingPresets ~/.local/share/xcodegen/
+```
+
+`make install` kullanma — universal binary üretmeye çalışır ve `xcbuild` gerektirir, güncel Xcode'da yok. `~/.local/bin`'in `PATH`'te olduğundan emin ol.
 
 ## Adım 3 — VS Code Eklentileri
 
@@ -45,7 +57,7 @@ code --install-extension GitHub.vscode-github-actions
 code --install-extension anthropic.claude-code
 ```
 
-`swiftlang.swift-vscode` içinde SourceKit-LSP var: otomatik tamamlama, "go to definition", hata gösterimi, test çalıştırma. Xcode'a benzemez ama Core paketi için fazlasıyla yeterli.
+`swiftlang.swift-vscode` içinde SourceKit-LSP var: otomatik tamamlama, "go to definition", hata gösterimi, test çalıştırma. `Core/` paketi için fazlasıyla yeterli.
 
 **VS Code ayarı** (`.vscode/settings.json` — repoda hazır):
 ```json
@@ -59,8 +71,7 @@ code --install-extension anthropic.claude-code
 ## Adım 4 — Repoyu Kur
 
 ```bash
-cd ~/Developer          # ya da nerede tutuyorsan
-# bu paketi buraya açtıysan:
+cd ~/Developer
 cd kod-kirintisi
 
 git init
@@ -77,86 +88,69 @@ gh repo create kod-kirintisi --public --source=. --push
 ```bash
 swift build --package-path Core
 swift test  --package-path Core
+
+xcodegen generate
+xcodebuild -project KodKirintisi.xcodeproj -scheme KodKirintisi \
+  -destination 'platform=iOS Simulator,name=iPhone 17' build
 ```
-
-İlk çalıştırmada `Core/Sources` boş olduğu için hata alabilirsin — bu normal, ilk görev orayı doldurmak (bkz. CLAUDE.md, M1).
-
-## Adım 6 — Claude Code ile Başla
-
-```bash
-cd kod-kirintisi
-claude
-```
-
-İlk mesajın şu olsun:
-
-```
-CLAUDE.md, docs/SPEC.md ve docs/ARCHITECTURE.md dosyalarını oku.
-Sonra M1 (Core domain) milestone'unu uygula.
-Kod yazmadan önce 3-5 maddelik planını söyle ve onayımı bekle.
-```
-
-Claude Code `CLAUDE.md`'yi otomatik okur, ama ilk turda açıkça belirtmek işi garantiye alır.
 
 ---
 
-## Günlük Geliştirme Döngüsü (Mac, Xcode yok)
+## Günlük Geliştirme Döngüsü
 
 ```bash
-swift test --package-path Core     # mantığı doğrula
-swiftformat . && swiftlint         # temizle
-git add -A && git commit -m "..."  # kaydet
-git push
+swift test --package-path Core     # mantığı doğrula — ana döngü, hızlı
+swiftformat . && swiftlint lint    # temizle
+git commit -m "..."
 ```
 
-Bu döngü M1–M3 arasındaki tüm işi kapsıyor. UI yazarken de kod yazabilirsin, sadece **görsel doğrulamayı** ertelersin.
-
-## Xcode'lu Makinede Doğrulama
-
-Diğer bilgisayarda, ilk seferde:
+Bir milestone'u kapatmadan önce ayrıca:
 
 ```bash
-git clone https://github.com/<kullanıcı-adın>/kod-kirintisi.git
-cd kod-kirintisi
-brew install xcodegen
 xcodegen generate
-open KodKirintisi.xcodeproj
+xcodebuild -project KodKirintisi.xcodeproj -scheme KodKirintisi \
+  -destination 'platform=iOS Simulator,name=iPhone 17' test
 ```
 
-Sonraki her seferde:
+`xcodegen generate` her `project.yml` değişikliğinden ve her `git pull`'dan sonra çalıştırılmalı — `.xcodeproj` git'te tutulmuyor.
+
+## Simülatörde Gözle Doğrulama
+
+Derlenen kod doğru **görünen** kod demek değil. Widget'ı ve ekranları en az bir kere gerçekten gör:
 
 ```bash
-git pull && xcodegen generate && open KodKirintisi.xcodeproj
+xcodebuild -project KodKirintisi.xcodeproj -scheme KodKirintisi \
+  -destination 'platform=iOS Simulator,name=iPhone 17' build
+open -a Simulator
 ```
 
-Xcode'da yapılacaklar (bir kereye mahsus):
-1. **Signing & Capabilities** → Team seç (ücretsiz Apple ID yeterli, test için).
-2. App ve Widget target'larının ikisinde de **App Groups** capability'sinin `group.com.beratsumer.kodkirintisi` ile eşleştiğini doğrula.
-3. Simülatörde çalıştır, ana ekrana widget ekle, test et.
+Sonra simülatörde:
+1. Uygulamayı bir kez çalıştır (App Group konteynerini oluşturur).
+2. Ana ekranda boş bir alana uzun bas → **+** → "Kod Kırıntısı" → small ve medium boyutları ekle.
+3. Kilit ekranı için: Ayarlar → Duvar Kâğıdı → Özelleştir → widget alanı → accessoryRectangular'ı ekle.
+4. Widget üzerindeki bir şıkka dokun. Doğru/yanlış işareti belirmeli, butonlar kaybolmalı, seri sayacı güncellenmeli.
+5. Uygulamayı aç ve widget'ta verilen cevabın orada da göründüğünü doğrula (App Group paylaşımının asıl testi bu).
 
-Bulduğun sorunları not al, kendi makinene dön, VS Code'da düzelt, push et.
+> Widget boş görünüyorsa ve hata yoksa: App Group id'si iki target'ta uyuşmuyordur. Bkz. CLAUDE.md "Bilinen Tuzaklar".
 
-> ⚠️ Xcode'lu makinede **kod yazma**. Orada sadece derle ve test et. İki makinede paralel değişiklik yaparsan merge işkencesi başlar.
+## İmzalama
 
-## Xcode'u Kendi Makinene Kurmak İstersen
-
-Er ya da geç kuracaksın (App Store'a yüklemek için şart). En kolay yol:
-
-```bash
-brew install --cask xcodes
-xcodes install --latest
-```
-
-`xcodes` sürüm yönetimini kolaylaştırır ve App Store'dan indirmekten daha hızlıdır. ~20 GB boş alan gerekiyor.
+`project.yml`'de `DEVELOPMENT_TEAM` boş. Simülatör için gerekmez. Gerçek cihaza atmak istediğinde Xcode'da **Signing & Capabilities** → Team seç (ücretsiz Apple ID yeterli); App ve Widget target'larının ikisinde de.
 
 ---
 
 ## Sorun Giderme
 
-**`swift: command not found`** → Command Line Tools kurulmamış veya `xcode-select -p` yanlış yeri gösteriyor. `sudo xcode-select --switch /Library/Developer/CommandLineTools`
+**`swift: command not found`** → `xcode-select -p` yanlış yeri gösteriyor. `sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer`
 
-**`xcodegen generate` "Team not found" hatası veriyor** → Normal. `project.yml`'de `DEVELOPMENT_TEAM` boş; imzalamayı Xcode'da elle seç.
+**`xcodebuild` "unable to find utility" veya SDK bulamıyor diyor** → `env | grep -i developer_dir`. `DEVELOPER_DIR` Command Line Tools'a sabitlenmişse `xcodebuild` hiç çalışmaz; kaldır.
 
-**VS Code'da SwiftUI dosyalarında yüzlerce hata** → Beklenen. SourceKit-LSP macOS SDK'sına bakıyor, iOS-only API'leri göremiyor. Bu hatalar sahte; gerçek derleme Xcode'da yapılıyor. `Core/` içinde hata görürsen o gerçektir.
+**`could not build Objective-C module '_Builtin_float'`** → Eski bir toolchain (örn. swiftly ile kurulmuş 6.0.x) yeni SDK'yı derlemeye çalışıyor. `which swift` ile kontrol et; `/usr/bin/swift` kullan.
+
+**`Could not find test host for KodKirintisiTests`** → Ürün adı "Kod Kırıntısı" (boşluklu), XcodeGen'in türettiği varsayılan `TEST_HOST` yolu tutmuyor. `project.yml`'de açıkça yazılı; silme.
+
+**`xcodegen generate` "Team not found" hatası veriyor** → Normal. `DEVELOPMENT_TEAM` boş; imzalamayı Xcode'da elle seç.
+
+**VS Code'da SwiftUI dosyalarında yüzlerce hata** → Beklenen. SourceKit-LSP macOS SDK'sına bakıyor, iOS-only API'leri göremiyor. Bu hatalar sahte; gerçek doğrulama `xcodebuild` ile. `Core/` içinde hata görürsen o gerçektir.
 
 **CI'da Linux job'ı `import Testing` bulamıyor** → Docker imajını daha yeni bir Swift sürümüne yükselt (`.github/workflows/ci.yml`).
