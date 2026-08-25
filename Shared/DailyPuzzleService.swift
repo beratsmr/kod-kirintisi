@@ -88,6 +88,32 @@ struct DailyPuzzleService: Sendable {
         return PuzzleArchive.entries(bank: bank, progress: progress, through: date, calendar: calendar)
     }
 
+    /// Streaks and per-category accuracy for the Statistics screen.
+    func stats(
+        asOf date: Date = .now,
+        calendar: Calendar = .current
+    ) async throws -> StatsSnapshot {
+        guard let store else { throw Failure.containerUnavailable }
+        let progress = try await store.progress()
+        let bank = try PuzzleBank.shared()
+        let records = progress.records.values
+
+        let correctDays = StreakCalculator.correctDays(from: records, calendar: calendar)
+        let wrongDays = StreakCalculator.wrongDays(from: records, calendar: calendar)
+
+        return StatsSnapshot(
+            overall: StatsCalculator.overall(records: records),
+            byCategory: StatsCalculator.byCategory(records: records, puzzles: bank.puzzles),
+            currentStreak: StreakCalculator.currentStreak(
+                correctlyAnsweredDays: correctDays, wronglyAnsweredDays: wrongDays,
+                today: date, calendar: calendar
+            ),
+            longestStreak: StreakCalculator.longestStreak(
+                correctlyAnsweredDays: correctDays, calendar: calendar
+            )
+        )
+    }
+
     private func digest(
         for date: Date,
         calendar: Calendar,
