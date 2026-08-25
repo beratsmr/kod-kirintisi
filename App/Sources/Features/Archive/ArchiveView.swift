@@ -40,6 +40,8 @@ struct ArchiveView: View {
         }
     }
 
+    @Environment(AppRouter.self) private var router
+
     @State private var state = LoadState.loading
     @State private var searchText = ""
     @State private var statusFilter = StatusFilter.all
@@ -47,13 +49,15 @@ struct ArchiveView: View {
     @State private var difficultyFilter: Difficulty?
 
     var body: some View {
-        NavigationStack {
+        @Bindable var router = router
+        NavigationStack(path: $router.archivePath) {
             content
                 .navigationTitle("Archive")
                 .searchable(text: $searchText)
                 .toolbar {
                     ToolbarItem(placement: .topBarTrailing) { filterMenu }
                 }
+                .navigationDestination(for: String.self) { detail(for: $0) }
                 .task { await load() }
         }
     }
@@ -86,12 +90,25 @@ struct ArchiveView: View {
             )
         } else {
             List(entries) { entry in
-                NavigationLink {
-                    ArchiveDetailView(entry: entry)
-                } label: {
+                NavigationLink(value: entry.id) {
                     ArchiveEntryRow(entry: entry)
                 }
             }
+        }
+    }
+
+    /// Resolves a pushed id against the loaded entries.
+    ///
+    /// The id can arrive before ``load()`` finishes — Spotlight and Siri both
+    /// push one straight into ``AppRouter/archivePath`` — so a miss here is
+    /// usually "not yet", and this rebuilds once the entries land. A genuine
+    /// miss means the day has not been revealed, which is the same dead end.
+    @ViewBuilder
+    private func detail(for puzzleID: String) -> some View {
+        if case let .loaded(entries) = state, let entry = entries.first(where: { $0.id == puzzleID }) {
+            ArchiveDetailView(entry: entry)
+        } else {
+            PuzzleUnavailableView()
         }
     }
 

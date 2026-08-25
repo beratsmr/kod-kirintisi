@@ -3,8 +3,9 @@ import AppIntents
 /// Opens the app on today's puzzle.
 ///
 /// M5 needs this because a `ControlWidgetButton` must be given an intent to
-/// run. M7 builds on it for the Siri phrase and the shortcut; until the Today
-/// screen exists in M6 it does nothing beyond bringing the app forward.
+/// run, and it did nothing beyond bringing the app forward until the Today
+/// screen existed. Now it selects that tab too, so the intent lands somewhere
+/// predictable even if the user last left the app on Statistics.
 struct ShowTodaysPuzzleIntent: AppIntent {
     static var title: LocalizedStringResource {
         "Show today's puzzle"
@@ -18,7 +19,14 @@ struct ShowTodaysPuzzleIntent: AppIntent {
         true
     }
 
+    /// Resolved from the app process, never the widget's: ``openAppWhenRun``
+    /// means the system launches the app and performs there, which is the only
+    /// place ``KodKirintisiApp`` has registered a router.
+    @Dependency private var router: AppRouter
+
+    @MainActor
     func perform() async throws -> some IntentResult {
-        .result()
+        router.showToday()
+        return .result()
     }
 }
