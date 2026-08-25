@@ -1,4 +1,5 @@
 import AppIntents
+import CoreSpotlight
 import SwiftUI
 
 /// The host application.
@@ -9,6 +10,8 @@ import SwiftUI
 /// selection under ``AppRouter`` so that intents can steer it.
 @main
 struct KodKirintisiApp: App {
+    @Environment(\.scenePhase) private var scenePhase
+
     @State private var router: AppRouter
 
     init() {
@@ -37,6 +40,18 @@ struct KodKirintisiApp: App {
                 }
             }
             .environment(router)
+            .onContinueUserActivity(CSSearchableItemActionType) { activity in
+                guard let id = SpotlightIndexer.puzzleID(from: activity) else { return }
+                router.showArchivedPuzzle(id: id)
+            }
+        }
+        // Not `.task`: the revealed set grows at local midnight, which usually
+        // happens while the app is in the background, so re-indexing only at
+        // launch would leave Spotlight a day behind for anyone who never
+        // fully quits the app.
+        .onChange(of: scenePhase, initial: true) { _, phase in
+            guard phase == .active else { return }
+            Task { await SpotlightIndexer.shared.reindex() }
         }
     }
 }
