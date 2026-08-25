@@ -27,10 +27,22 @@ final class AppRouter {
     /// up in the entries it has already loaded.
     var archivePath: [String] = []
 
+    /// Whether the Today screen should show the answer for a day that has not
+    /// been answered. Deliberately not persisted anywhere: revealing is a peek,
+    /// it records nothing, and it counts for nothing in the streak. ``TodayView``
+    /// clears it as soon as the user leaves the tab.
+    var revealsTodaysAnswer = false
+
     /// Brings today's puzzle forward. The Archive stack is left as it was, so
     /// returning to that tab by hand lands where the user left off.
     func showToday() {
         selectedScreen = .today
+    }
+
+    /// Opens today's puzzle with the answer already showing.
+    func revealTodaysAnswer() {
+        selectedScreen = .today
+        revealsTodaysAnswer = true
     }
 
     /// Opens one revealed puzzle read-only, replacing whatever the Archive

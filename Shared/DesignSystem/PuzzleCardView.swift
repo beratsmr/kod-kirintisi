@@ -9,6 +9,11 @@ import SwiftUI
 /// the post-answer explanation, and the "why the others are wrong" notes.
 struct PuzzleCardView: View {
     let digest: DailyDigest
+    /// Shows the answer and explanation for a day that was never answered —
+    /// the "reveal" shortcut, which deliberately records nothing. It also
+    /// makes the choices inert, so a revealed puzzle cannot then be answered
+    /// for credit.
+    var isRevealed = false
     /// Called with the tapped choice's index. `nil` makes every choice a
     /// plain, unresponsive row instead of a button — the Archive uses this to
     /// look back at an old day. Core only ever records an answer against
@@ -16,6 +21,13 @@ struct PuzzleCardView: View {
     /// other day instead"), so an old entry could never really be answered
     /// from here regardless.
     var onSelect: ((Int) -> Void)?
+
+    /// Whether the correct choice and the explanation are on screen, however
+    /// they got there. Every part of the card below the question keys off this
+    /// rather than ``DailyDigest/isAnswered`` directly.
+    private var showsAnswer: Bool {
+        digest.isAnswered || isRevealed
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
@@ -32,7 +44,7 @@ struct PuzzleCardView: View {
                 }
             }
             choices
-            if digest.isAnswered {
+            if showsAnswer {
                 explanation
             }
         }
@@ -57,7 +69,7 @@ struct PuzzleCardView: View {
 
     @ViewBuilder
     private func choiceRow(index: Int, title: String) -> some View {
-        if let onSelect, !digest.isAnswered {
+        if let onSelect, !showsAnswer {
             Button {
                 onSelect(index)
             } label: {
@@ -74,7 +86,7 @@ struct PuzzleCardView: View {
             Text(title)
                 .font(.system(.body, design: .monospaced))
             Spacer(minLength: 8)
-            if digest.isAnswered, index == digest.puzzle.correctIndex {
+            if showsAnswer, index == digest.puzzle.correctIndex {
                 Image(systemName: "checkmark.circle.fill")
             } else if digest.record?.selectedIndex == index {
                 Image(systemName: "xmark.circle.fill")
@@ -91,7 +103,7 @@ struct PuzzleCardView: View {
     /// wrong pick is marked too, so the user sees both what they chose and
     /// what was right.
     private func choiceBackground(index: Int) -> AnyShapeStyle {
-        guard digest.isAnswered else { return AnyShapeStyle(.fill.secondary) }
+        guard showsAnswer else { return AnyShapeStyle(.fill.secondary) }
 
         if index == digest.puzzle.correctIndex {
             return AnyShapeStyle(Color.green.opacity(0.2))
@@ -103,7 +115,7 @@ struct PuzzleCardView: View {
     }
 
     private func choiceForeground(index: Int) -> Color {
-        guard digest.isAnswered else { return .primary }
+        guard showsAnswer else { return .primary }
 
         if index == digest.puzzle.correctIndex {
             return .green

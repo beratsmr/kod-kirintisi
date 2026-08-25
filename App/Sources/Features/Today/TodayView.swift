@@ -15,6 +15,8 @@ struct TodayView: View {
         case failed
     }
 
+    @Environment(AppRouter.self) private var router
+
     @State private var state = LoadState.loading
 
     var body: some View {
@@ -22,6 +24,10 @@ struct TodayView: View {
             content
                 .navigationTitle("Today")
                 .task { await load() }
+                // A reveal lasts only as long as the visit that asked for it.
+                // Leaving the tab is the clearest "I'm done looking" signal
+                // available without inventing a piece of stored state.
+                .onDisappear { router.revealsTodaysAnswer = false }
         }
     }
 
@@ -34,6 +40,7 @@ struct TodayView: View {
             ScrollView {
                 PuzzleCardView(
                     digest: digest,
+                    isRevealed: router.revealsTodaysAnswer,
                     onSelect: digest.isAnswered ? nil : { index in
                         Task { await answer(index) }
                     }
