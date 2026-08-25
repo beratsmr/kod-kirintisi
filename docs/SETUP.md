@@ -133,6 +133,22 @@ Sonra simülatörde:
 
 > Widget boş görünüyorsa ve hata yoksa: App Group id'si iki target'ta uyuşmuyordur. Bkz. CLAUDE.md "Bilinen Tuzaklar".
 
+## Yayın Görsellerini Üretmek
+
+App Store'a giden her görsel repodaki bir script tarafından üretilir; hiçbiri elle çizilmez. Böylece çıktı da kaynak kodu gibi gözden geçirilebilir ve tekrar üretilebilir olur.
+
+```bash
+./scripts/make-app-icon.swift        # ikonu yeniden çizer (PNG commit'lenir)
+./scripts/make-screenshots.sh        # App Store ekran görüntüleri → docs/screenshots/
+./scripts/record-widget.sh           # README için widget GIF'i → docs/widget.gif
+```
+
+Ekran görüntüleri, uygulamayı gerçekten çalıştıran bir UI testinden alınır — sahte view'lardan değil. Temiz bir kurulumda arşivde tek satır, istatistiklerde sıfır göründüğü için test uygulamayı `-KodKirintisiDemoContent` bayrağıyla başlatır; `DemoContent` de 42 günlük makul bir cevap geçmişini gerçek konteynere yazar. Bu tipin gövdesi yalnızca `DEBUG` altında derlenir, dolayısıyla App Store binary'sinde hiç bulunmaz.
+
+`record-widget.sh` tek bir manuel adım içerir: widget'ı ana ekrana yerleştirmek. `simctl`'de bunun karşılığı yok, o yüzden script durup sorar. GIF dönüşümü ffmpeg değil AVFoundation + ImageIO kullanır; ek kurulum gerekmez.
+
+Ekran görüntüsü şeması (`Screenshots`) bilerek `KodKirintisi` şemasından ayrı tutuldu: booted bir simülatör gerektiriyor ve dakikalar sürüyor, günlük test döngüsü ve CI bunun bedelini ödememeli.
+
 ## İmzalama
 
 `project.yml`'de `DEVELOPMENT_TEAM` boş. Simülatör için gerekmez. Gerçek cihaza atmak istediğinde Xcode'da **Signing & Capabilities** → Team seç (ücretsiz Apple ID yeterli); App ve Widget target'larının ikisinde de.
