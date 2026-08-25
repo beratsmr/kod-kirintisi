@@ -49,7 +49,7 @@ Kesin sınır: aşağıdakiler var, **başka hiçbir şey yok**.
 ### 5.2 Uygulama
 
 - [ ] **Bugün** — soru kartı, şıklar, cevap sonrası açıklama (kod örnekli), "neden diğerleri yanlış" notu, kaynak linki.
-- [ ] **Arşiv** — geçmiş sorular; kategori/zorluk filtresi, arama, doğru-yanlış işareti.
+- [ ] **Arşiv** — geçmiş sorular; kategori/zorluk/durum filtresi, arama, doğru-yanlış işareti. Durum filtresi Akış C'nin ihtiyacı: "hepsi / yanlış cevapladıklarım / cevaplanmamışlar".
 - [ ] **İstatistik** — streak, toplam doğru oranı, kategori bazlı başarı grafiği (Swift Charts).
 
 > **Streak kuralı:** Streak **yalnızca doğru cevaplanan günleri** sayar.
@@ -62,8 +62,11 @@ Kesin sınır: aşağıdakiler var, **başka hiçbir şey yok**.
 ### 5.3 Sistem entegrasyonları
 
 - [ ] **App Intents** — `ShowTodaysPuzzleIntent`, `AnswerPuzzleIntent`, `RevealAnswerIntent` + `AppShortcutsProvider` (Siri: "Bugünkü kod kırıntısı").
-- [ ] **Spotlight (CoreSpotlight)** — tüm sorular sistem aramasından bulunabilir; sonuca dokununca ilgili soru açılır.
+  `RevealAnswerIntent` **cevap kaydetmez**: açıklamayı gösterir, gün cevaplanmamış kalır, streak'e ve doğruluk oranına dokunmaz. Açıklama açıkken şıklar tıklanamaz olur, yani "gör, sonra doğruyu işaretle" mümkün değil.
+- [ ] **Spotlight (CoreSpotlight)** — **açılmış günlerin** soruları sistem aramasından bulunabilir; sonuca dokununca soru Arşiv'de açılır.
+  İlk taslak "tüm sorular" diyordu; bu, henüz günü gelmemiş soruları sızdırırdı — Arşiv'in uyduğu spoiler kuralı burada da geçerli. İndekse yalnızca başlık, soru metni ve etiketler girer; **açıklama, şıklar ve doğru cevap asla girmez**.
 - [ ] **Local notification** — kullanıcının seçtiği saatte günlük hatırlatma (opsiyonel, varsayılan kapalı).
+  Metin sabittir ("bugünün sorusu hazır"), sorunun kendisi değil: tekrarlayan tetikleyici tek kayıttan aylarca ateşlenir, gömülü soru metni bayatlar ve kilit ekranı günü sızdırmak için yanlış yerdir.
 
 ### 5.4 İçerik
 

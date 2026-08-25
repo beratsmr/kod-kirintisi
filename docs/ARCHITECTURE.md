@@ -89,17 +89,20 @@ kod-kirintisi/
 │       └── PuzzleBankIntegrityTests.swift  # gerçek bankayı doğrular
 ├── Shared/                    # App + Widget target'larının ikisine de girer
 │   ├── AppGroup.swift
+│   ├── AppRouter.swift        # intent/Spotlight → hangi ekran; Shared'da çünkü
+│   │                          # Intents/ widget target'ına da giriyor
 │   ├── Intents/
 │   │   ├── AnswerPuzzleIntent.swift
 │   │   ├── RevealAnswerIntent.swift
-│   │   ├── ShowTodaysPuzzleIntent.swift
-│   │   └── AppShortcuts.swift
+│   │   └── ShowTodaysPuzzleIntent.swift
 │   └── DesignSystem/
 │       ├── Theme.swift
 │       └── PuzzleCardView.swift
 ├── App/
 │   ├── Sources/
 │   │   ├── KodKirintisiApp.swift
+│   │   ├── Intents/AppShortcuts.swift   # sağlayıcı bundle başına tek olmalı,
+│   │   │                                # bu yüzden Shared'da değil
 │   │   ├── Features/Today/
 │   │   ├── Features/Archive/
 │   │   ├── Features/Stats/
