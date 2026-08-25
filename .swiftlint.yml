@@ -4,6 +4,7 @@ included:
   - Shared
   - App/Sources
   - App/Tests
+  - App/UITests
   - Widget/Sources
 
 excluded:

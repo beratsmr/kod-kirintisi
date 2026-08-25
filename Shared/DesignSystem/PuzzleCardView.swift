@@ -8,6 +8,13 @@ import SwiftUI
 /// `Puzzle.WidgetLimits` — there is room for the code snippet at full size,
 /// the post-answer explanation, and the "why the others are wrong" notes.
 struct PuzzleCardView: View {
+    /// Identifies the explanation text to UI tests.
+    ///
+    /// A UI test bundle shares no code with the app, so `ScreenshotTests`
+    /// repeats this string as a literal; naming it here at least gives it one
+    /// obvious home to grep for.
+    static let explanationIdentifier = "puzzle.explanation"
+
     let digest: DailyDigest
     /// Shows the answer and explanation for a day that was never answered —
     /// the "reveal" shortcut, which deliberately records nothing. It also
@@ -132,6 +139,10 @@ struct PuzzleCardView: View {
 
             Text(digest.puzzle.explanation)
                 .font(.body)
+                // Rendered only once the puzzle has been answered, which makes
+                // it the marker the screenshot test waits on to tell an
+                // explained puzzle from a still-open question.
+                .accessibilityIdentifier(Self.explanationIdentifier)
 
             if let note = wrongAnswerNote {
                 Text(note)

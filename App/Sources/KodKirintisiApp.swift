@@ -15,6 +15,10 @@ struct KodKirintisiApp: App {
     @State private var router: AppRouter
 
     init() {
+        // Before any screen reads progress. A no-op unless this is a debug
+        // build launched with the screenshot flag — see ``DemoContent``.
+        DemoContent.installIfRequested()
+
         let router = AppRouter()
         _router = State(initialValue: router)
         // Intents with `openAppWhenRun` perform inside this process, so handing

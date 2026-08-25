@@ -127,6 +127,23 @@ targets:
         TEST_HOST: $(BUILT_PRODUCTS_DIR)/Kod Kırıntısı.app/Kod Kırıntısı
         BUNDLE_LOADER: $(TEST_HOST)
 
+  # ─────────────────────────────────────────────────────────
+  # Drives the app to capture App Store screenshots. Deliberately kept out
+  # of the KodKirintisi scheme's test action: it needs a booted simulator
+  # and takes minutes, while that scheme is what CI and everyday runs use.
+  KodKirintisiUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: App/UITests
+    dependencies:
+      - target: KodKirintisi
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.beratsumer.kodkirintisi.uitests
+        GENERATE_INFOPLIST_FILE: YES
+        TEST_TARGET_NAME: KodKirintisi
+
 schemes:
   KodKirintisi:
     build:
@@ -142,3 +159,14 @@ schemes:
         - KodKirintisiTests
     archive:
       config: Release
+
+  # Screenshot capture, run on demand by scripts/make-screenshots.sh.
+  Screenshots:
+    build:
+      targets:
+        KodKirintisi: all
+        KodKirintisiWidget: all
+    test:
+      config: Debug
+      targets:
+        - KodKirintisiUITests
