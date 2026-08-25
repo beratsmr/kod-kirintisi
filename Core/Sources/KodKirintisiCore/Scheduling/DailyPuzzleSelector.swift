@@ -9,6 +9,22 @@ import Foundation
 ///
 /// See `docs/SPEC.md` §8.
 public struct DailyPuzzleSelector: Sendable {
+    /// How many puzzles are shuffled together as one unit.
+    ///
+    /// The schedule is built block by block rather than as a single shuffle of
+    /// the whole bank, and that is what makes the bank safely append-only. A
+    /// block's order depends on the seed and on where the block starts, never
+    /// on how many puzzles exist in total, so shipping new content leaves
+    /// every earlier block — and therefore every day already seen — untouched.
+    ///
+    /// Shuffling the whole bank at once looked equivalent and was not: growing
+    /// a bank from 120 to 130 puzzles changed all 120 of the first days,
+    /// because every draw advances the generator and the sequence of draws
+    /// depends on the count. `PuzzleBankIntegrityTests` keeps the bank a whole
+    /// number of blocks, so a block is never half-filled by one release and
+    /// completed by the next, which would move the days inside it.
+    public static let blockSize = 30
+
     /// Number of puzzles the selector was built for.
     public let puzzleCount: Int
 
@@ -27,17 +43,35 @@ public struct DailyPuzzleSelector: Sendable {
         self.puzzleCount = puzzleCount
         self.epoch = epoch
 
-        var generator = SeededRandom(seed: seed)
-        var indices = Array(0 ..< puzzleCount)
+        var indices: [Int] = []
+        indices.reserveCapacity(puzzleCount)
+        for start in stride(from: 0, to: puzzleCount, by: Self.blockSize) {
+            let end = min(start + Self.blockSize, puzzleCount)
+            indices.append(contentsOf: Self.shuffledBlock(seed: seed, range: start ..< end))
+        }
+        permutation = indices
+    }
+
+    /// One block's indices in the order this installation will see them.
+    ///
+    /// Seeded from the installation seed mixed with the block's starting
+    /// position, so every block draws from its own stream and none can be
+    /// disturbed by a change to another.
+    private static func shuffledBlock(seed: UInt64, range: Range<Int>) -> [Int] {
+        // The multiplier is the golden-ratio constant SplitMix64 uses as its
+        // increment. It is odd, so multiplying by the block start is
+        // invertible and no two blocks can land on the same stream.
+        var generator = SeededRandom(seed: seed ^ (UInt64(range.lowerBound) &* 0x9E37_79B9_7F4A_7C15))
+        var indices = Array(range)
         // Fisher-Yates is written out rather than delegating to
         // `shuffled(using:)`, because the standard library does not promise a
         // stable shuffling algorithm across Swift releases. If it changed, every
         // user's schedule would silently shift after an app update.
-        for position in stride(from: puzzleCount - 1, to: 0, by: -1) {
+        for position in stride(from: indices.count - 1, to: 0, by: -1) {
             let target = Int(generator.next(upperBound: UInt64(position + 1)))
             indices.swapAt(position, target)
         }
-        permutation = indices
+        return indices
     }
 
     /// Whole days from this installation's epoch to `date`, in the user's

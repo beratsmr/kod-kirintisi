@@ -24,6 +24,25 @@ struct PuzzleBankIntegrityTests {
         #expect(shared == bundled)
     }
 
+    /// The scheduler shuffles the bank one block at a time, and a block's order
+    /// depends on where it starts. A release that leaves the last block half
+    /// full and a later one that completes it would therefore reorder the days
+    /// inside that block — for users who had already lived through them. Keeping
+    /// the bank a whole number of blocks means content only ever arrives as
+    /// blocks that no user has reached yet.
+    @Test("The bank is a whole number of scheduling blocks")
+    func bankFillsWholeBlocks() throws {
+        let bank = try PuzzleBank.bundled()
+
+        #expect(
+            bank.puzzles.count % DailyPuzzleSelector.blockSize == 0,
+            """
+            the bank holds \(bank.puzzles.count) puzzles, which is not a multiple of \
+            \(DailyPuzzleSelector.blockSize); add or remove puzzles so the last block is full
+            """
+        )
+    }
+
     @Test("Identifiers are unique")
     func identifiersAreUnique() throws {
         let bank = try PuzzleBank.bundled()
