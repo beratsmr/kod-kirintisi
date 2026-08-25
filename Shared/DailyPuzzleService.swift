@@ -114,6 +114,14 @@ struct DailyPuzzleService: Sendable {
         )
     }
 
+    /// Clears every recorded answer. The install seed is untouched, so the
+    /// schedule the user has already partly seen does not reshuffle under
+    /// them — see ``ProgressStore/reset()``.
+    func resetProgress() async throws {
+        guard let store else { throw Failure.containerUnavailable }
+        try await store.reset()
+    }
+
     private func digest(
         for date: Date,
         calendar: Calendar,
