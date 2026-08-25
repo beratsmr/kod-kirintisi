@@ -2,7 +2,8 @@ import KodKirintisiCore
 import SwiftUI
 
 /// The second tab: every puzzle the schedule has revealed so far, searchable
-/// and filterable by category and difficulty, each one reopenable read-only.
+/// and filterable by answer status, category and difficulty, each one
+/// reopenable read-only.
 ///
 /// "Revealed so far" is Core's rule, not this view's: ``DailyPuzzleService/archive()``
 /// already excludes anything the user hasn't reached yet, so there is no
@@ -14,8 +15,34 @@ struct ArchiveView: View {
         case failed
     }
 
+    /// The two states worth going back for — a day answered wrong is worth
+    /// rereading, and a day never answered is still open. "Answered correctly"
+    /// is deliberately absent: nobody browses for what they already got right.
+    private enum StatusFilter: CaseIterable {
+        case all
+        case answeredIncorrectly
+        case unanswered
+
+        var label: LocalizedStringKey {
+            switch self {
+            case .all: "All Puzzles"
+            case .answeredIncorrectly: "Answered Incorrectly"
+            case .unanswered: "Unanswered"
+            }
+        }
+
+        func matches(_ entry: PuzzleArchive.Entry) -> Bool {
+            switch self {
+            case .all: true
+            case .answeredIncorrectly: entry.record?.isCorrect == false
+            case .unanswered: entry.record == nil
+            }
+        }
+    }
+
     @State private var state = LoadState.loading
     @State private var searchText = ""
+    @State private var statusFilter = StatusFilter.all
     @State private var categoryFilter: PuzzleCategory?
     @State private var difficultyFilter: Difficulty?
 
@@ -70,6 +97,11 @@ struct ArchiveView: View {
 
     private var filterMenu: some View {
         Menu {
+            Picker("Status", selection: $statusFilter) {
+                ForEach(StatusFilter.allCases, id: \.self) { status in
+                    Text(status.label).tag(status)
+                }
+            }
             Picker("Category", selection: $categoryFilter) {
                 Text("All Categories").tag(PuzzleCategory?.none)
                 ForEach(PuzzleCategory.allCases, id: \.self) { category in
@@ -93,7 +125,7 @@ struct ArchiveView: View {
     }
 
     private var hasActiveFilter: Bool {
-        categoryFilter != nil || difficultyFilter != nil
+        statusFilter != .all || categoryFilter != nil || difficultyFilter != nil
     }
 
     /// Newest reveal first, since browsing the archive is looking back at
@@ -101,6 +133,7 @@ struct ArchiveView: View {
     private func filtered(_ entries: [PuzzleArchive.Entry]) -> [PuzzleArchive.Entry] {
         entries
             .reversed()
+            .filter { statusFilter.matches($0) }
             .filter { categoryFilter == nil || $0.puzzle.category == categoryFilter }
             .filter { difficultyFilter == nil || $0.puzzle.difficulty == difficultyFilter }
             .filter { matches($0, searchText: searchText) }
