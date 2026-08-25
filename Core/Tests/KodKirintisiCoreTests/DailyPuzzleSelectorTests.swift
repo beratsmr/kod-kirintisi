@@ -210,6 +210,47 @@ struct DailyPuzzleSelectorTests {
             == selector.dayIndex(for: leapDay, calendar: calendar) + 1)
     }
 
+    @Test("Day zero reveals exactly one puzzle")
+    func revealedIndicesStartsWithOne() throws {
+        let selector = try #require(DailyPuzzleSelector(seed: 9, puzzleCount: 30))
+
+        let revealed = selector.revealedIndices(throughDayIndex: 0)
+
+        #expect(revealed.count == 1)
+        #expect(try (0 ..< 30).contains(#require(revealed.first)))
+    }
+
+    @Test("A negative day index reveals nothing")
+    func revealedIndicesRejectsNegativeDays() throws {
+        let selector = try #require(DailyPuzzleSelector(seed: 9, puzzleCount: 30))
+
+        #expect(selector.revealedIndices(throughDayIndex: -1).isEmpty)
+    }
+
+    @Test("Revealed indices grow by exactly one puzzle a day, without repeats")
+    func revealedIndicesAccumulateWithoutRepeats() throws {
+        let count = 30
+        let selector = try #require(DailyPuzzleSelector(seed: 9, puzzleCount: count))
+
+        for dayIndex in 0 ..< count {
+            let revealed = selector.revealedIndices(throughDayIndex: dayIndex)
+            #expect(revealed.count == dayIndex + 1)
+            #expect(Set(revealed).count == revealed.count, "a puzzle repeated before the cycle ended")
+        }
+    }
+
+    @Test("Revealed indices stop growing once the bank is exhausted")
+    func revealedIndicesCapAtTheBankSize() throws {
+        let count = 12
+        let selector = try #require(DailyPuzzleSelector(seed: 9, puzzleCount: count))
+
+        let atExhaustion = selector.revealedIndices(throughDayIndex: count - 1)
+        let wellPastExhaustion = selector.revealedIndices(throughDayIndex: count * 5)
+
+        #expect(atExhaustion.count == count)
+        #expect(wellPastExhaustion == atExhaustion, "a second cycle must not add or reorder entries")
+    }
+
     @Test("Every index stays inside the bank")
     func staysInBounds() throws {
         let calendar = try calendar()

@@ -61,6 +61,18 @@ public actor ProgressStore {
         return true
     }
 
+    /// Clears every stored answer and persists the result immediately.
+    ///
+    /// Keeps the same installation seed — see ``UserProgress/resetAnswers()``
+    /// — so the Settings screen's "reset progress" erases history without
+    /// reshuffling the schedule the app and the widget already agree on.
+    public func reset() throws {
+        var progress = try progress()
+        progress.resetAnswers()
+        try persistence.save(progress)
+        cached = progress
+    }
+
     /// Re-reads progress written by the other process.
     ///
     /// The app calls this when it comes to the foreground, since the widget may

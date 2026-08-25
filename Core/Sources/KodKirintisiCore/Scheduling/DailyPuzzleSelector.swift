@@ -56,4 +56,20 @@ public struct DailyPuzzleSelector: Sendable {
     public func index(for date: Date, calendar: Calendar) -> Int {
         permutation[dayIndex(for: date, calendar: calendar) % permutation.count]
     }
+
+    /// Bank indices revealed by day `dayIndex`, oldest first, each exactly once.
+    ///
+    /// The permutation built at init already is one full, non-repeating cycle
+    /// through every puzzle; ``index(for:calendar:)`` only wraps around it with
+    /// `%` once a user has been active longer than the bank is long. This
+    /// returns the prefix of that cycle a user reaching `dayIndex` has seen at
+    /// least once — which is what an archive should show, since listing a
+    /// second reveal of the same puzzle would just repeat the first.
+    ///
+    /// - Parameter dayIndex: A value from ``dayIndex(for:calendar:)``. Negative
+    ///   values yield an empty array rather than trapping.
+    public func revealedIndices(throughDayIndex dayIndex: Int) -> [Int] {
+        guard dayIndex >= 0 else { return [] }
+        return Array(permutation.prefix(min(dayIndex + 1, puzzleCount)))
+    }
 }

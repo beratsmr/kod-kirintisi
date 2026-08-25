@@ -39,4 +39,14 @@ public struct UserProgress: Sendable, Codable, Equatable {
         records[record.puzzleID] = record
         return true
     }
+
+    /// Clears every stored answer, keeping ``installSeed`` untouched.
+    ///
+    /// The daily schedule is derived from the seed alone, so this does not
+    /// reshuffle which puzzle appears on which day — only the answers, streak,
+    /// and statistics are forgotten. A fresh seed would be a different, more
+    /// drastic operation this type does not offer.
+    public mutating func resetAnswers() {
+        records = [:]
+    }
 }

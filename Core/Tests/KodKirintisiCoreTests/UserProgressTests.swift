@@ -59,6 +59,30 @@ struct UserProgressTests {
         #expect(progress.records.count == 1)
     }
 
+    @Test("Resetting clears every answer but keeps the seed")
+    func resetAnswersKeepsSeed() {
+        var progress = UserProgress(installSeed: 42)
+        progress.recordAnswer(makeRecord(puzzleID: "swift-sample-001"))
+        progress.recordAnswer(makeRecord(puzzleID: "swift-sample-002", isCorrect: false))
+
+        progress.resetAnswers()
+
+        #expect(progress.installSeed == 42)
+        #expect(progress.records.isEmpty)
+    }
+
+    @Test("A puzzle answered after a reset can be recorded again")
+    func canAnswerAgainAfterReset() {
+        var progress = UserProgress(installSeed: 1)
+        progress.recordAnswer(makeRecord(isCorrect: false))
+        progress.resetAnswers()
+
+        let stored = progress.recordAnswer(makeRecord(isCorrect: true))
+
+        #expect(stored)
+        #expect(progress.record(for: "swift-sample-001")?.isCorrect == true)
+    }
+
     @Test("Answers to different puzzles are kept side by side")
     func keepsAnswersPerPuzzle() {
         var progress = UserProgress(installSeed: 1)

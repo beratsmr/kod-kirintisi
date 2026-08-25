@@ -95,6 +95,25 @@ struct ProgressStoreTests {
         #expect(try await store.progress().records["swift-a-001"]?.isCorrect == false)
     }
 
+    @Test("Resetting clears answers on disk but keeps the seed")
+    func resetClearsAnswersAndPersists() async throws {
+        let directory = try makeTemporaryDirectory()
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let url = directory.appendingPathComponent("progress.json")
+        let store = ProgressStore(persistence: FileProgressStore(url: url)) { 9 }
+
+        try await store.recordAnswer(record("swift-a-001"))
+        try await store.reset()
+
+        let inMemory = try await store.progress()
+        #expect(inMemory.installSeed == 9)
+        #expect(inMemory.records.isEmpty)
+
+        let onDisk = try #require(try FileProgressStore(url: url).load())
+        #expect(onDisk.installSeed == 9)
+        #expect(onDisk.records.isEmpty)
+    }
+
     @Test("Reloading picks up an answer written by the other process")
     func reloadSeesExternalWrites() async throws {
         let directory = try makeTemporaryDirectory()
