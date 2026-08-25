@@ -40,7 +40,14 @@ struct CategoryAccuracyChart: View {
                         y: .value("Category", String(localized: row.category.badgeName))
                     )
                     .foregroundStyle(.tint)
-                    .annotation(position: .trailing) {
+                    // A 100% bar ends exactly at the domain maximum, so its
+                    // trailing label would sit outside the plot area and be
+                    // clipped to "10". Letting it move back inside keeps the
+                    // best scores — the ones worth showing off — readable.
+                    .annotation(
+                        position: .trailing,
+                        overflowResolution: .init(x: .fit(to: .chart), y: .disabled)
+                    ) {
                         Text(row.summary.accuracy, format: percentFormat)
                             .font(.caption2)
                             .foregroundStyle(.secondary)
