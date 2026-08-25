@@ -124,7 +124,7 @@ guard CGImageDestinationFinalize(destination) else {
 }
 
 let size = (try? outputURL.resourceValues(forKeys: [.fileSizeKey]).fileSize) ?? 0
-let megabytes = Double(size ?? 0) / 1_048_576
+let megabytes = Double(size) / 1_048_576
 print(String(
     format: "Wrote %d frames (%.1f s at %d fps, %d px wide) to %@ — %.1f MB",
     frames.count, duration.seconds, framesPerSecond, targetWidth, outputURL.path, megabytes
