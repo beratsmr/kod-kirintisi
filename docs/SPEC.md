@@ -52,7 +52,11 @@ Kesin sınır: aşağıdakiler var, **başka hiçbir şey yok**.
 - [ ] **Arşiv** — geçmiş sorular; kategori/zorluk filtresi, arama, doğru-yanlış işareti.
 - [ ] **İstatistik** — streak, toplam doğru oranı, kategori bazlı başarı grafiği (Swift Charts).
 
-> **Streak kuralı:** Streak **yalnızca doğru cevaplanan günleri** sayar — yanlış cevap seriyi kırar. Cevaplanmamış bugün seriyi bitirmez (gün henüz dolmadı); iki gün üst üste boş geçince sıfırlanır. Gün sınırı kullanıcının takvimine göre (`startOfDay`), yaz saati geçişlerinde de gün tam olarak bir artar.
+> **Streak kuralı:** Streak **yalnızca doğru cevaplanan günleri** sayar.
+> - **Yanlış cevap seriyi anında kırar.** Cevap verildiği an streak 0 olur, gece yarısını beklemez — kullanıcı kaybettiği seriyi gün boyu ayakta görmemeli.
+> - **Cevaplanmamış bugün seriyi bitirmez**; gün henüz dolmadı. İki gün üst üste boş geçince sıfırlanır.
+> - Bu ikisi farklı durumlardır, bu yüzden `StreakCalculator` hem doğru hem yanlış cevaplanan gün kümesini alır. Sonucu yalnızca **bugünün** yanlış kümesinde olması değiştirir; geçmiş yanlış günler zaten doğru kümesinde olmadıkları için seriyi kendiliğinden durdurur.
+> - Gün sınırı kullanıcının takvimine göre (`startOfDay`), yaz saati geçişlerinde de gün tam olarak bir artar.
 - [ ] **Ayarlar** — günlük bildirim saati, dahil edilecek kategoriler, ilerlemeyi sıfırla, hakkında.
 
 ### 5.3 Sistem entegrasyonları

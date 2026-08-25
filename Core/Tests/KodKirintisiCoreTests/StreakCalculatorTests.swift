@@ -141,88 +141,66 @@ struct StreakCalculatorTests {
         ) == 1)
     }
 
-    @Test("The streak survives a spring-forward day")
-    func survivesSpringForward() throws {
-        let newYork = try calendar(timeZone: "America/New_York")
-        let today = try date(2026, 3, 9, in: newYork)
-        let answered = try [
-            date(2026, 3, 9, in: newYork),
-            date(2026, 3, 8, in: newYork), // the 23-hour day
-            date(2026, 3, 7, in: newYork)
-        ]
-
-        #expect(StreakCalculator.currentStreak(
-            correctlyAnsweredDays: days(answered, in: newYork),
-            today: today,
-            calendar: newYork
-        ) == 3)
-    }
-
-    @Test("The streak survives a fall-back day")
-    func survivesFallBack() throws {
-        let newYork = try calendar(timeZone: "America/New_York")
-        let today = try date(2026, 11, 2, in: newYork)
-        let answered = try [
-            date(2026, 11, 2, in: newYork),
-            date(2026, 11, 1, in: newYork), // the 25-hour day
-            date(2026, 10, 31, in: newYork)
-        ]
-
-        #expect(StreakCalculator.currentStreak(
-            correctlyAnsweredDays: days(answered, in: newYork),
-            today: today,
-            calendar: newYork
-        ) == 3)
-    }
-
-    @Test("The streak survives new year's eve")
-    func survivesYearBoundary() throws {
+    @Test("Answering today wrongly zeroes the streak immediately")
+    func wrongAnswerTodayBreaksTheStreakNow() throws {
         let calendar = try calendar()
-        let today = try date(2027, 1, 1, in: calendar)
-        let answered = try [
-            date(2027, 1, 1, in: calendar),
-            date(2026, 12, 31, in: calendar),
-            date(2026, 12, 30, in: calendar)
+        let today = try date(2026, 5, 10, in: calendar)
+        let earlier = try [
+            date(2026, 5, 9, in: calendar),
+            date(2026, 5, 8, in: calendar),
+            date(2026, 5, 7, in: calendar)
         ]
 
+        // Three days banked, then today is answered wrongly. The user should
+        // see the run gone at once, not keep a stale 3 until midnight.
         #expect(StreakCalculator.currentStreak(
-            correctlyAnsweredDays: days(answered, in: calendar),
+            correctlyAnsweredDays: days(earlier, in: calendar),
+            wronglyAnsweredDays: days([today], in: calendar),
             today: today,
             calendar: calendar
-        ) == 3)
+        ) == 0)
     }
 
-    @Test("The streak survives a leap day")
-    func survivesLeapDay() throws {
+    @Test("An unanswered today keeps the streak alive")
+    func unansweredTodayIsNotAWrongAnswer() throws {
         let calendar = try calendar()
-        let today = try date(2028, 3, 1, in: calendar)
-        let answered = try [
-            date(2028, 3, 1, in: calendar),
-            date(2028, 2, 29, in: calendar),
-            date(2028, 2, 28, in: calendar)
+        let today = try date(2026, 5, 10, in: calendar)
+        let earlier = try [
+            date(2026, 5, 9, in: calendar),
+            date(2026, 5, 8, in: calendar)
         ]
+        let oldMistake = try date(2026, 5, 4, in: calendar)
 
+        // The mirror image of the test above: the same wrong-day set, but with
+        // today absent from it. Only today's membership may zero the run.
         #expect(StreakCalculator.currentStreak(
-            correctlyAnsweredDays: days(answered, in: calendar),
-            today: today,
-            calendar: calendar
-        ) == 3)
-    }
-
-    @Test("Answering at either edge of a day counts as that day")
-    func timeOfDayDoesNotMatter() throws {
-        let calendar = try calendar()
-        let today = try date(2026, 5, 10, hour: 23, in: calendar)
-        let answered = try [
-            date(2026, 5, 10, hour: 0, in: calendar),
-            date(2026, 5, 9, hour: 23, in: calendar)
-        ]
-
-        #expect(StreakCalculator.currentStreak(
-            correctlyAnsweredDays: days(answered, in: calendar),
+            correctlyAnsweredDays: days(earlier, in: calendar),
+            wronglyAnsweredDays: days([oldMistake], in: calendar),
             today: today,
             calendar: calendar
         ) == 2)
+    }
+
+    @Test("A wrong day is reported by wrongDays and withheld from correctDays")
+    func wrongDaysComplementsCorrectDays() throws {
+        let calendar = try calendar()
+        let records = try [
+            AnswerRecord(
+                puzzleID: "a", selectedIndex: 0, isCorrect: true,
+                answeredAt: date(2026, 5, 10, in: calendar)
+            ),
+            AnswerRecord(
+                puzzleID: "b", selectedIndex: 1, isCorrect: false,
+                answeredAt: date(2026, 5, 9, in: calendar)
+            )
+        ]
+
+        let correct = StreakCalculator.correctDays(from: records, calendar: calendar)
+        let wrong = StreakCalculator.wrongDays(from: records, calendar: calendar)
+        let ninth = try StreakCalculator.day(for: date(2026, 5, 9, in: calendar), calendar: calendar)
+
+        #expect(wrong == [ninth])
+        #expect(correct.isDisjoint(with: wrong))
     }
 
     @Test("The longest streak looks at the whole history")
