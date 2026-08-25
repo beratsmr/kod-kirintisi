@@ -12,7 +12,7 @@ Kod Kırıntısı puts a small Swift/algorithm question on your Home Screen ever
 
 ## Why
 
-Daily practice apps fail because opening them is the hard part. This one removes that step: the content lives where you already look. Fully offline, no account, no tracking, no ads.
+Daily practice apps fail because opening them is the hard part. This one removes that step: the content lives where you already look. Fully offline, no account, no tracking, no ads — the app contains no networking code at all, and [`docs/PRIVACY.md`](docs/PRIVACY.md) lists exactly what is stored and where.
 
 ## Architecture
 
@@ -60,6 +60,7 @@ Full environment notes (including how to develop this without Xcode installed): 
 | [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | Layers, data flow, key components, test strategy |
 | [`docs/SETUP.md`](docs/SETUP.md) | Toolchain, editor, CI, troubleshooting |
 | [`docs/puzzles.schema.json`](docs/puzzles.schema.json) | JSON Schema for the puzzle bank |
+| [`docs/PRIVACY.md`](docs/PRIVACY.md) | Privacy policy (EN/TR) and the filed App Store Connect answers |
 | [`CLAUDE.md`](CLAUDE.md) | Engineering rules and build milestones |
 
 ## Contributing puzzles
