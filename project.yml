@@ -51,6 +51,9 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.beratsumer.kodkirintisi
         PRODUCT_NAME: Kod Kırıntısı
+        # The display name has a space and Turkish letters, which would make the
+        # Swift module `Kod_Kırıntısı` and the test target's import unwieldy.
+        PRODUCT_MODULE_NAME: KodKirintisi
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         INFOPLIST_KEY_UILaunchScreen_Generation: YES
     info:
@@ -116,6 +119,10 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.beratsumer.kodkirintisi.tests
         GENERATE_INFOPLIST_FILE: YES
+        # XcodeGen derives TEST_HOST from the target name, but the product is
+        # named "Kod Kırıntısı", so the default path misses the bundle.
+        TEST_HOST: $(BUILT_PRODUCTS_DIR)/Kod Kırıntısı.app/Kod Kırıntısı
+        BUNDLE_LOADER: $(TEST_HOST)
 
 schemes:
   KodKirintisi:
