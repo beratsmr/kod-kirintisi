@@ -4,6 +4,10 @@ import Testing
 
 @Suite("Progress store")
 struct ProgressStoreTests {
+    /// The install instant the store stamps on a first launch, injected so the
+    /// tests never read the clock: 2026-01-01T00:00:00Z.
+    private let installedOn = Date(timeIntervalSince1970: 1_767_225_600)
+
     private func makeTemporaryDirectory() throws -> URL {
         let url = FileManager.default.temporaryDirectory
             .appendingPathComponent("kodkirintisi-tests")
@@ -26,7 +30,7 @@ struct ProgressStoreTests {
         let directory = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: directory) }
         let file = FileProgressStore(url: directory.appendingPathComponent("progress.json"))
-        let store = ProgressStore(persistence: file) { 4242 }
+        let store = ProgressStore(persistence: file, makeSeed: { 4242 }, now: { installedOn })
 
         let progress = try await store.progress()
 
@@ -40,12 +44,14 @@ struct ProgressStoreTests {
         defer { try? FileManager.default.removeItem(at: directory) }
         let url = directory.appendingPathComponent("progress.json")
         let file = FileProgressStore(url: url)
-        let store = ProgressStore(persistence: file) { 4242 }
+        let store = ProgressStore(persistence: file, makeSeed: { 4242 }, now: { installedOn })
 
         _ = try await store.progress()
 
         // A second store, standing in for the widget process, must agree.
-        let widgetSide = ProgressStore(persistence: FileProgressStore(url: url)) { 9999 }
+        let widgetSide = ProgressStore(
+            persistence: FileProgressStore(url: url), makeSeed: { 9999 }, now: { installedOn }
+        )
         #expect(try await widgetSide.progress().installSeed == 4242)
     }
 
@@ -54,7 +60,7 @@ struct ProgressStoreTests {
         let directory = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: directory) }
         let file = FileProgressStore(url: directory.appendingPathComponent("progress.json"))
-        let store = ProgressStore(persistence: file) { 7 }
+        let store = ProgressStore(persistence: file, makeSeed: { 7 }, now: { installedOn })
 
         let first = try await store.progress().installSeed
         try await store.recordAnswer(record("swift-a-001"))
@@ -71,7 +77,7 @@ struct ProgressStoreTests {
         let directory = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: directory) }
         let url = directory.appendingPathComponent("progress.json")
-        let store = ProgressStore(persistence: FileProgressStore(url: url)) { 1 }
+        let store = ProgressStore(persistence: FileProgressStore(url: url), makeSeed: { 1 }, now: { installedOn })
 
         let stored = try await store.recordAnswer(record("swift-a-001"))
 
@@ -85,7 +91,7 @@ struct ProgressStoreTests {
         let directory = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: directory) }
         let url = directory.appendingPathComponent("progress.json")
-        let store = ProgressStore(persistence: FileProgressStore(url: url)) { 1 }
+        let store = ProgressStore(persistence: FileProgressStore(url: url), makeSeed: { 1 }, now: { installedOn })
 
         let first = try await store.recordAnswer(record("swift-a-001", isCorrect: false))
         let second = try await store.recordAnswer(record("swift-a-001", isCorrect: true))
@@ -100,7 +106,7 @@ struct ProgressStoreTests {
         let directory = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: directory) }
         let url = directory.appendingPathComponent("progress.json")
-        let store = ProgressStore(persistence: FileProgressStore(url: url)) { 9 }
+        let store = ProgressStore(persistence: FileProgressStore(url: url), makeSeed: { 9 }, now: { installedOn })
 
         try await store.recordAnswer(record("swift-a-001"))
         try await store.reset()
@@ -119,12 +125,12 @@ struct ProgressStoreTests {
         let directory = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: directory) }
         let url = directory.appendingPathComponent("progress.json")
-        let appSide = ProgressStore(persistence: FileProgressStore(url: url)) { 3 }
+        let appSide = ProgressStore(persistence: FileProgressStore(url: url), makeSeed: { 3 }, now: { installedOn })
 
         _ = try await appSide.progress()
 
         // The widget answers while the app is in the background.
-        let widgetSide = ProgressStore(persistence: FileProgressStore(url: url)) { 3 }
+        let widgetSide = ProgressStore(persistence: FileProgressStore(url: url), makeSeed: { 3 }, now: { installedOn })
         try await widgetSide.recordAnswer(record("swift-a-001"))
 
         #expect(try await appSide.progress().records.isEmpty, "stale copy expected before reload")
@@ -138,7 +144,7 @@ struct ProgressStoreTests {
         defer { try? FileManager.default.removeItem(at: directory) }
         let url = directory.appendingPathComponent("progress.json")
         try Data("not json at all".utf8).write(to: url)
-        let store = ProgressStore(persistence: FileProgressStore(url: url)) { 55 }
+        let store = ProgressStore(persistence: FileProgressStore(url: url), makeSeed: { 55 }, now: { installedOn })
 
         let progress = try await store.progress()
 
@@ -151,7 +157,7 @@ struct ProgressStoreTests {
         let directory = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: directory) }
         let url = directory.appendingPathComponent("progress.json")
-        let store = ProgressStore(persistence: FileProgressStore(url: url)) { 1234 }
+        let store = ProgressStore(persistence: FileProgressStore(url: url), makeSeed: { 1234 }, now: { installedOn })
 
         _ = try await store.progress()
         try FileManager.default.removeItem(at: url)
@@ -166,7 +172,7 @@ struct ProgressStoreTests {
         let directory = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: directory) }
         let url = directory.appendingPathComponent("progress.json")
-        let store = ProgressStore(persistence: FileProgressStore(url: url)) { 2 }
+        let store = ProgressStore(persistence: FileProgressStore(url: url), makeSeed: { 2 }, now: { installedOn })
         let count = 50
 
         try await withThrowingTaskGroup(of: Bool.self) { group in
@@ -190,7 +196,7 @@ struct ProgressStoreTests {
         let directory = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: directory) }
         let url = directory.appendingPathComponent("progress.json")
-        let store = ProgressStore(persistence: FileProgressStore(url: url)) { 2 }
+        let store = ProgressStore(persistence: FileProgressStore(url: url), makeSeed: { 2 }, now: { installedOn })
 
         let results = try await withThrowingTaskGroup(of: Bool.self) { group -> [Bool] in
             for _ in 0 ..< 20 {

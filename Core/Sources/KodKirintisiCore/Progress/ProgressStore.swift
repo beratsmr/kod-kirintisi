@@ -9,6 +9,7 @@ import Foundation
 public actor ProgressStore {
     private let persistence: any ProgressPersisting
     private let makeSeed: @Sendable () -> UInt64
+    private let now: @Sendable () -> Date
     private var cached: UserProgress?
 
     /// - Parameters:
@@ -16,12 +17,17 @@ public actor ProgressStore {
     ///   - makeSeed: Produces the installation seed on first launch. It is
     ///     injected rather than read from the system generator so tests are
     ///     deterministic; production passes `{ UInt64.random(in: .min ... .max) }`.
+    ///   - now: Stamps ``UserProgress/installedOn`` on first launch. Injected
+    ///     for the same reason as the seed: it is read exactly once per
+    ///     install and fixes the whole schedule, so tests must control it.
     public init(
         persistence: any ProgressPersisting,
-        makeSeed: @escaping @Sendable () -> UInt64
+        makeSeed: @escaping @Sendable () -> UInt64,
+        now: @escaping @Sendable () -> Date
     ) {
         self.persistence = persistence
         self.makeSeed = makeSeed
+        self.now = now
     }
 
     /// The current progress, loading it on first use.
@@ -40,7 +46,7 @@ public actor ProgressStore {
             return loaded
         }
 
-        let fresh = UserProgress(installSeed: makeSeed())
+        let fresh = UserProgress(installSeed: makeSeed(), installedOn: now())
         try persistence.save(fresh)
         cached = fresh
         return fresh
@@ -86,7 +92,7 @@ public actor ProgressStore {
         // The file is gone — deleted, or quarantined as unreadable. Reuse the
         // seed already in memory instead of drawing a new one, which would
         // reshuffle the user's whole schedule mid-session.
-        let fallback = cached ?? UserProgress(installSeed: makeSeed())
+        let fallback = cached ?? UserProgress(installSeed: makeSeed(), installedOn: now())
         try persistence.save(fallback)
         cached = fallback
         return fallback

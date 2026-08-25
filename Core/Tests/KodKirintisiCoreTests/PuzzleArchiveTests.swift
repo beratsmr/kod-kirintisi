@@ -4,6 +4,12 @@ import Testing
 
 @Suite("Puzzle archive")
 struct PuzzleArchiveTests {
+    /// The fixture installation's day zero: 2026-01-01T00:00:00Z.
+    ///
+    /// The archive counts reveals from the install, so the dates below are
+    /// meaningful only as offsets from here.
+    private let installedOn = Date(timeIntervalSince1970: 1_767_225_600)
+
     private func calendar(timeZone identifier: String = "UTC") throws -> Calendar {
         var calendar = Calendar(identifier: .gregorian)
         calendar.timeZone = try #require(TimeZone(identifier: identifier))
@@ -36,7 +42,7 @@ struct PuzzleArchiveTests {
 
         let entries = try PuzzleArchive.entries(
             bank: PuzzleBank(version: 1, puzzles: []),
-            progress: UserProgress(installSeed: 1),
+            progress: UserProgress(installSeed: 1, installedOn: installedOn),
             through: today,
             calendar: calendar
         )
@@ -51,7 +57,7 @@ struct PuzzleArchiveTests {
 
         let entries = try PuzzleArchive.entries(
             bank: bank(count: 12),
-            progress: UserProgress(installSeed: 7),
+            progress: UserProgress(installSeed: 7, installedOn: installedOn),
             through: today,
             calendar: calendar
         )
@@ -66,8 +72,8 @@ struct PuzzleArchiveTests {
         let calendar = try calendar()
         let today = try date(2026, 3, 4, in: calendar)
         let bank = try bank(count: 12)
-        let progress = UserProgress(installSeed: 99)
-        let selector = try #require(DailyPuzzleSelector(seed: 99, puzzleCount: bank.puzzles.count))
+        let progress = UserProgress(installSeed: 99, installedOn: installedOn)
+        let selector = try #require(DailyPuzzleSelector(seed: 99, puzzleCount: bank.puzzles.count, epoch: installedOn))
 
         let entries = PuzzleArchive.entries(
             bank: bank, progress: progress, through: today, calendar: calendar
@@ -84,9 +90,9 @@ struct PuzzleArchiveTests {
         let calendar = try calendar()
         let today = try date(2026, 1, 1, in: calendar)
         let bank = try bank(count: 12)
-        var progress = UserProgress(installSeed: 7)
+        var progress = UserProgress(installSeed: 7, installedOn: installedOn)
 
-        let selector = try #require(DailyPuzzleSelector(seed: 7, puzzleCount: bank.puzzles.count))
+        let selector = try #require(DailyPuzzleSelector(seed: 7, puzzleCount: bank.puzzles.count, epoch: installedOn))
         let todaysPuzzle = bank.puzzles[selector.index(for: today, calendar: calendar)]
         let stored = progress.recordAnswer(AnswerRecord(
             puzzleID: todaysPuzzle.id, selectedIndex: 0, isCorrect: true, answeredAt: today
@@ -108,7 +114,7 @@ struct PuzzleArchiveTests {
         // Two full cycles plus a bit, so the schedule has wrapped more than once.
         let farInTheFuture = try date(2026, 1, 1 + count * 2 + 1, in: calendar)
         let bank = try bank(count: count)
-        let progress = UserProgress(installSeed: 3)
+        let progress = UserProgress(installSeed: 3, installedOn: installedOn)
 
         let entries = PuzzleArchive.entries(
             bank: bank, progress: progress, through: farInTheFuture, calendar: calendar
@@ -123,7 +129,7 @@ struct PuzzleArchiveTests {
         let calendar = try calendar()
         let today = try date(2026, 1, 6, in: calendar)
         let bank = try bank(count: 20)
-        let progress = UserProgress(installSeed: 15)
+        let progress = UserProgress(installSeed: 15, installedOn: installedOn)
 
         let entries = PuzzleArchive.entries(
             bank: bank, progress: progress, through: today, calendar: calendar

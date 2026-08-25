@@ -4,6 +4,9 @@ import Testing
 
 @Suite("File progress store")
 struct FileProgressStoreTests {
+    /// Day zero for the fixture installation: 2026-01-01T00:00:00Z.
+    private let installedOn = Date(timeIntervalSince1970: 1_767_225_600)
+
     /// A private directory per test, removed afterwards.
     private func makeTemporaryDirectory() throws -> URL {
         let url = FileManager.default.temporaryDirectory
@@ -37,7 +40,7 @@ struct FileProgressStoreTests {
         defer { try? FileManager.default.removeItem(at: directory) }
         let store = FileProgressStore(url: directory.appendingPathComponent("progress.json"))
 
-        var progress = UserProgress(installSeed: 987_654_321)
+        var progress = UserProgress(installSeed: 987_654_321, installedOn: installedOn)
         progress.recordAnswer(record("swift-a-001"))
         try store.save(progress)
 
@@ -53,7 +56,7 @@ struct FileProgressStoreTests {
         defer { try? FileManager.default.removeItem(at: directory) }
         let store = FileProgressStore(url: directory.appendingPathComponent("progress.json"))
 
-        var progress = UserProgress(installSeed: 1)
+        var progress = UserProgress(installSeed: 1, installedOn: installedOn)
         progress.recordAnswer(record("swift-a-001"))
         try store.save(progress)
 
@@ -74,7 +77,7 @@ struct FileProgressStoreTests {
             .appendingPathComponent("progress.json")
         let store = FileProgressStore(url: nested)
 
-        try store.save(UserProgress(installSeed: 5))
+        try store.save(UserProgress(installSeed: 5, installedOn: installedOn))
 
         #expect(FileManager.default.fileExists(atPath: nested.path))
         #expect(try store.load()?.installSeed == 5)
@@ -130,7 +133,7 @@ struct FileProgressStoreTests {
 
         try Data("broken".utf8).write(to: url)
         _ = try store.load()
-        try store.save(UserProgress(installSeed: 42))
+        try store.save(UserProgress(installSeed: 42, installedOn: installedOn))
 
         #expect(try store.load()?.installSeed == 42)
     }

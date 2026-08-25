@@ -9,20 +9,23 @@ import Foundation
 ///
 /// See `docs/SPEC.md` §8.
 public struct DailyPuzzleSelector: Sendable {
-    /// Day zero of the schedule.
-    public static let epoch = DateComponents(year: 2026, month: 1, day: 1)
-
     /// Number of puzzles the selector was built for.
     public let puzzleCount: Int
+
+    /// Day zero of this installation's schedule.
+    public let epoch: Date
 
     /// Bank indices in the order this installation will see them.
     private let permutation: [Int]
 
     /// Creates a selector over a bank of `puzzleCount` puzzles.
+    /// - Parameter epoch: The day to start counting from, normally
+    ///   ``UserProgress/installedOn``.
     /// - Returns: `nil` for an empty bank, which has no puzzle to select.
-    public init?(seed: UInt64, puzzleCount: Int) {
+    public init?(seed: UInt64, puzzleCount: Int, epoch: Date) {
         guard puzzleCount > 0 else { return nil }
         self.puzzleCount = puzzleCount
+        self.epoch = epoch
 
         var generator = SeededRandom(seed: seed)
         var indices = Array(0 ..< puzzleCount)
@@ -37,13 +40,13 @@ public struct DailyPuzzleSelector: Sendable {
         permutation = indices
     }
 
-    /// Whole days from the epoch to `date`, in the user's calendar.
+    /// Whole days from this installation's epoch to `date`, in the user's
+    /// calendar.
     ///
     /// Dates before the epoch clamp to day zero, so a device whose clock is set
     /// backwards still gets a puzzle instead of nothing.
     public func dayIndex(for date: Date, calendar: Calendar) -> Int {
-        guard let epochDate = calendar.date(from: Self.epoch) else { return 0 }
-        let start = calendar.startOfDay(for: epochDate)
+        let start = calendar.startOfDay(for: epoch)
         let target = calendar.startOfDay(for: date)
         let days = calendar.dateComponents([.day], from: start, to: target).day ?? 0
         return max(0, days)

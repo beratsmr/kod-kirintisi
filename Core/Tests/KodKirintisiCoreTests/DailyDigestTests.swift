@@ -4,6 +4,12 @@ import Testing
 
 @Suite("Daily digest")
 struct DailyDigestTests {
+    /// The fixture installation's day zero: 2026-01-01T00:00:00Z.
+    ///
+    /// The schedule counts from the install, so the dates below are meaningful
+    /// only as offsets from here.
+    private let installedOn = Date(timeIntervalSince1970: 1_767_225_600)
+
     private func calendar(timeZone identifier: String = "UTC") throws -> Calendar {
         var calendar = Calendar(identifier: .gregorian)
         calendar.timeZone = try #require(TimeZone(identifier: identifier))
@@ -34,12 +40,12 @@ struct DailyDigestTests {
         let calendar = try calendar()
         let today = try date(2026, 3, 4, in: calendar)
         let bank = try bank(count: 12)
-        let progress = UserProgress(installSeed: 99)
+        let progress = UserProgress(installSeed: 99, installedOn: installedOn)
 
         let digest = try #require(DailyDigest.make(
             bank: bank, progress: progress, date: today, calendar: calendar
         ))
-        let selector = try #require(DailyPuzzleSelector(seed: 99, puzzleCount: bank.puzzles.count))
+        let selector = try #require(DailyPuzzleSelector(seed: 99, puzzleCount: bank.puzzles.count, epoch: installedOn))
 
         #expect(digest.puzzle == bank.puzzles[selector.index(for: today, calendar: calendar)])
         #expect(digest.dayIndex == selector.dayIndex(for: today, calendar: calendar))
@@ -52,7 +58,7 @@ struct DailyDigestTests {
 
         #expect(try DailyDigest.make(
             bank: PuzzleBank(version: 1, puzzles: []),
-            progress: UserProgress(installSeed: 1),
+            progress: UserProgress(installSeed: 1, installedOn: installedOn),
             date: today,
             calendar: calendar
         ) == nil)
@@ -65,7 +71,7 @@ struct DailyDigestTests {
 
         let digest = try #require(try DailyDigest.make(
             bank: bank(count: 12),
-            progress: UserProgress(installSeed: 7),
+            progress: UserProgress(installSeed: 7, installedOn: installedOn),
             date: today,
             calendar: calendar
         ))
@@ -81,9 +87,9 @@ struct DailyDigestTests {
         let calendar = try calendar()
         let today = try date(2026, 3, 4, in: calendar)
         let bank = try bank(count: 12)
-        var progress = UserProgress(installSeed: 7)
+        var progress = UserProgress(installSeed: 7, installedOn: installedOn)
 
-        let selector = try #require(DailyPuzzleSelector(seed: 7, puzzleCount: bank.puzzles.count))
+        let selector = try #require(DailyPuzzleSelector(seed: 7, puzzleCount: bank.puzzles.count, epoch: installedOn))
         let todaysPuzzle = bank.puzzles[selector.index(for: today, calendar: calendar)]
 
         let stored = progress.recordAnswer(AnswerRecord(
@@ -107,9 +113,9 @@ struct DailyDigestTests {
         let today = try date(2026, 3, 4, in: calendar)
         let yesterday = try date(2026, 3, 3, in: calendar)
         let bank = try bank(count: 12)
-        var progress = UserProgress(installSeed: 7)
+        var progress = UserProgress(installSeed: 7, installedOn: installedOn)
 
-        let selector = try #require(DailyPuzzleSelector(seed: 7, puzzleCount: bank.puzzles.count))
+        let selector = try #require(DailyPuzzleSelector(seed: 7, puzzleCount: bank.puzzles.count, epoch: installedOn))
         let yesterdaysPuzzle = bank.puzzles[selector.index(for: yesterday, calendar: calendar)]
 
         let stored = progress.recordAnswer(AnswerRecord(
@@ -132,9 +138,9 @@ struct DailyDigestTests {
         let today = try date(2026, 3, 4, in: calendar)
         let yesterday = try date(2026, 3, 3, in: calendar)
         let bank = try bank(count: 12)
-        var progress = UserProgress(installSeed: 7)
+        var progress = UserProgress(installSeed: 7, installedOn: installedOn)
 
-        let selector = try #require(DailyPuzzleSelector(seed: 7, puzzleCount: bank.puzzles.count))
+        let selector = try #require(DailyPuzzleSelector(seed: 7, puzzleCount: bank.puzzles.count, epoch: installedOn))
         let yesterdaysPuzzle = bank.puzzles[selector.index(for: yesterday, calendar: calendar)]
         let todaysPuzzle = bank.puzzles[selector.index(for: today, calendar: calendar)]
 
@@ -162,7 +168,7 @@ struct DailyDigestTests {
     func rollsOverAtLocalMidnight() throws {
         let calendar = try calendar(timeZone: "Europe/Istanbul")
         let bank = try bank(count: 30)
-        let progress = UserProgress(installSeed: 4242)
+        let progress = UserProgress(installSeed: 4242, installedOn: installedOn)
 
         let lateTonight = try date(2026, 3, 4, hour: 23, in: calendar)
         let earlyTomorrow = try date(2026, 3, 5, hour: 0, in: calendar)

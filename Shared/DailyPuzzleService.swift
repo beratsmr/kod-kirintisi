@@ -26,7 +26,8 @@ struct DailyPuzzleService: Sendable {
         store = progressURL.map { url in
             ProgressStore(
                 persistence: FileProgressStore(url: url),
-                makeSeed: { UInt64.random(in: .min ... .max) }
+                makeSeed: { UInt64.random(in: .min ... .max) },
+                now: { .now }
             )
         }
     }

@@ -4,6 +4,14 @@ import Testing
 
 @Suite("Daily puzzle selection")
 struct DailyPuzzleSelectorTests {
+    /// Day zero for the fixture installation: 2026-01-01T00:00:00Z.
+    ///
+    /// The schedule counts from the install rather than from a date fixed in
+    /// the source, so every test has to say when its installation began. The
+    /// tests below measure days as offsets from here, which is why most of
+    /// them start counting at 2026-01-01.
+    private let epoch = Date(timeIntervalSince1970: 1_767_225_600)
+
     /// A fixed calendar so a test never depends on where it runs.
     private func calendar(timeZone identifier: String = "UTC") throws -> Calendar {
         var calendar = Calendar(identifier: .gregorian)
@@ -24,13 +32,13 @@ struct DailyPuzzleSelectorTests {
 
     @Test("An empty bank has no selector")
     func rejectsEmptyBank() {
-        #expect(DailyPuzzleSelector(seed: 1, puzzleCount: 0) == nil)
+        #expect(DailyPuzzleSelector(seed: 1, puzzleCount: 0, epoch: epoch) == nil)
     }
 
     @Test("A single-puzzle bank always returns that puzzle")
     func handlesSinglePuzzleBank() throws {
         let calendar = try calendar()
-        let selector = try #require(DailyPuzzleSelector(seed: 99, puzzleCount: 1))
+        let selector = try #require(DailyPuzzleSelector(seed: 99, puzzleCount: 1, epoch: epoch))
 
         for offset in 0 ..< 5 {
             let day = try date(2026, 1, 1 + offset, in: calendar)
@@ -41,7 +49,7 @@ struct DailyPuzzleSelectorTests {
     @Test("The same day always yields the same puzzle")
     func isDeterministicWithinADay() throws {
         let calendar = try calendar()
-        let selector = try #require(DailyPuzzleSelector(seed: 12345, puzzleCount: 120))
+        let selector = try #require(DailyPuzzleSelector(seed: 12345, puzzleCount: 120, epoch: epoch))
 
         let morning = try date(2026, 3, 14, hour: 0, minute: 1, in: calendar)
         let evening = try date(2026, 3, 14, hour: 23, minute: 59, in: calendar)
@@ -53,8 +61,8 @@ struct DailyPuzzleSelectorTests {
     @Test("Two selectors with the same seed agree, which is how app and widget match")
     func isReproducibleAcrossInstances() throws {
         let calendar = try calendar()
-        let first = try #require(DailyPuzzleSelector(seed: 777, puzzleCount: 120))
-        let second = try #require(DailyPuzzleSelector(seed: 777, puzzleCount: 120))
+        let first = try #require(DailyPuzzleSelector(seed: 777, puzzleCount: 120, epoch: epoch))
+        let second = try #require(DailyPuzzleSelector(seed: 777, puzzleCount: 120, epoch: epoch))
 
         for offset in 0 ..< 40 {
             let day = try date(2026, 1, 1 + offset, in: calendar)
@@ -66,8 +74,8 @@ struct DailyPuzzleSelectorTests {
     @Test("Different seeds order the bank differently")
     func differentSeedsDiffer() throws {
         let calendar = try calendar()
-        let first = try #require(DailyPuzzleSelector(seed: 1, puzzleCount: 120))
-        let second = try #require(DailyPuzzleSelector(seed: 2, puzzleCount: 120))
+        let first = try #require(DailyPuzzleSelector(seed: 1, puzzleCount: 120, epoch: epoch))
+        let second = try #require(DailyPuzzleSelector(seed: 2, puzzleCount: 120, epoch: epoch))
 
         var differences = 0
         for offset in 0 ..< 60 {
@@ -85,7 +93,7 @@ struct DailyPuzzleSelectorTests {
     func doesNotRepeatWithinACycle() throws {
         let calendar = try calendar()
         let count = 120
-        let selector = try #require(DailyPuzzleSelector(seed: 2024, puzzleCount: count))
+        let selector = try #require(DailyPuzzleSelector(seed: 2024, puzzleCount: count, epoch: epoch))
 
         var seen: [Int] = []
         for offset in 0 ..< count {
@@ -101,7 +109,7 @@ struct DailyPuzzleSelectorTests {
     func wrapsAfterExhaustion() throws {
         let calendar = try calendar()
         let count = 30
-        let selector = try #require(DailyPuzzleSelector(seed: 5, puzzleCount: count))
+        let selector = try #require(DailyPuzzleSelector(seed: 5, puzzleCount: count, epoch: epoch))
 
         let first = try date(2026, 1, 1, in: calendar)
         let afterCycle = try #require(
@@ -112,23 +120,39 @@ struct DailyPuzzleSelectorTests {
             == selector.index(for: afterCycle, calendar: calendar))
     }
 
-    @Test("Day zero is the epoch")
+    @Test("Day zero is the day of the install")
     func epochIsDayZero() throws {
         let calendar = try calendar()
-        let selector = try #require(DailyPuzzleSelector(seed: 1, puzzleCount: 120))
-        let epoch = try date(2026, 1, 1, in: calendar)
+        let selector = try #require(DailyPuzzleSelector(seed: 1, puzzleCount: 120, epoch: epoch))
 
         #expect(selector.dayIndex(for: epoch, calendar: calendar) == 0)
+    }
+
+    /// An installation started later is on its own day one, not dropped into
+    /// the middle of a schedule that has been running without it. This is the
+    /// whole point of anchoring the epoch to the install.
+    @Test("A later install still starts at day zero")
+    func laterInstallStartsAtDayZero() throws {
+        let calendar = try calendar()
+        let installDay = try date(2027, 6, 15, in: calendar)
+        let selector = try #require(
+            DailyPuzzleSelector(seed: 1, puzzleCount: 120, epoch: installDay)
+        )
+
+        #expect(selector.dayIndex(for: installDay, calendar: calendar) == 0)
+        #expect(selector.revealedIndices(throughDayIndex: 0).count == 1)
+
+        let nextDay = try date(2027, 6, 16, in: calendar)
+        #expect(selector.dayIndex(for: nextDay, calendar: calendar) == 1)
     }
 
     @Test("Dates before the epoch clamp to day zero")
     func clampsBeforeEpoch() throws {
         let calendar = try calendar()
-        let selector = try #require(DailyPuzzleSelector(seed: 1, puzzleCount: 120))
+        let selector = try #require(DailyPuzzleSelector(seed: 1, puzzleCount: 120, epoch: epoch))
 
         let longBefore = try date(2020, 6, 15, in: calendar)
         let dayBefore = try date(2025, 12, 31, in: calendar)
-        let epoch = try date(2026, 1, 1, in: calendar)
 
         #expect(selector.dayIndex(for: longBefore, calendar: calendar) == 0)
         #expect(selector.dayIndex(for: dayBefore, calendar: calendar) == 0)
@@ -140,7 +164,7 @@ struct DailyPuzzleSelectorTests {
     func rollsOverAtLocalMidnight() throws {
         // Istanbul is UTC+3, so 22:00 UTC is already the next local day.
         let istanbul = try calendar(timeZone: "Europe/Istanbul")
-        let selector = try #require(DailyPuzzleSelector(seed: 42, puzzleCount: 120))
+        let selector = try #require(DailyPuzzleSelector(seed: 42, puzzleCount: 120, epoch: epoch))
 
         let lateEvening = try date(2026, 5, 10, hour: 23, minute: 30, in: istanbul)
         let justAfterMidnight = try date(2026, 5, 11, hour: 0, minute: 30, in: istanbul)
@@ -155,7 +179,7 @@ struct DailyPuzzleSelectorTests {
     func handlesDaylightSavingSpringForward() throws {
         // New York loses an hour at 02:00 on 2026-03-08.
         let newYork = try calendar(timeZone: "America/New_York")
-        let selector = try #require(DailyPuzzleSelector(seed: 8, puzzleCount: 120))
+        let selector = try #require(DailyPuzzleSelector(seed: 8, puzzleCount: 120, epoch: epoch))
 
         let before = try date(2026, 3, 7, in: newYork)
         let during = try date(2026, 3, 8, in: newYork)
@@ -171,7 +195,7 @@ struct DailyPuzzleSelectorTests {
     func handlesDaylightSavingFallBack() throws {
         // New York gains an hour at 02:00 on 2026-11-01.
         let newYork = try calendar(timeZone: "America/New_York")
-        let selector = try #require(DailyPuzzleSelector(seed: 8, puzzleCount: 120))
+        let selector = try #require(DailyPuzzleSelector(seed: 8, puzzleCount: 120, epoch: epoch))
 
         let before = try date(2026, 10, 31, in: newYork)
         let during = try date(2026, 11, 1, in: newYork)
@@ -186,7 +210,7 @@ struct DailyPuzzleSelectorTests {
     @Test("New year's eve rolls over into a single new day")
     func handlesYearBoundary() throws {
         let calendar = try calendar()
-        let selector = try #require(DailyPuzzleSelector(seed: 3, puzzleCount: 120))
+        let selector = try #require(DailyPuzzleSelector(seed: 3, puzzleCount: 120, epoch: epoch))
 
         let lastDay = try date(2026, 12, 31, hour: 23, minute: 59, in: calendar)
         let newYear = try date(2027, 1, 1, hour: 0, minute: 1, in: calendar)
@@ -198,7 +222,7 @@ struct DailyPuzzleSelectorTests {
     @Test("A leap day counts as one ordinary day")
     func handlesLeapDay() throws {
         let calendar = try calendar()
-        let selector = try #require(DailyPuzzleSelector(seed: 3, puzzleCount: 120))
+        let selector = try #require(DailyPuzzleSelector(seed: 3, puzzleCount: 120, epoch: epoch))
 
         let before = try date(2028, 2, 28, in: calendar)
         let leapDay = try date(2028, 2, 29, in: calendar)
@@ -212,7 +236,7 @@ struct DailyPuzzleSelectorTests {
 
     @Test("Day zero reveals exactly one puzzle")
     func revealedIndicesStartsWithOne() throws {
-        let selector = try #require(DailyPuzzleSelector(seed: 9, puzzleCount: 30))
+        let selector = try #require(DailyPuzzleSelector(seed: 9, puzzleCount: 30, epoch: epoch))
 
         let revealed = selector.revealedIndices(throughDayIndex: 0)
 
@@ -222,7 +246,7 @@ struct DailyPuzzleSelectorTests {
 
     @Test("A negative day index reveals nothing")
     func revealedIndicesRejectsNegativeDays() throws {
-        let selector = try #require(DailyPuzzleSelector(seed: 9, puzzleCount: 30))
+        let selector = try #require(DailyPuzzleSelector(seed: 9, puzzleCount: 30, epoch: epoch))
 
         #expect(selector.revealedIndices(throughDayIndex: -1).isEmpty)
     }
@@ -230,7 +254,7 @@ struct DailyPuzzleSelectorTests {
     @Test("Revealed indices grow by exactly one puzzle a day, without repeats")
     func revealedIndicesAccumulateWithoutRepeats() throws {
         let count = 30
-        let selector = try #require(DailyPuzzleSelector(seed: 9, puzzleCount: count))
+        let selector = try #require(DailyPuzzleSelector(seed: 9, puzzleCount: count, epoch: epoch))
 
         for dayIndex in 0 ..< count {
             let revealed = selector.revealedIndices(throughDayIndex: dayIndex)
@@ -242,7 +266,7 @@ struct DailyPuzzleSelectorTests {
     @Test("Revealed indices stop growing once the bank is exhausted")
     func revealedIndicesCapAtTheBankSize() throws {
         let count = 12
-        let selector = try #require(DailyPuzzleSelector(seed: 9, puzzleCount: count))
+        let selector = try #require(DailyPuzzleSelector(seed: 9, puzzleCount: count, epoch: epoch))
 
         let atExhaustion = selector.revealedIndices(throughDayIndex: count - 1)
         let wellPastExhaustion = selector.revealedIndices(throughDayIndex: count * 5)
@@ -255,7 +279,7 @@ struct DailyPuzzleSelectorTests {
     func staysInBounds() throws {
         let calendar = try calendar()
         let count = 17
-        let selector = try #require(DailyPuzzleSelector(seed: 6, puzzleCount: count))
+        let selector = try #require(DailyPuzzleSelector(seed: 6, puzzleCount: count, epoch: epoch))
 
         for offset in 0 ..< 100 {
             let day = try date(2026, 1, 1 + offset, in: calendar)

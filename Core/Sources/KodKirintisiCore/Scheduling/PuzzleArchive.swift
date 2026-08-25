@@ -44,7 +44,8 @@ public enum PuzzleArchive {
     ) -> [Entry] {
         guard let selector = DailyPuzzleSelector(
             seed: progress.installSeed,
-            puzzleCount: bank.puzzles.count
+            puzzleCount: bank.puzzles.count,
+            epoch: progress.installedOn
         ) else {
             return []
         }
