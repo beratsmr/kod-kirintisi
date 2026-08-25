@@ -141,21 +141,32 @@ App Group: group.com.beratsumer.kodkirintisi
 
 ```swift
 public struct DailyPuzzleSelector: Sendable {
-    public static let epoch = DateComponents(year: 2026, month: 1, day: 1)
+    /// Kaç sorunun tek bir birim olarak karıştırıldığı.
+    public static let blockSize = 30
 
-    public init?(seed: UInt64, puzzleCount: Int)   // boş banka → nil
+    public let puzzleCount: Int
+    public let epoch: Date                          // kurulum günü
+
+    public init?(seed: UInt64, puzzleCount: Int, epoch: Date)   // boş banka → nil
     public func index(for date: Date, calendar: Calendar) -> Int
     public func dayIndex(for date: Date, calendar: Calendar) -> Int
+    public func revealedIndices(throughDayIndex: Int) -> [Int]
 }
 ```
 
 Başlatıcı `init?`: boş bir banka üzerinde seçilecek soru yoktur, bu yüzden geçersiz durum çağrı anında elenir ve `index(for:)` opsiyonel dönmek zorunda kalmaz.
 
+**Epoch bir parametredir, sabit değil.** Çağıran `UserProgress.installedOn`'u verir. Sabit bir takvim gününe (2026-01-01) bağlıydı; aylar sonra kuran kullanıcı arşivi baştan açılmış buluyordu.
+
+**Karıştırma blok blok yapılır.** Banka `blockSize`'lık dilimlere bölünür; her dilim `seed ^ (blokBaşı &* 0x9E37_79B9_7F4A_7C15)` ile kendi akışından beslenir ve yalnızca kendi indekslerini karıştırır. Bloklar sırayla birleştirilir — blokların *sırası* kasten karıştırılmaz, yoksa aynı problem bir seviye yukarıda tekrar ederdi.
+
+Bunun sebebi ölçülmüş bir hata: bankayı tek parça karıştırırken 120 → 130 büyümesi **geçmiş 120 günün 120'sini birden** değiştiriyordu, çünkü her çekiliş üreteci ilerletir ve çekiliş dizisi `puzzleCount`'a bağlıdır. Blok yaklaşımında bir bloğun içeriği kendisinden sonra kaç blok geldiğine bağlı değildir. Karşılığı: banka her zaman 30'un tam katı olmalı (`PuzzleBankIntegrityTests`), yoksa yarım kalan bir blok sonraki sürümde tamamlanır ve içindeki günler kayar.
+
 Karıştırma `shuffled(using:)` ile değil, elle yazılmış Fisher-Yates ile yapılır — standart kütüphane karıştırma algoritmasının sürümler arası sabit kalacağına söz vermiyor; değişseydi her kullanıcının takvimi bir güncellemeden sonra sessizce kayardı.
 
 Yan etkisi yok, zaman okumuyor (tarih parametre olarak geliyor), rastgelelik tohumlu. **Test edilmesi çok kolay** — bu yüzden bu şekilde tasarlandı.
 
-Test edilmesi gerekenler: aynı gün → aynı sonuç · ardışık `bank.count` gün → tekrar yok · saat dilimi değişimi gün sınırını kaydırmalı · `bank.count` değişince eski günler bozulmamalı (bankaya soru **sadece sona eklenir**).
+Test edilmesi gerekenler: aynı gün → aynı sonuç · ardışık `bank.count` gün → tekrar yok · saat dilimi değişimi gün sınırını kaydırmalı · **banka büyüyünce yaşanmış günler değişmemeli** (`DailyPuzzleSelectorGrowthTests`) · blok sınırları · geç kurulum da 0. günden başlamalı.
 
 ### `StreakCalculator`
 

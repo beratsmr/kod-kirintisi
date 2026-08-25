@@ -112,4 +112,4 @@ App icon, App Store ekran görüntüleri, gizlilik bildirimi (veri toplamıyoruz
 - **İnteraktif widget butonları yalnızca `AppIntent` ile çalışır**, kapanış (closure) ile değil. `Button(intent:)` kullan.
 - **`Bundle.module` widget extension içinde de çalışır** çünkü SPM kaynak paketi extension'a da gömülür — ama target bağımlılığının `project.yml`'de tanımlı olduğundan emin ol.
 - **Gün sınırı kullanıcının takvimine göre.** `Calendar.current` enjekte edilir; UTC varsayma.
-- **Bankaya soru sadece SONA eklenir.** Ortaya ekleme veya silme, kullanıcıların geçmiş günlerinin sorusunu değiştirir.
+- **Bankaya soru sadece SONA ve 30'ar 30'ar eklenir.** Ortaya ekleme veya silme, kullanıcıların geçmiş günlerinin sorusunu değiştirir. Sona eklemek ise ancak banka 30'un (`DailyPuzzleSelector.blockSize`) tam katı kaldığı sürece güvenlidir: takvim blok blok karıştırılır, yarım kalan bir blok sonraki sürümde tamamlanınca içindeki günler kayar. `PuzzleBankIntegrityTests` bunu zorlar. Gerekçe: `docs/SPEC.md` §8.

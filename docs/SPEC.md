@@ -115,14 +115,18 @@ Mülakat öncesi uygulamayı açar → Arşiv → "yanlış cevapladıklarım" f
 
 Backend olmadığı için seçim **deterministik ve saf bir fonksiyon** olmalı — aynı gün, aynı cihaz, her zaman aynı soru; widget ve uygulama bağımsız hesaplayınca aynı sonucu bulmalı.
 
-1. Kurulumda bir `installSeed: UInt64` üretilip App Group'a yazılır (her kullanıcı farklı sırada görür).
-2. `installSeed` ile SplitMix64 tabanlı deterministik shuffle → soru indekslerinin sabit bir permütasyonu.
-3. `dayIndex = epoch (2026-01-01) ile bugün arasındaki gün farkı`
+1. Kurulumda bir `installSeed: UInt64` **ve** kurulum günü (`installedOn`) üretilip App Group'a yazılır. Seed her kullanıcının soruları farklı sırada görmesini sağlar.
+2. Banka **30'luk bloklar hâlinde** shuffle edilir. Her blok kendi tohumundan (`installSeed ^ (blokBaşı × altın oran sabiti)`) beslenir ve yalnızca kendi aralığındaki indeksleri karıştırır. Bloklar sırayla birleştirilince ortaya bankanın tam bir permütasyonu çıkar.
+3. `dayIndex = installedOn ile bugün arasındaki gün farkı`
 4. `puzzle = permutation[dayIndex % bank.count]`
+
+**Neden blok blok?** Tek seferde tüm bankayı karıştırmak eşdeğer görünüyor ama değil: Fisher-Yates'te her çekiliş üreteci ilerletir ve çekiliş sayısı `bank.count`'a bağlıdır. Bankayı 120'den 150'ye çıkarmak, ölçtüğümüzde **geçmiş 120 günün 120'sini birden** değiştiriyordu — kullanıcı güncellemeden sonra uygulamayı açıp dünkü sorusunu bambaşka bulurdu. Blok yaklaşımında bir bloğun sırası yalnızca seed'e ve bloğun başladığı yere bağlıdır, toplam soru sayısına değil; dolayısıyla yeni içerik yayınlamak daha önceki her bloğu — ve yaşanmış her günü — olduğu gibi bırakır. Bunun karşılığında banka **her zaman 30'un tam katı** olmalıdır (`PuzzleBankIntegrityTests` zorlar), yoksa yarım kalan bir blok sonraki sürümde tamamlanır ve içindeki günler kayar.
+
+**Neden kurulum günü?** Epoch eskiden sabit bir takvim günüydü (2026-01-01). Bu, aylar sonra kuran bir kullanıcının arşivini baştan tamamen açılmış hâlde bulması ve geri dönmek için bir sebebinin kalmaması demekti. Kuruluma sabitlemek herkese gerçek bir "1. gün" verir. `installedOn` alanı olmayan eski dosyalar en erken cevabın tarihinden, hiç cevap yoksa eski sabit epoch'tan devralır.
 
 Epoch'tan önceki tarihler (cihaz saati geriye alınmışsa) 0. güne sabitlenir; widget asla boş kalmaz.
 
-Sonuç: banka tükenene kadar tekrar yok, ağ yok, saat dilimi kullanıcının takvimine göre, %100 test edilebilir.
+Sonuç: banka tükenene kadar tekrar yok, ağ yok, saat dilimi kullanıcının takvimine göre, banka büyüdükçe geçmiş bozulmuyor, %100 test edilebilir.
 
 ## 9. Gelir Modeli
 
