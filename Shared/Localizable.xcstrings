@@ -1,0 +1,588 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "About" : {
+      "localizations" : {
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hakkında"
+          }
+        }
+      }
+    },
+    "Accuracy" : {
+      "localizations" : {
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Doğruluk"
+          }
+        }
+      }
+    },
+    "Accuracy by Category" : {
+      "localizations" : {
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kategoriye Göre Doğruluk"
+          }
+        }
+      }
+    },
+    "Advanced" : {
+      "localizations" : {
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "İleri"
+          }
+        }
+      }
+    },
+    "Algo" : {
+      "comment" : "Category badge. A product name, left untranslated on purpose.",
+      "shouldTranslate" : false
+    },
+    "All Categories" : {
+      "localizations" : {
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tüm Kategoriler"
+          }
+        }
+      }
+    },
+    "All Difficulties" : {
+      "localizations" : {
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tüm Zorluklar"
+          }
+        }
+      }
+    },
+    "All Puzzles" : {
+      "localizations" : {
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tüm Sorular"
+          }
+        }
+      }
+    },
+    "Allow notifications for Kod Kırıntısı in Settings to get a daily reminder." : {
+      "localizations" : {
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Günlük hatırlatma almak için Ayarlar'dan Kod Kırıntısı'na bildirim izni ver."
+          }
+        }
+      }
+    },
+    "Answer a few puzzles to see your accuracy by category." : {
+      "localizations" : {
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kategoriye göre doğruluğunu görmek için birkaç soru cevapla."
+          }
+        }
+      }
+    },
+    "Answered" : {
+      "comment" : "Statistics tile: how many puzzles have been answered in total.",
+      "localizations" : {
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cevaplanan"
+          }
+        }
+      }
+    },
+    "Answered correctly" : {
+      "comment" : "VoiceOver label for the tick mark on an archive row.",
+      "localizations" : {
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Doğru cevaplandı"
+          }
+        }
+      }
+    },
+    "Answered Incorrectly" : {
+      "comment" : "Archive status filter option.",
+      "localizations" : {
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yanlış Cevaplananlar"
+          }
+        }
+      }
+    },
+    "Answered incorrectly" : {
+      "comment" : "VoiceOver label for the cross mark on an archive row.",
+      "localizations" : {
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yanlış cevaplandı"
+          }
+        }
+      }
+    },
+    "ARC" : {
+      "comment" : "Category badge. A technical term, left untranslated on purpose.",
+      "shouldTranslate" : false
+    },
+    "Archive" : {
+      "localizations" : {
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arşiv"
+          }
+        }
+      }
+    },
+    "Async" : {
+      "comment" : "Category badge. A technical term, left untranslated on purpose.",
+      "shouldTranslate" : false
+    },
+    "Basic" : {
+      "comment" : "Difficulty level, the easiest of three.",
+      "localizations" : {
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Temel"
+          }
+        }
+      }
+    },
+    "Categories" : {
+      "localizations" : {
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kategoriler"
+          }
+        }
+      }
+    },
+    "Category" : {
+      "localizations" : {
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kategori"
+          }
+        }
+      }
+    },
+    "Couldn't Reset Progress" : {
+      "localizations" : {
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "İlerleme Sıfırlanamadı"
+          }
+        }
+      }
+    },
+    "Current Streak" : {
+      "localizations" : {
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Güncel Seri"
+          }
+        }
+      }
+    },
+    "Daily Reminder" : {
+      "localizations" : {
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Günlük Hatırlatma"
+          }
+        }
+      }
+    },
+    "Difficulty" : {
+      "localizations" : {
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zorluk"
+          }
+        }
+      }
+    },
+    "Filter" : {
+      "comment" : "Toolbar button that opens the archive's filter menu.",
+      "localizations" : {
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Filtrele"
+          }
+        }
+      }
+    },
+    "Foundation" : {
+      "comment" : "Category badge. A framework name, left untranslated on purpose.",
+      "shouldTranslate" : false
+    },
+    "Intermediate" : {
+      "comment" : "Difficulty level, the middle of three.",
+      "localizations" : {
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Orta"
+          }
+        }
+      }
+    },
+    "iOS" : {
+      "comment" : "Category badge. A platform name, left untranslated on purpose.",
+      "shouldTranslate" : false
+    },
+    "Kod Kırıntısı" : {
+      "comment" : "The app's name. The same in every language.",
+      "shouldTranslate" : false
+    },
+    "Longest Streak" : {
+      "localizations" : {
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En Uzun Seri"
+          }
+        }
+      }
+    },
+    "No Matching Puzzles" : {
+      "localizations" : {
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eşleşen Soru Yok"
+          }
+        }
+      }
+    },
+    "Not answered yet" : {
+      "comment" : "VoiceOver label for the open circle on an unanswered day.",
+      "localizations" : {
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Henüz cevaplanmadı"
+          }
+        }
+      }
+    },
+    "Not Now" : {
+      "comment" : "Dismisses the alert offering to open system Settings.",
+      "localizations" : {
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Şimdi Değil"
+          }
+        }
+      }
+    },
+    "Notifications" : {
+      "localizations" : {
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bildirimler"
+          }
+        }
+      }
+    },
+    "Notifications Are Turned Off" : {
+      "localizations" : {
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bildirimler Kapalı"
+          }
+        }
+      }
+    },
+    "OK" : {
+      "localizations" : {
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tamam"
+          }
+        }
+      }
+    },
+    "Open Settings" : {
+      "comment" : "Opens the system Settings app, not the app's own settings tab.",
+      "localizations" : {
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ayarları Aç"
+          }
+        }
+      }
+    },
+    "Opens Kod Kırıntısı on the puzzle of the day." : {
+      "comment" : "Description of the Control Center control.",
+      "localizations" : {
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kod Kırıntısı'nı günün sorusuyla açar."
+          }
+        }
+      }
+    },
+    "Puzzle unavailable" : {
+      "localizations" : {
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Soru yüklenemedi"
+          }
+        }
+      }
+    },
+    "Reminder Time" : {
+      "localizations" : {
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hatırlatma Saati"
+          }
+        }
+      }
+    },
+    "Reset All Progress?" : {
+      "localizations" : {
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tüm İlerleme Sıfırlansın mı?"
+          }
+        }
+      }
+    },
+    "Reset Progress" : {
+      "localizations" : {
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "İlerlemeyi Sıfırla"
+          }
+        }
+      }
+    },
+    "Settings" : {
+      "comment" : "The app's own fourth tab, not the system Settings app.",
+      "localizations" : {
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ayarlar"
+          }
+        }
+      }
+    },
+    "Something went wrong. Please try again." : {
+      "localizations" : {
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bir şeyler ters gitti. Lütfen tekrar dene."
+          }
+        }
+      }
+    },
+    "Statistics" : {
+      "localizations" : {
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "İstatistik"
+          }
+        }
+      }
+    },
+    "Status" : {
+      "comment" : "Archive filter: answered, unanswered, or all.",
+      "localizations" : {
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Durum"
+          }
+        }
+      }
+    },
+    "Streak: %lld days" : {
+      "comment" : "VoiceOver label for the flame and count. Turkish does not inflect the noun after a numeral, so both plural forms read the same.",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Streak: %lld day"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Streak: %lld days"
+                }
+              }
+            }
+          }
+        },
+        "tr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Seri: %lld gün"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Seri: %lld gün"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Swift" : {
+      "comment" : "Category badge. A language name, left untranslated on purpose.",
+      "shouldTranslate" : false
+    },
+    "SwiftUI" : {
+      "comment" : "Category badge. A framework name, left untranslated on purpose.",
+      "shouldTranslate" : false
+    },
+    "This clears every answered puzzle. Your daily schedule stays the same." : {
+      "localizations" : {
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cevapladığın bütün soruları siler. Günlük takvimin değişmez."
+          }
+        }
+      }
+    },
+    "Today" : {
+      "localizations" : {
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bugün"
+          }
+        }
+      }
+    },
+    "Today's puzzle" : {
+      "comment" : "Title of the Control Center control.",
+      "localizations" : {
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bugünün sorusu"
+          }
+        }
+      }
+    },
+    "Today's puzzle is ready." : {
+      "comment" : "Body of the daily reminder notification.",
+      "localizations" : {
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bugünün sorusu hazır."
+          }
+        }
+      }
+    },
+    "Today's Swift puzzle — answer it without leaving the home screen." : {
+      "comment" : "Shown in the widget gallery when adding the widget.",
+      "localizations" : {
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bugünün Swift sorusu — ana ekrandan ayrılmadan cevapla."
+          }
+        }
+      }
+    },
+    "Try a different search or filter." : {
+      "localizations" : {
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Farklı bir arama ya da filtre dene."
+          }
+        }
+      }
+    },
+    "Try Again" : {
+      "comment" : "Retries loading after a failure.",
+      "localizations" : {
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tekrar Dene"
+          }
+        }
+      }
+    },
+    "Unanswered" : {
+      "comment" : "Archive status filter option.",
+      "localizations" : {
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cevaplanmayanlar"
+          }
+        }
+      }
+    },
+    "Version" : {
+      "comment" : "About section: the app's version number.",
+      "localizations" : {
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sürüm"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

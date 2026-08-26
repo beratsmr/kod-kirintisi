@@ -100,8 +100,17 @@ targets:
       path: Widget/Info.plist
       properties:
         CFBundleDisplayName: Kod Kırıntısı
+        CFBundleDevelopmentRegion: en
         CFBundleShortVersionString: $(MARKETING_VERSION)
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        # The widget resolves its strings against its OWN bundle, not the
+        # app's, so it has to declare the same languages. Shared/ — including
+        # Localizable.xcstrings — is compiled into both targets for the same
+        # reason. Leave this out and the widget silently falls back to
+        # English while the app is Turkish.
+        CFBundleLocalizations:
+          - en
+          - tr
         NSExtension:
           NSExtensionPointIdentifier: com.apple.widgetkit-extension
     entitlements:

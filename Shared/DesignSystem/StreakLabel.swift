@@ -17,6 +17,10 @@ struct StreakLabel: View {
             .font(.system(.caption2, weight: .medium))
             .foregroundStyle(.orange)
             .accessibilityElement(children: .combine)
+            // The catalog carries the plural forms, so VoiceOver says "1 day"
+            // rather than "1 days". Turkish needs no such rule — a numeral
+            // leaves the noun alone — but the entry still lists both forms
+            // because the catalog requires them per language.
             .accessibilityLabel(Text("Streak: \(streak) days"))
         }
     }
