@@ -20,6 +20,9 @@
 // wrong. Without a pause it flashes past and the animation restarts before
 // that has registered.
 //
+// Dead air at the head of the clip is trimmed automatically, so a recording
+// does not have to be started with good timing. See "Trimming" below.
+//
 // GIF is a poor codec — 256 colours, no interframe compression worth the name
 // — so the defaults trade smoothness for a file size a README can carry. Ten
 // frames a second is enough to read a button tap.
@@ -104,6 +107,62 @@ guard !frames.isEmpty else {
     fail("Could not extract any frames from \(inputURL.lastPathComponent).")
 }
 
+// MARK: - Trimming
+
+/// The one part of the recording that cannot be automated is the tap, so a
+/// person's reaction time ends up inside the clip: in practice most of a take
+/// is the Home Screen sitting perfectly still, waiting for someone to press a
+/// button. Asking for a well-timed performance would be the fragile fix. Find
+/// where the screen first changes instead, and keep only a beat before it.
+let leadIn = 1.5
+
+/// A coarse downsample, small enough to compare cheaply and still catch a
+/// button changing colour.
+func fingerprint(_ image: CGImage) -> [UInt8] {
+    let width = 64
+    let height = 128
+    var data = [UInt8](repeating: 0, count: width * height * 4)
+    data.withUnsafeMutableBytes { buffer in
+        guard let context = CGContext(
+            data: buffer.baseAddress, width: width, height: height,
+            bitsPerComponent: 8, bytesPerRow: width * 4,
+            space: CGColorSpaceCreateDeviceRGB(),
+            bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
+        ) else { return }
+        context.draw(image, in: CGRect(x: 0, y: 0, width: width, height: height))
+    }
+    return data
+}
+
+func changedSamples(_ lhs: [UInt8], _ rhs: [UInt8]) -> Int {
+    // A tolerance, because h264 gives slightly different bytes for pixels the
+    // eye reads as unchanged.
+    zip(lhs, rhs).reduce(0) { $0 + (abs(Int($1.0) - Int($1.1)) > 12 ? 1 : 0) }
+}
+
+/// The first frame that differs from the opening one, or `nil` when the clip
+/// never really moves and so has nothing to trim.
+///
+/// The threshold is measured against the largest change in the clip rather
+/// than being a fixed number, so this does not need retuning for a different
+/// screen, widget size or recording resolution.
+func firstChangedFrame(in differences: [Int], sampleCount: Int) -> Int? {
+    guard let peak = differences.max(), peak > sampleCount / 200 else { return nil }
+    return differences.firstIndex { $0 >= peak / 4 }
+}
+
+let fingerprints = frames.map { fingerprint($0.image) }
+let baseline = fingerprints[0]
+let differences = fingerprints.map { changedSamples(baseline, $0) }
+
+if let firstChange = firstChangedFrame(in: differences, sampleCount: baseline.count) {
+    let keepFrom = max(0, firstChange - Int(leadIn * Double(framesPerSecond)))
+    if keepFrom > 0 {
+        frames.removeFirst(keepFrom)
+        print("Trimmed \(keepFrom) still frames before the first change.")
+    }
+}
+
 // MARK: - Writing
 
 try? FileManager.default.createDirectory(
@@ -122,6 +181,10 @@ CGImageDestinationSetProperties(destination, [
 ] as CFDictionary)
 
 let interval = 1.0 / Double(framesPerSecond)
+/// Summed rather than derived from the source duration, which stopped being the
+/// answer once trimming was added and is the number a reader actually wants:
+/// how long the loop takes to come back around.
+var playback = 0.0
 
 for (index, frame) in frames.enumerated() {
     // A frame stays up until the next surviving one was due, so any gap left
@@ -130,6 +193,7 @@ for (index, frame) in frames.enumerated() {
     let isLast = index + 1 == frames.count
     let nextTime = isLast ? frame.time + interval : frames[index + 1].time
     let delay = max(interval, nextTime - frame.time) + (isLast ? finalHold : 0)
+    playback += delay
     // The unclamped delay is the one modern viewers honour; the clamped one is
     // written too because some older renderers still floor anything under
     // 0.1 s to a tenth of a second and would otherwise play at the wrong speed.
@@ -149,8 +213,8 @@ guard CGImageDestinationFinalize(destination) else {
 let size = (try? outputURL.resourceValues(forKeys: [.fileSizeKey]).fileSize) ?? 0
 let megabytes = Double(size) / 1_048_576
 print(String(
-    format: "Wrote %d frames (%.1f s at %d fps, %d px wide) to %@ — %.1f MB",
-    frames.count, duration.seconds, framesPerSecond, targetWidth, outputURL.path, megabytes
+    format: "Wrote %d frames (%.1f s of %.1f s at %d fps, %d px wide) to %@ — %.1f MB",
+    frames.count, playback, duration.seconds, framesPerSecond, targetWidth, outputURL.path, megabytes
 ))
 
 // GitHub serves READMEs over a CDN but a heavy GIF still hurts the first
