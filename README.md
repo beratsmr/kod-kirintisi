@@ -8,12 +8,9 @@
 
 Kod Kırıntısı puts a small Swift/algorithm question on your Home Screen every morning. You answer it with interactive widget buttons in about four seconds. Open the app only when you want the full explanation.
 
-<!--
-  Record with ./scripts/record-widget.sh, which writes docs/widget.gif.
-  Uncomment once the file exists — a broken image is worse than none.
+<!-- Regenerate with ./scripts/record-widget.sh, which writes docs/widget.gif. -->
 
 ![Answering the daily puzzle from the Home Screen widget](docs/widget.gif)
--->
 
 | Today | Archive | Explanation | Statistics |
 |---|---|---|---|
