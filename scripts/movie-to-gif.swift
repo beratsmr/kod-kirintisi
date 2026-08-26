@@ -9,10 +9,16 @@
 // GIF, and both ship with macOS.
 //
 //   ./scripts/movie-to-gif.swift recording.mov docs/widget.gif
-//   ./scripts/movie-to-gif.swift recording.mov docs/widget.gif 12 480
+//   ./scripts/movie-to-gif.swift recording.mov docs/widget.gif 12 480 0
 //
 // Arguments: input, output, frames per second (default 10), width in pixels
-// (default 420). Height follows the source aspect ratio.
+// (default 420), and how long to hold the last frame before the loop restarts
+// (default 1.5 seconds, 0 to disable). Height follows the source aspect ratio.
+//
+// The hold matters more than it sounds. A README GIF loops forever, and the
+// last frame is the one carrying the payoff — the answer marked right or
+// wrong. Without a pause it flashes past and the animation restarts before
+// that has registered.
 //
 // GIF is a poor codec — 256 colours, no interframe compression worth the name
 // — so the defaults trade smoothness for a file size a README can carry. Ten
@@ -33,16 +39,21 @@ func fail(_ message: String) -> Never {
 
 let arguments = CommandLine.arguments
 guard arguments.count >= 3 else {
-    fail("Usage: movie-to-gif.swift <input.mov> <output.gif> [fps] [width]")
+    fail("Usage: movie-to-gif.swift <input.mov> <output.gif> [fps] [width] [hold]")
 }
 
 let inputURL = URL(fileURLWithPath: arguments[1])
 let outputURL = URL(fileURLWithPath: arguments[2])
 let framesPerSecond = arguments.count > 3 ? Int(arguments[3]) ?? 10 : 10
 let targetWidth = arguments.count > 4 ? Int(arguments[4]) ?? 420 : 420
+let finalHold = arguments.count > 5 ? Double(arguments[5]) ?? 1.5 : 1.5
 
 guard framesPerSecond > 0, targetWidth > 0 else {
     fail("Frames per second and width must both be positive.")
+}
+
+guard finalHold >= 0 else {
+    fail("The final hold cannot be negative.")
 }
 
 guard FileManager.default.fileExists(atPath: inputURL.path) else {
@@ -116,8 +127,9 @@ for (index, frame) in frames.enumerated() {
     // A frame stays up until the next surviving one was due, so any gap left
     // by a dropped frame is spent holding the last real image rather than
     // being cut out of the running time.
-    let nextTime = index + 1 < frames.count ? frames[index + 1].time : frame.time + interval
-    let delay = max(interval, nextTime - frame.time)
+    let isLast = index + 1 == frames.count
+    let nextTime = isLast ? frame.time + interval : frames[index + 1].time
+    let delay = max(interval, nextTime - frame.time) + (isLast ? finalHold : 0)
     // The unclamped delay is the one modern viewers honour; the clamped one is
     // written too because some older renderers still floor anything under
     // 0.1 s to a tenth of a second and would otherwise play at the wrong speed.

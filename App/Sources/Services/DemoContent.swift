@@ -1,6 +1,7 @@
 import Foundation
 import KodKirintisiCore
 import os
+import WidgetKit
 
 /// Fills the shared container with a plausible answer history, for screenshots.
 ///
@@ -27,6 +28,12 @@ enum DemoContent {
             guard ProcessInfo.processInfo.arguments.contains(launchArgument) else { return }
             do {
                 try install(now: now, calendar: calendar)
+                // The widget caches whatever timeline it last built, so on a
+                // second run it would keep showing the answer from the previous
+                // one and `record-widget.sh` would film a puzzle that is already
+                // solved. Rewriting the container is not something WidgetKit can
+                // notice on its own.
+                WidgetCenter.shared.reloadTimelines(ofKind: WidgetKind.dailyPuzzle)
             } catch {
                 // Fail loudly in the log but let the app start: a screenshot of the
                 // empty state is a better failure than a crash nobody can diagnose.
