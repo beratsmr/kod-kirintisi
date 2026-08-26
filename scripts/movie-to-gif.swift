@@ -72,15 +72,21 @@ generator.requestedTimeToleranceAfter = .zero
 // A zero height tells AVFoundation to preserve the aspect ratio.
 generator.maximumSize = CGSize(width: targetWidth, height: 0)
 
-var frames: [CGImage] = []
+/// Each frame is kept with the time it was requested for. A screen recording
+/// is variable frame rate — `simctl` emits almost nothing while the screen is
+/// still — so with zero tolerance many of the requested times have no frame to
+/// return and get skipped. Skipping is the right call, but the *time* they
+/// covered still has to be paid: giving every surviving frame an identical
+/// delay silently compresses a 14 s recording into an 8 s GIF that plays too
+/// fast. Holding the previous frame on screen for the gap instead keeps
+/// playback honest no matter how many frames the generator drops.
+var frames: [(image: CGImage, time: Double)] = []
 frames.reserveCapacity(frameCount)
 // `images(for:)` yields in the order the times were requested, so appending
-// keeps playback order without any sorting. Frames the generator cannot
-// produce are skipped rather than aborting the run: losing one frame of a
-// README animation does not matter, failing the whole recording does.
+// keeps playback order without any sorting.
 for await result in generator.images(for: times) {
     guard let image = try? result.image else { continue }
-    frames.append(image)
+    frames.append((image, result.requestedTime.seconds))
 }
 
 guard !frames.isEmpty else {
@@ -104,19 +110,24 @@ CGImageDestinationSetProperties(destination, [
     kCGImagePropertyGIFDictionary: [kCGImagePropertyGIFLoopCount: 0]
 ] as CFDictionary)
 
-// The unclamped delay is the one modern viewers honour; the clamped one is
-// written too because some older renderers still floor anything under 0.1 s
-// to a tenth of a second and would otherwise play the GIF at the wrong speed.
-let delay = 1.0 / Double(framesPerSecond)
-let frameProperties = [
-    kCGImagePropertyGIFDictionary: [
-        kCGImagePropertyGIFUnclampedDelayTime: delay,
-        kCGImagePropertyGIFDelayTime: delay
-    ]
-] as CFDictionary
+let interval = 1.0 / Double(framesPerSecond)
 
-for frame in frames {
-    CGImageDestinationAddImage(destination, frame, frameProperties)
+for (index, frame) in frames.enumerated() {
+    // A frame stays up until the next surviving one was due, so any gap left
+    // by a dropped frame is spent holding the last real image rather than
+    // being cut out of the running time.
+    let nextTime = index + 1 < frames.count ? frames[index + 1].time : frame.time + interval
+    let delay = max(interval, nextTime - frame.time)
+    // The unclamped delay is the one modern viewers honour; the clamped one is
+    // written too because some older renderers still floor anything under
+    // 0.1 s to a tenth of a second and would otherwise play at the wrong speed.
+    let frameProperties = [
+        kCGImagePropertyGIFDictionary: [
+            kCGImagePropertyGIFUnclampedDelayTime: delay,
+            kCGImagePropertyGIFDelayTime: delay
+        ]
+    ] as CFDictionary
+    CGImageDestinationAddImage(destination, frame.image, frameProperties)
 }
 
 guard CGImageDestinationFinalize(destination) else {
