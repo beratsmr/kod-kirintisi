@@ -1,6 +1,7 @@
 import KodKirintisiCore
 import SwiftUI
 import UIKit
+import WidgetKit
 
 /// The fourth tab: notification preferences, which categories are wanted,
 /// and a way to start over.
@@ -177,6 +178,11 @@ struct SettingsView: View {
     private func resetProgress() async {
         do {
             try await DailyPuzzleService.shared.resetProgress()
+            // Same reason as answering: the widget serves its cached timeline
+            // and cannot see that the container was emptied underneath it. Left
+            // out, the Home Screen keeps showing an answer the user has just
+            // asked the app to forget.
+            WidgetCenter.shared.reloadTimelines(ofKind: WidgetKind.dailyPuzzle)
         } catch {
             resetError = "Something went wrong. Please try again."
         }
