@@ -69,6 +69,11 @@ targets:
         UILaunchScreen: {}
         UISupportedInterfaceOrientations:
           - UIInterfaceOrientationPortrait
+        # Portrait alone is not a complete answer without this: the build
+        # otherwise warns that every orientation must be supported. The app is
+        # iPhone-only (TARGETED_DEVICE_FAMILY 1) and every screen is a single
+        # column, so there is nothing landscape would add.
+        UIRequiresFullScreen: true
         UIUserInterfaceStyle: Automatic
         CFBundleLocalizations:
           - en
