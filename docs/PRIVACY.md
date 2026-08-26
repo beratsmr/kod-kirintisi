@@ -67,8 +67,13 @@ notes rather than made quietly.
 
 ## Contact
 
-<!-- TODO: replace with the public contact address used on the App Store listing -->
-Questions: open an issue on the project's GitHub repository.
+Questions and privacy requests: open an issue at
+<https://github.com/beratsmr/kod-kirintisi/issues>.
+
+This is deliberately a public issue tracker rather than an email address. There
+is no personal data to ask us about — nothing leaves your device — so anything
+worth asking is worth answering in the open, where the next person can read it
+too.
 
 ---
 
@@ -146,3 +151,24 @@ bağımlılığı var.
 
 Bizden talep etmeniz gereken bir şey yok, çünkü başka hiçbir yerde tutulan bir
 şey yok.
+
+## Çocuklar
+
+Uygulama her yaş için güvenlidir. Hiçbir şey toplanmadığı için, bir çocuk
+kullanıcıya dair de hiçbir şey toplanmaz.
+
+## Değişiklikler
+
+İleride bir sürüm herhangi bir veri toplayacak olursa, bu belge o sürüm
+yayınlanmadan **önce** güncellenir ve değişiklik sürüm notlarında açıkça
+belirtilir — sessizce yapılmaz.
+
+## İletişim
+
+Sorularınız ve gizlilikle ilgili talepleriniz için
+<https://github.com/beratsmr/kod-kirintisi/issues> adresinde bir issue açın.
+
+Burada bilerek bir e-posta adresi yerine herkese açık bir issue takipçisi
+duruyor. Size dair sorabileceğiniz kişisel bir veri yok — hiçbir şey cihazınızdan
+çıkmıyor — dolayısıyla sorulmaya değer her şey, bir sonraki kişinin de
+okuyabileceği bir yerde cevaplanmaya değer.
