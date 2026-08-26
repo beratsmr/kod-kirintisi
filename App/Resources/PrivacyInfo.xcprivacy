@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Privacy manifest. Hand-written and committed, unlike Info.plist and the
+  entitlements, which XcodeGen generates — nothing here is derived from
+  project.yml, and the declarations below are claims about the app that a
+  human has to stand behind.
+
+  The prose version of this file is docs/PRIVACY.md. If one changes, so does
+  the other.
+-->
+<plist version="1.0">
+<dict>
+    <!--
+      No tracking, and nothing collected. Not an omission: the app has no
+      networking code at all, so there is nowhere for data to go. Every
+      puzzle ships in the bundle and every answer stays in the App Group
+      container.
+    -->
+    <key>NSPrivacyTracking</key>
+    <false/>
+    <key>NSPrivacyTrackingDomains</key>
+    <array/>
+    <key>NSPrivacyCollectedDataTypes</key>
+    <array/>
+
+    <!--
+      Required-reason APIs. Only one applies: SettingsView keeps the reminder
+      time, the reminder switch and the excluded categories in @AppStorage,
+      which is UserDefaults.
+    -->
+    <key>NSPrivacyAccessedAPITypes</key>
+    <array>
+        <dict>
+            <key>NSPrivacyAccessedAPIType</key>
+            <string>NSPrivacyAccessedAPICategoryUserDefaults</string>
+            <!--
+              CA92.1 — information only the app itself can reach. Deliberately
+              not 1C8F.1, which is the App Group variant: the app does have an
+              App Group, but it holds a JSON file written by FileProgressStore,
+              not a UserDefaults suite. @AppStorage writes to the standard
+              defaults inside the app's own sandbox.
+            -->
+            <key>NSPrivacyAccessedAPITypeReasons</key>
+            <array>
+                <string>CA92.1</string>
+            </array>
+        </dict>
+    </array>
+</dict>
+</plist>
