@@ -17,8 +17,27 @@ import XCTest
 /// interaction in one `@MainActor` method is what makes this build without
 /// concurrency warnings.
 final class ScreenshotTests: XCTestCase {
+    /// The App Store set.
     @MainActor
     func testCaptureScreenshots() {
+        captureAll(in: .english)
+    }
+
+    /// A translation review pass rather than part of the listing, which is
+    /// English only.
+    ///
+    /// A second test method rather than a parameter because there is no
+    /// dependable way to hand a UI test a value from the command line: the test
+    /// runs in the simulator, so the environment `xcodebuild` was invoked with
+    /// is not its environment. `-only-testing:` selects one of the two, which is
+    /// also what keeps a single set of attachments in the result bundle.
+    @MainActor
+    func testCaptureTurkishScreenshots() {
+        captureAll(in: .turkish)
+    }
+
+    @MainActor
+    private func captureAll(in language: Language) {
         // One failed screen should not leave the remaining ones uncaptured.
         continueAfterFailure = true
 
@@ -26,30 +45,61 @@ final class ScreenshotTests: XCTestCase {
         app.launchArguments += [
             // Fabricate a believable answer history — see `DemoContent`.
             "-KodKirintisiDemoContent",
-            // Pin the language: the app ships `en` and `tr`, and the screenshots
-            // generated here are the English set.
-            "-AppleLanguages", "(en)",
-            "-AppleLocale", "en_US"
+            "-AppleLanguages", "(\(language.code))",
+            "-AppleLocale", language.locale
         ]
         app.launch()
         defer { app.terminate() }
 
-        capture(app, tab: "Today", screen: "Today", named: "01-today")
-        capture(app, tab: "Archive", screen: "Archive", named: "02-archive")
+        capture(app, screen: language.today, named: "01-today")
+        capture(app, screen: language.archive, named: "02-archive")
         captureArchiveDetail(app, named: "03-explanation")
-        capture(app, tab: "Statistics", screen: "Statistics", named: "04-statistics")
-        capture(app, tab: "Settings", screen: "Settings", named: "05-settings")
+        capture(app, screen: language.statistics, named: "04-statistics")
+        capture(app, screen: language.settings, named: "05-settings")
+    }
+
+    // MARK: - Language
+
+    /// The language the capture runs in, and the labels to expect in it.
+    ///
+    /// The language is pinned rather than inherited from the simulator: a
+    /// screenshot set that quietly follows whatever language the device happens
+    /// to be in is not reproducible. Note that `-testLanguage` cannot do this —
+    /// XCTest injects it into `launchArguments`, the launch below appends its
+    /// own `-AppleLanguages` afterwards, and the last value in the argument
+    /// domain wins, so the flag is swallowed without a word.
+    ///
+    /// Each screen's navigation title is also its tab label, so one string per
+    /// screen covers both. Spelling the expected labels out is what makes a
+    /// missing translation fail the run instead of producing a screenshot of
+    /// the wrong language.
+    private struct Language {
+        let code: String
+        let locale: String
+        let today: String
+        let archive: String
+        let statistics: String
+        let settings: String
+
+        static let english = Language(
+            code: "en", locale: "en_US",
+            today: "Today", archive: "Archive", statistics: "Statistics", settings: "Settings"
+        )
+
+        static let turkish = Language(
+            code: "tr", locale: "tr_TR",
+            today: "Bugün", archive: "Arşiv", statistics: "İstatistik", settings: "Ayarlar"
+        )
     }
 
     // MARK: - Steps
 
-    /// Selects a tab, waits for it to finish loading, and files the screenshot.
+    /// Selects a screen's tab, waits for it to finish loading, and files the
+    /// screenshot.
     @MainActor
-    private func capture(
-        _ app: XCUIApplication, tab: String, screen: String, named name: String
-    ) {
-        let button = app.tabBars.buttons[tab]
-        XCTAssertTrue(button.waitForExistence(timeout: 10), "no \(tab) tab")
+    private func capture(_ app: XCUIApplication, screen: String, named name: String) {
+        let button = app.tabBars.buttons[screen]
+        XCTAssertTrue(button.waitForExistence(timeout: 10), "no \(screen) tab")
         button.tap()
 
         waitUntilLoaded(app, screen: screen)

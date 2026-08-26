@@ -7,20 +7,40 @@
 # test runs against a fabricated answer history (see `DemoContent`) because a
 # clean install has an empty archive and zeroed statistics.
 #
-#   ./scripts/make-screenshots.sh                  # iPhone 17 Pro Max
-#   ./scripts/make-screenshots.sh "iPhone 17 Pro"  # any available device
+#   ./scripts/make-screenshots.sh                     # iPhone 17 Pro Max
+#   ./scripts/make-screenshots.sh "iPhone 17 Pro"     # any available device
+#   ./scripts/make-screenshots.sh "iPhone 17 Pro" tr  # Turkish, for review only
 #
 # App Store Connect wants 6.9" screenshots, which is what the Pro Max renders,
 # so that is the default. See `xcrun simctl list devices available` for the
 # names on this machine.
+#
+# The listing is English, so only the English run writes to docs/screenshots.
+# Other languages land in a temporary directory and are printed — the point of
+# those is to see all four screens translated in one pass, not to ship them.
 
 set -euo pipefail
 
 DEVICE="${1:-iPhone 17 Pro Max}"
+LANGUAGE="${2:-en}"
 SCHEME="Screenshots"
-OUTPUT_DIR="docs/screenshots"
 
 cd "$(dirname "$0")/.."
+
+case "$LANGUAGE" in
+  en)
+    OUTPUT_DIR="docs/screenshots"
+    TEST="KodKirintisiUITests/ScreenshotTests/testCaptureScreenshots"
+    ;;
+  tr)
+    OUTPUT_DIR="$(mktemp -d)/$LANGUAGE"
+    TEST="KodKirintisiUITests/ScreenshotTests/testCaptureTurkishScreenshots"
+    ;;
+  *)
+    echo "Unknown language '$LANGUAGE' — the app ships en and tr." >&2
+    exit 1
+    ;;
+esac
 
 RESULT_BUNDLE="$(mktemp -d)/Screenshots.xcresult"
 # xcodebuild refuses to write a result bundle that already exists, and mktemp
@@ -53,6 +73,7 @@ xcodebuild test \
   -scheme "$SCHEME" \
   -destination "platform=iOS Simulator,name=$DEVICE" \
   -resultBundlePath "$RESULT_BUNDLE" \
+  -only-testing:"$TEST" \
   -quiet
 
 echo "==> Extracting attachments"
@@ -95,4 +116,8 @@ echo "==> Restoring the status bar"
 xcrun simctl status_bar "$DEVICE" clear
 
 echo
-echo "Done. Review $OUTPUT_DIR before committing — these go on the store page."
+if [ "$LANGUAGE" = "en" ]; then
+  echo "Done. Review $OUTPUT_DIR before committing — these go on the store page."
+else
+  echo "Done. $LANGUAGE screenshots are in $OUTPUT_DIR — for review, not for committing."
+fi
