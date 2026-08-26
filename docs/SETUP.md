@@ -133,6 +133,56 @@ Sonra simülatörde:
 
 > Widget boş görünüyorsa ve hata yoksa: App Group id'si iki target'ta uyuşmuyordur. Bkz. CLAUDE.md "Bilinen Tuzaklar".
 
+### Türkçe Arayüzü Doğrulamak
+
+Arayüz iki dilli (`Shared/Localizable.xcstrings`), soru içeriği İngilizce.
+Yeni bir kullanıcı metni eklediğinde Türkçesinin gerçekten göründüğünü
+doğrula — catalog'a girmemiş bir string sessizce İngilizce kalır, derleme
+uyarı vermez.
+
+Tek bir çalıştırma için cihazın dilini değiştirmeye gerek yok:
+
+```bash
+xcrun simctl launch <device> com.beratsumer.kodkirintisi \
+  -AppleLanguages "(tr)" -AppleLocale "tr_TR"
+```
+
+Dört ekranı birden Türkçe görmek için ekran görüntüsü scriptini o dilde koş:
+
+```bash
+./scripts/make-screenshots.sh "iPhone 17 Pro" tr
+```
+
+Çıktı geçici bir klasöre yazılır ve yolu ekrana basılır; mağaza listesi İngilizce
+olduğu için `docs/screenshots/` sadece `en` koşusuyla güncellenir.
+
+> `-testLanguage tr` **işe yaramaz.** XCTest onu `launchArguments`'a enjekte
+> ediyor, test kendi `-AppleLanguages`'ını sonradan ekliyor ve argüman alanında
+> son yazan kazanıyor — bayrak sessizce yutuluyor. Bu yüzden her dilin ayrı bir
+> test metodu var ve script `-only-testing:` ile birini seçiyor.
+
+Widget ayrı bir mesele: stringleri **kendi** bundle'ından okur ve uygulamanın
+launch argümanlarını görmez. Onu Türkçe görmek için cihazın dilini değiştirmek
+gerekir:
+
+```bash
+xcrun simctl spawn booted defaults write .GlobalPreferences AppleLanguages -array tr
+xcrun simctl spawn booted defaults write .GlobalPreferences AppleLocale -string tr_TR
+xcrun simctl shutdown booted && xcrun simctl boot <device>
+```
+
+Yeniden başlatma ana ekran düzenini sıfırlar, yani widget'ı tekrar yerleştirmen
+gerekir — `simctl`'de karşılığı olmayan adım bu. Dili geri almak için aynı
+komutları `en` / `en_US` ile çalıştır.
+
+Çevirinin widget bundle'ına gerçekten girdiğini gözle bakmadan da
+doğrulayabilirsin; sessiz İngilizce'ye düşme tuzağı tam olarak burada yakalanır:
+
+```bash
+plutil -p "$(find ~/Library/Developer/Xcode/DerivedData/KodKirintisi-*/Build/Products/\
+Debug-iphonesimulator -name KodKirintisiWidget.appex)/tr.lproj/Localizable.strings"
+```
+
 ## Yayın Görsellerini Üretmek
 
 App Store'a giden her görsel repodaki bir script tarafından üretilir; hiçbiri elle çizilmez. Böylece çıktı da kaynak kodu gibi gözden geçirilebilir ve tekrar üretilebilir olur.
