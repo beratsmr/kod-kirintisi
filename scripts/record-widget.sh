@@ -75,9 +75,15 @@ cat <<'INSTRUCTIONS'
     4. Make sure the app itself is closed (swipe it away in the
        app switcher) — the animation is meant to show the widget
        working on its own.
+    5. Check that the widget shows a flame streak and an unanswered
+       circle before going on. WidgetKit re-renders on its own
+       schedule — several seconds after the container was seeded —
+       so a widget added quickly can still be showing the old
+       timeline. Wait for the streak to appear.
 
   Recording starts when you press Return. During the recording,
   tap one of the widget's answer buttons and let the result appear.
+  Take your time: dead air before the tap is trimmed automatically.
   ─────────────────────────────────────────────────────────────
 
 INSTRUCTIONS
