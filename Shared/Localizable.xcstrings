@@ -168,16 +168,6 @@
         }
       }
     },
-    "Categories" : {
-      "localizations" : {
-        "tr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kategoriler"
-          }
-        }
-      }
-    },
     "Category" : {
       "localizations" : {
         "tr" : {

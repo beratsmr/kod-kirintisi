@@ -57,7 +57,14 @@ Kesin sınır: aşağıdakiler var, **başka hiçbir şey yok**.
 > - **Cevaplanmamış bugün seriyi bitirmez**; gün henüz dolmadı. İki gün üst üste boş geçince sıfırlanır.
 > - Bu ikisi farklı durumlardır, bu yüzden `StreakCalculator` hem doğru hem yanlış cevaplanan gün kümesini alır. Sonucu yalnızca **bugünün** yanlış kümesinde olması değiştirir; geçmiş yanlış günler zaten doğru kümesinde olmadıkları için seriyi kendiliğinden durdurur.
 > - Gün sınırı kullanıcının takvimine göre (`startOfDay`), yaz saati geçişlerinde de gün tam olarak bir artar.
-- [ ] **Ayarlar** — günlük bildirim saati, dahil edilecek kategoriler, ilerlemeyi sıfırla, hakkında.
+- [ ] **Ayarlar** — günlük bildirim saati, ilerlemeyi sıfırla, hakkında.
+
+> **Kategori seçimi neden yok:** §8 günün sorusunu tarihin saf fonksiyonu
+> sayıyor; uygulama ile widget sunucu olmadan aynı sonuca varabildiği için
+> böyle. Kategori dışlaması bu hesabı ayarlara bağımlı kılar ve kullanıcı bir
+> kategoriyi kapattığında geçmiş günlerin soruları da değişir — yani arşiv
+> yeniden yazılır. Günde tek soru gösteren 120 soruluk bir bankada filtrenin
+> getirisi bu bedeli karşılamıyor.
 
 ### 5.3 Sistem entegrasyonları
 

@@ -1,22 +1,21 @@
-import KodKirintisiCore
 import SwiftUI
 import UIKit
 import WidgetKit
 
-/// The fourth tab: notification preferences, which categories are wanted,
-/// and a way to start over.
+/// The fourth tab: notification preferences and a way to start over.
 ///
-/// The category toggles are UI-only: they persist a preference that nothing
-/// reads, because ``DailyPuzzleSelector`` schedules over the whole bank and
-/// has no way to honour an exclusion. That was a deliberate scope call, not
-/// an oversight. The notification switches, UI-only in M6, now drive
-/// ``NotificationScheduler``.
+/// There were category toggles here too, which wrote a preference nothing
+/// read — ``DailyPuzzleSelector`` schedules over the whole bank and has no
+/// way to honour an exclusion. Honouring one would have meant giving up the
+/// property the schedule is built on, that the puzzle of a day is a function
+/// of the date alone (`docs/SPEC.md` §8): the day-to-puzzle mapping would
+/// then depend on a setting, and flipping it would rewrite the archive. A
+/// switch that does nothing is worse than no switch, so they are gone.
 struct SettingsView: View {
     @Environment(\.openURL) private var openURL
 
     @AppStorage("settings.notificationsEnabled") private var notificationsEnabled = false
     @AppStorage("settings.notificationMinuteOfDay") private var notificationMinuteOfDay = 9 * 60
-    @AppStorage("settings.excludedCategories") private var excludedCategoriesRaw = ""
 
     @State private var isShowingResetConfirmation = false
     @State private var isShowingPermissionAlert = false
@@ -26,7 +25,6 @@ struct SettingsView: View {
         NavigationStack {
             Form {
                 notificationSection
-                categorySection
                 resetSection
                 aboutSection
             }
@@ -73,18 +71,6 @@ struct SettingsView: View {
         }
     }
 
-    private var categorySection: some View {
-        Section {
-            ForEach(PuzzleCategory.allCases, id: \.self) { category in
-                Toggle(isOn: binding(for: category)) {
-                    Text(category.badgeName)
-                }
-            }
-        } header: {
-            Text("Categories")
-        }
-    }
-
     private var resetSection: some View {
         Section {
             Button("Reset Progress", role: .destructive) {
@@ -114,25 +100,6 @@ struct SettingsView: View {
             set: { newValue in
                 let components = Calendar.current.dateComponents([.hour, .minute], from: newValue)
                 notificationMinuteOfDay = (components.hour ?? 9) * 60 + (components.minute ?? 0)
-            }
-        )
-    }
-
-    private var excludedCategories: Set<PuzzleCategory> {
-        Set(excludedCategoriesRaw.split(separator: ",").compactMap { PuzzleCategory(rawValue: String($0)) })
-    }
-
-    private func binding(for category: PuzzleCategory) -> Binding<Bool> {
-        Binding(
-            get: { !excludedCategories.contains(category) },
-            set: { included in
-                var excluded = excludedCategories
-                if included {
-                    excluded.remove(category)
-                } else {
-                    excluded.insert(category)
-                }
-                excludedCategoriesRaw = excluded.map(\.rawValue).sorted().joined(separator: ",")
             }
         )
     }
