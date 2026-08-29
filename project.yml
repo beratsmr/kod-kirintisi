@@ -22,7 +22,9 @@ settings:
     SWIFT_STRICT_CONCURRENCY: complete
     SWIFT_UPCOMING_FEATURE_EXISTENTIAL_ANY: YES
     CODE_SIGN_STYLE: Automatic
-    DEVELOPMENT_TEAM: "" # Xcode'da Signing & Capabilities'ten seç
+    # Xcode'un Signing sekmesinden değil buradan: .xcodeproj üretilen bir
+    # dosya, orada seçilen team ilk `xcodegen generate`'te silinir.
+    DEVELOPMENT_TEAM: "AJMFR76NFH"
     MARKETING_VERSION: "1.0.0"
     CURRENT_PROJECT_VERSION: "1"
     ENABLE_USER_SCRIPT_SANDBOXING: YES
