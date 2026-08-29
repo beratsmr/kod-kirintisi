@@ -126,7 +126,7 @@ open -a Simulator
 
 Sonra simülatörde:
 1. Uygulamayı bir kez çalıştır (App Group konteynerini oluşturur).
-2. Ana ekranda boş bir alana uzun bas → **+** → "Kod Kırıntısı" → small ve medium boyutları ekle.
+2. Ana ekranda boş bir alana uzun bas → **+** → "Codestion" → small ve medium boyutları ekle.
 3. Kilit ekranı için: Ayarlar → Duvar Kâğıdı → Özelleştir → widget alanı → accessoryRectangular'ı ekle.
 4. Widget üzerindeki bir şıkka dokun. Doğru/yanlış işareti belirmeli, butonlar kaybolmalı, seri sayacı güncellenmeli.
 5. Uygulamayı aç ve widget'ta verilen cevabın orada da göründüğünü doğrula (App Group paylaşımının asıl testi bu).
@@ -213,9 +213,9 @@ Ekran görüntüsü şeması (`Screenshots`) bilerek `KodKirintisi` şemasından
 
 **`could not build Objective-C module '_Builtin_float'`** → Eski bir toolchain (örn. swiftly ile kurulmuş 6.0.x) yeni SDK'yı derlemeye çalışıyor. `which swift` ile kontrol et; `/usr/bin/swift` kullan.
 
-**`Could not find test host for KodKirintisiTests`** → Ürün adı "Kod Kırıntısı" (boşluklu), XcodeGen'in türettiği varsayılan `TEST_HOST` yolu tutmuyor. `project.yml`'de açıkça yazılı; silme.
+**`Could not find test host for KodKirintisiTests`** → `PRODUCT_NAME` hâlâ "Kod Kırıntısı" (boşluklu) ve XcodeGen'in türettiği varsayılan `TEST_HOST` yolu tutmuyor. `project.yml`'de açıkça yazılı; silme. Uygulamanın **görünen** adı Codestion, ama o ayrı bir alan (`CFBundleDisplayName`) — diskteki `.app` eski adı taşımaya devam ediyor ve betikler o yola bakıyor.
 
-**`xcodegen generate` "Team not found" hatası veriyor** → Normal. `DEVELOPMENT_TEAM` boş; imzalamayı Xcode'da elle seç.
+**İmzalama hatası veriyor** → `DEVELOPMENT_TEAM` `project.yml`'de tanımlı; Xcode'un Signing sekmesinden seçme, orada yapılan seçim ilk `xcodegen generate`'te silinir. Sertifika yoksa Xcode → Settings → Accounts'tan Apple ID ile giriş yap.
 
 **VS Code'da SwiftUI dosyalarında yüzlerce hata** → Beklenen. SourceKit-LSP macOS SDK'sına bakıyor, iOS-only API'leri göremiyor. Bu hatalar sahte; gerçek doğrulama `xcodebuild` ile. `Core/` içinde hata görürsen o gerçektir.
 

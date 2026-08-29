@@ -1,8 +1,8 @@
-# Privacy Policy — Kod Kırıntısı
+# Privacy Policy — Codestion
 
 **Effective 26 August 2026.**
 
-Kod Kırıntısı collects nothing. There is no account, no server, no analytics
+Codestion collects nothing. There is no account, no server, no analytics
 and no advertising. The app contains no networking code at all: every puzzle
 ships inside the app bundle, and every answer stays on your device.
 
@@ -101,11 +101,11 @@ Supporting answers elsewhere in the submission:
 
 ---
 
-# Gizlilik Politikası — Kod Kırıntısı
+# Gizlilik Politikası — Codestion
 
 **26 Ağustos 2026 tarihinden itibaren geçerlidir.**
 
-Kod Kırıntısı hiçbir veri toplamaz. Hesap yok, sunucu yok, analitik yok, reklam
+Codestion hiçbir veri toplamaz. Hesap yok, sunucu yok, analitik yok, reklam
 yok. Uygulamada hiç ağ kodu bulunmuyor: bütün sorular uygulamanın içinde
 geliyor, verdiğiniz bütün cevaplar cihazınızda kalıyor.
 

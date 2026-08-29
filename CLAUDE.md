@@ -4,7 +4,7 @@ Bu dosya bu repoda çalışan her AI ajanı için bağlayıcıdır. Kod yazmadan
 
 ## Proje
 
-**Kod Kırıntısı** — iOS uygulaması. Her gün ana ekran widget'ında bir Swift/algoritma mini bulmacası gösterir. Kullanıcı soruyu **uygulamayı açmadan**, widget üzerindeki interaktif butonlarla cevaplar.
+**Codestion** — iOS uygulaması. Her gün ana ekran widget'ında bir Swift/algoritma mini bulmacası gösterir. Kullanıcı soruyu **uygulamayı açmadan**, widget üzerindeki interaktif butonlarla cevaplar.
 
 Detaylar: `docs/SPEC.md` (ürün) · `docs/ARCHITECTURE.md` (teknik) · `docs/SETUP.md` (ortam)
 

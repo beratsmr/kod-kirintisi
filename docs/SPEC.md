@@ -1,4 +1,4 @@
-# Kod Kırıntısı — Ürün Spesifikasyonu
+# Codestion — Ürün Spesifikasyonu
 
 > v1.0 · Tamamen offline iOS uygulaması · Hedef: 3–4 haftada App Store'da yayında
 
@@ -145,7 +145,7 @@ v1.1+ opsiyonları (CV'ye StoreKit 2 eklemek istersen):
 
 ## 10. Farklılaşma
 
-| | Kod Kırıntısı | LeetCode | Duolingo tarzı | Diğer quiz app'leri |
+| | Codestion | LeetCode | Duolingo tarzı | Diğer quiz app'leri |
 |---|---|---|---|---|
 | Uygulama açmadan kullanım | ✅ | ❌ | ❌ | ❌ |
 | Günlük efor | ~4 sn | 20–40 dk | 5–10 dk | 5 dk |

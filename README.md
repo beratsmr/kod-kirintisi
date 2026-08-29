@@ -1,4 +1,4 @@
-# Kod Kırıntısı
+# Codestion
 
 [![CI](https://github.com/beratsmr/kod-kirintisi/actions/workflows/ci.yml/badge.svg)](https://github.com/beratsmr/kod-kirintisi/actions/workflows/ci.yml)
 ![Swift 6](https://img.shields.io/badge/Swift-6.0-orange)
@@ -6,7 +6,7 @@
 
 **One Swift puzzle a day, on your Home Screen — no app launch required.**
 
-Kod Kırıntısı puts a small Swift/algorithm question on your Home Screen every morning. You answer it with interactive widget buttons in about four seconds. Open the app only when you want the full explanation.
+Codestion puts a small Swift/algorithm question on your Home Screen every morning. You answer it with interactive widget buttons in about four seconds. Open the app only when you want the full explanation.
 
 <!-- Regenerate with ./scripts/record-widget.sh, which writes docs/widget.gif. -->
 

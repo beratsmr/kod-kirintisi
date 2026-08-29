@@ -69,7 +69,7 @@ cat <<'INSTRUCTIONS'
 
   In the Simulator window:
     1. Go to the Home Screen and long-press an empty area.
-    2. Tap "Edit" then "Add Widget", search for "Kod Kırıntısı".
+    2. Tap "Edit" then "Add Widget", search for "Codestion".
     3. Add the medium widget and leave the Home Screen in edit mode
        by tapping Done.
     4. Make sure the app itself is closed (swipe it away in the

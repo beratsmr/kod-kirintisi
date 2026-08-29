@@ -12,7 +12,7 @@ struct RevealAnswerIntent: AppIntent {
     }
 
     static var description: IntentDescription {
-        IntentDescription("Opens Kod Kırıntısı on today's answer and explanation, without recording an answer.")
+        IntentDescription("Opens Codestion on today's answer and explanation, without recording an answer.")
     }
 
     static var openAppWhenRun: Bool {

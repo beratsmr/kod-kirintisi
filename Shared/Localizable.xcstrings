@@ -75,12 +75,12 @@
         }
       }
     },
-    "Allow notifications for Kod Kırıntısı in Settings to get a daily reminder." : {
+    "Allow notifications for Codestion in Settings to get a daily reminder." : {
       "localizations" : {
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Günlük hatırlatma almak için Ayarlar'dan Kod Kırıntısı'na bildirim izni ver."
+            "value" : "Günlük hatırlatma almak için Ayarlar'dan Codestion'a bildirim izni ver."
           }
         }
       }
@@ -248,7 +248,7 @@
       "comment" : "Category badge. A platform name, left untranslated on purpose.",
       "shouldTranslate" : false
     },
-    "Kod Kırıntısı" : {
+    "Codestion" : {
       "comment" : "The app's name. The same in every language.",
       "shouldTranslate" : false
     },
@@ -335,13 +335,13 @@
         }
       }
     },
-    "Opens Kod Kırıntısı on the puzzle of the day." : {
+    "Opens Codestion on the puzzle of the day." : {
       "comment" : "Description of the Control Center control.",
       "localizations" : {
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Kod Kırıntısı'nı günün sorusuyla açar."
+            "value" : "Codestion'ı günün sorusuyla açar."
           }
         }
       }

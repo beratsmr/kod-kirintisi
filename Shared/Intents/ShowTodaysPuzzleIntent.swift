@@ -12,7 +12,7 @@ struct ShowTodaysPuzzleIntent: AppIntent {
     }
 
     static var description: IntentDescription {
-        IntentDescription("Opens Kod Kırıntısı on the puzzle of the day.")
+        IntentDescription("Opens Codestion on the puzzle of the day.")
     }
 
     static var openAppWhenRun: Bool {

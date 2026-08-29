@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://kodkirintisi.app/schemas/puzzles.schema.json",
-  "title": "Kod Kırıntısı puzzle bank",
+  "title": "Codestion puzzle bank",
   "type": "object",
   "required": ["version", "puzzles"],
   "additionalProperties": false,

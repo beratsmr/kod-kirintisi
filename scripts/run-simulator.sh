@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Builds Kod Kırıntısı and launches it on a simulator.
+# Builds Codestion and launches it on a simulator.
 #
 # The manual checks M7 needs — notification permission, Spotlight results,
 # Siri shortcuts — cannot be verified by a build, only by running the thing.

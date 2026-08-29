@@ -18,6 +18,6 @@ struct TodaysPuzzleControl: ControlWidget {
             }
         }
         .displayName("Today's puzzle")
-        .description("Opens Kod Kırıntısı on the puzzle of the day.")
+        .description("Opens Codestion on the puzzle of the day.")
     }
 }

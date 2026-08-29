@@ -47,7 +47,7 @@ struct NotificationScheduler: Sendable {
         }
 
         let content = UNMutableNotificationContent()
-        content.title = String(localized: "Kod Kırıntısı")
+        content.title = String(localized: "Codestion")
         content.body = String(localized: "Today's puzzle is ready.")
         content.sound = .default
 

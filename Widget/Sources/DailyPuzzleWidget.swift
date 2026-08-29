@@ -11,7 +11,7 @@ struct DailyPuzzleWidget: Widget {
             DailyPuzzleWidgetView(entry: entry)
                 .containerBackground(.fill.tertiary, for: .widget)
         }
-        .configurationDisplayName("Kod Kırıntısı")
+        .configurationDisplayName("Codestion")
         .description("Today's Swift puzzle — answer it without leaving the home screen.")
         .supportedFamilies([.systemSmall, .systemMedium, .accessoryRectangular])
     }

@@ -49,7 +49,7 @@ struct SettingsView: View {
                 Button("Open Settings") { openSystemSettings() }
                 Button("Not Now", role: .cancel) {}
             } message: {
-                Text("Allow notifications for Kod Kırıntısı in Settings to get a daily reminder.")
+                Text("Allow notifications for Codestion in Settings to get a daily reminder.")
             }
             .onChange(of: notificationsEnabled) { _, isEnabled in
                 Task { await applyReminderSetting(isEnabled: isEnabled) }

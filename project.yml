@@ -64,7 +64,14 @@ targets:
     info:
       path: App/Info.plist
       properties:
-        CFBundleDisplayName: Kod Kırıntısı
+        # The name under the icon and in the App Store listing. Deliberately
+        # not PRODUCT_NAME, which stays "Kod Kırıntısı": that one names the
+        # .app on disk, nobody sees it, and TEST_HOST below is built from it.
+        CFBundleDisplayName: Codestion
+        # Falls back to PRODUCT_NAME when absent, which would leak the old
+        # name into the places that read the short name instead of the
+        # display name — Settings, some system alerts.
+        CFBundleName: Codestion
         CFBundleDevelopmentRegion: en
         CFBundleShortVersionString: $(MARKETING_VERSION)
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
@@ -106,7 +113,9 @@ targets:
     info:
       path: Widget/Info.plist
       properties:
-        CFBundleDisplayName: Kod Kırıntısı
+        # Shows in the widget gallery alongside the widget's own name.
+        CFBundleDisplayName: Codestion
+        CFBundleName: Codestion
         CFBundleDevelopmentRegion: en
         CFBundleShortVersionString: $(MARKETING_VERSION)
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
