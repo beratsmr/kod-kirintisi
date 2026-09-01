@@ -13,6 +13,7 @@ import WidgetKit
 /// switch that does nothing is worse than no switch, so they are gone.
 struct SettingsView: View {
     @Environment(\.openURL) private var openURL
+    @Environment(AppRouter.self) private var router
 
     @AppStorage("settings.notificationsEnabled") private var notificationsEnabled = false
     @AppStorage("settings.notificationMinuteOfDay") private var notificationMinuteOfDay = 9 * 60
@@ -150,6 +151,8 @@ struct SettingsView: View {
             // out, the Home Screen keeps showing an answer the user has just
             // asked the app to forget.
             WidgetCenter.shared.reloadTimelines(ofKind: WidgetKind.dailyPuzzle)
+            // The other three tabs are still holding the history just erased.
+            router.progressDidChange()
         } catch {
             resetError = "Something went wrong. Please try again."
         }

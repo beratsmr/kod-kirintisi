@@ -130,8 +130,25 @@ App Group: group.com.beratsumer.kodkirintisi
 ```
 
 - `Core` bu konteynerin nerede olduğunu **bilmez**; kendisine bir `URL` verilir (dependency injection). Testlerde geçici klasör verilir → Linux'ta çalışır.
-- Widget cevap yazdığında `WidgetCenter.shared.reloadTimelines(ofKind:)` çağırır; uygulama öne geldiğinde store'u yeniden okur.
 - Yazma çakışmasını önlemek için `ProgressStore` bir `actor`; dosyaya yazma `Data.write(to:options: .atomic)` ile yapılır.
+- Her iki taraf da cevap yazdıktan sonra `WidgetCenter.shared.reloadTimelines(ofKind:)` çağırır.
+
+**Önbellek iki process'te ayrıdır.** `ProgressStore` okuduğu progress'i bellekte tutar ve bir daha dosyaya bakmaz — tek process içinde doğru, iki process arasında sessiz bir tuzak: WidgetKit extension process'ini sıcak tuttuğu için widget'ın kopyası bir önceki reload'dan kalmış olabilir, uygulama arka plandayken widget'ın yazdığını göremez. `reloadTimelines` process'i yeniden başlatmaz, sadece timeline ister.
+
+İki sonucu var, ikincisi daha ağır:
+
+1. **Bayat görüntü.** Uygulamada işaretlenen cevap widget'ta görünmez.
+2. **Veri kaybı.** `recordAnswer` bir read-modify-write'tır ve **tüm** `UserProgress` nesnesini yazar; bayat bir kopya üzerinden yazmak diğer process'in kaydettiği cevapları siler.
+
+Bu yüzden `DailyPuzzleService.refresh()` (→ `ProgressStore.reload()`) şu üç noktada çağrılır:
+
+| Nerede | Ne zaman |
+| --- | --- |
+| `DailyPuzzleTimelineProvider` | her `getTimeline` / `getSnapshot`, entry üretmeden önce |
+| `KodKirintisiApp` | `scenePhase` `.active`'e **döndüğünde** (açılışta değil: process yeni, cache boş) |
+| `DailyPuzzleService.answer` | yazmadan hemen önce — yukarıdaki (2) için zorunlu |
+
+Uygulama içinde ekranların haberdar olması `AppRouter.progressRevision` sayacıyla olur; `TabView` ziyaret edilmiş sekmeleri canlı tuttuğu için düz bir `.task` bir daha çalışmaz, ekranlar `.task(id:)` kullanır.
 
 **Neden SwiftData/Core Data değil?** İki process'in aynı store'a yazması ek karmaşıklık getirir, üstelik Linux'ta test edilemez. Veri hacmi küçük (birkaç yüz kayıt). v1.1'de CloudKit senkronizasyonu eklenirken bu katman değişebilir; `ProgressPersisting` protokolü o değişimi izole ediyor.
 

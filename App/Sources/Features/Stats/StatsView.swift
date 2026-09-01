@@ -10,13 +10,17 @@ struct StatsView: View {
         case failed
     }
 
+    @Environment(AppRouter.self) private var router
+
     @State private var state = LoadState.loading
 
     var body: some View {
         NavigationStack {
             content
                 .navigationTitle("Statistics")
-                .task { await load() }
+                // See ``AppRouter/progressRevision``: every answer moves a
+                // streak and an accuracy bar on this screen.
+                .task(id: router.progressRevision) { await load() }
         }
     }
 

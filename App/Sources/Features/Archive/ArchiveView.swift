@@ -58,7 +58,9 @@ struct ArchiveView: View {
                     ToolbarItem(placement: .topBarTrailing) { filterMenu }
                 }
                 .navigationDestination(for: String.self) { detail(for: $0) }
-                .task { await load() }
+                // See ``AppRouter/progressRevision``: an answer given on Today
+                // or in the widget changes a row in this list.
+                .task(id: router.progressRevision) { await load() }
         }
     }
 

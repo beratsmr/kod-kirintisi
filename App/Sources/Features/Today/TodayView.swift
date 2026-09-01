@@ -23,7 +23,9 @@ struct TodayView: View {
         NavigationStack {
             content
                 .navigationTitle("Today")
-                .task { await load() }
+                // Keyed on the revision, not a bare `.task`: the answer may
+                // have been given in the widget's process while this one slept.
+                .task(id: router.progressRevision) { await load() }
                 // A reveal lasts only as long as the visit that asked for it.
                 // Leaving the tab is the clearest "I'm done looking" signal
                 // available without inventing a piece of stored state.
@@ -72,6 +74,9 @@ struct TodayView: View {
             // The widget caches its own timeline; without this it would keep
             // showing "not answered" until its next scheduled refresh.
             WidgetCenter.shared.reloadTimelines(ofKind: WidgetKind.dailyPuzzle)
+            // And the Archive and Statistics tabs, which have their own copies
+            // of this same answer and no other reason to notice it changed.
+            router.progressDidChange()
         } catch {
             state = .failed
         }

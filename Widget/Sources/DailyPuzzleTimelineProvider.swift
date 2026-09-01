@@ -35,12 +35,15 @@ struct DailyPuzzleTimelineProvider: TimelineProvider {
         }
 
         Task {
+            await refreshProgress()
             await completion(entry(for: .now))
         }
     }
 
     func getTimeline(in _: Context, completion: @escaping @Sendable (Timeline<DailyPuzzleEntry>) -> Void) {
         Task {
+            await refreshProgress()
+
             let now = Date.now
             let midnight = nextMidnight(after: now)
 
@@ -56,6 +59,24 @@ struct DailyPuzzleTimelineProvider: TimelineProvider {
                 entries: entries,
                 policy: midnight.map { .after($0) } ?? .atEnd
             ))
+        }
+    }
+
+    /// Picks up whatever the app has written before any entry is built.
+    ///
+    /// WidgetKit reuses this extension process between reloads, so the service's
+    /// cached progress outlives the reload that populated it — an answer given
+    /// in the app would otherwise never reach a warm widget, however many times
+    /// `reloadTimelines` was called. Once per timeline rather than once per
+    /// entry: both entries of a timeline describe the same stored progress.
+    ///
+    /// A failure is logged and swallowed. The entries built next report their
+    /// own trouble, and a stale card beats no card.
+    private func refreshProgress() async {
+        do {
+            try await service.refresh()
+        } catch {
+            Self.logger.error("Could not refresh progress: \(error, privacy: .public)")
         }
     }
 

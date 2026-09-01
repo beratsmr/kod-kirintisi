@@ -33,6 +33,25 @@ final class AppRouter {
     /// clears it as soon as the user leaves the tab.
     var revealsTodaysAnswer = false
 
+    /// Bumped whenever stored progress may have changed underneath the screens.
+    ///
+    /// Every tab reads the same progress file, but a `.task` runs once and a
+    /// `TabView` keeps visited tabs alive — so answering on Today left Archive
+    /// and Statistics showing what they loaded on first visit, and an answer
+    /// given in the widget reached none of them. Screens key their loading task
+    /// on this value instead, and a change re-runs the load.
+    ///
+    /// A counter rather than a flag: what SwiftUI acts on is the value being
+    /// *different* from the last one it saw, not what the value is.
+    private(set) var progressRevision = 0
+
+    /// Tells every screen to reload. Call after anything that writes progress,
+    /// and after returning to the foreground, where the widget may have written
+    /// it for us.
+    func progressDidChange() {
+        progressRevision += 1
+    }
+
     /// Brings today's puzzle forward. The Archive stack is left as it was, so
     /// returning to that tab by hand lands where the user left off.
     func showToday() {

@@ -57,5 +57,17 @@ struct KodKirintisiApp: App {
             guard phase == .active else { return }
             Task { await SpotlightIndexer.shared.reindex() }
         }
+        // Deliberately without `initial:`, unlike the reindex above. At launch
+        // this process is new and its cache empty, so each screen's own task
+        // already reads the current file; firing here too would only make every
+        // screen load twice. What needs catching is a *return* to the
+        // foreground, when the widget may have answered in its own process.
+        .onChange(of: scenePhase) { _, phase in
+            guard phase == .active else { return }
+            Task {
+                try? await DailyPuzzleService.shared.refresh()
+                router.progressDidChange()
+            }
+        }
     }
 }

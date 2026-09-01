@@ -32,6 +32,22 @@ struct DailyPuzzleService: Sendable {
         }
     }
 
+    /// Re-reads progress from disk, discarding what this process had cached.
+    ///
+    /// The app and the widget are separate processes, each with its own
+    /// ``ProgressStore`` cache, and neither is told when the other writes. A
+    /// process that has read progress once therefore keeps serving what it saw
+    /// then: a widget extension left warm from an earlier reload shows "not
+    /// answered" for a day the app has since answered, and vice versa.
+    ///
+    /// So every point where a process starts looking at progress again — the
+    /// app returning to the foreground, the widget building a timeline — calls
+    /// this first. It costs one small JSON read.
+    func refresh() async throws {
+        guard let store else { throw Failure.containerUnavailable }
+        _ = try await store.reload()
+    }
+
     /// The digest for `date`, loading progress and the bank as needed.
     func digest(
         for date: Date = .now,
@@ -57,6 +73,12 @@ struct DailyPuzzleService: Sendable {
         calendar: Calendar = .current
     ) async throws -> DailyDigest {
         guard let store else { throw Failure.containerUnavailable }
+
+        // Not just so the caller sees current data — this one is a correctness
+        // requirement. `recordAnswer` is a read-modify-write that saves the
+        // *whole* `UserProgress`, so answering from a stale copy would erase
+        // every answer the other process has written since this one last read.
+        _ = try await store.reload()
 
         let current = try await digest(
             for: date, calendar: calendar, progress: store.progress()
