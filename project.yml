@@ -61,6 +61,10 @@ targets:
         # Shared, so both must resolve the same accent colour.
         ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
         INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        # XcodeGen defaults `application`/`app-extension` targets to "1,2"
+        # (universal) regardless of the project-level base setting above —
+        # this key only takes effect when set here, at the target level.
+        TARGETED_DEVICE_FAMILY: "1"
     info:
       path: App/Info.plist
       properties:
@@ -110,6 +114,9 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: com.beratsumer.kodkirintisi.widget
         PRODUCT_NAME: KodKirintisiWidget
         ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        # See the same key on the KodKirintisi target: XcodeGen ignores the
+        # project-level default for `application`/`app-extension` targets.
+        TARGETED_DEVICE_FAMILY: "1"
     info:
       path: Widget/Info.plist
       properties:
