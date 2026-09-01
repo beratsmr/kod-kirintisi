@@ -26,7 +26,7 @@ settings:
     # dosya, orada seçilen team ilk `xcodegen generate`'te silinir.
     DEVELOPMENT_TEAM: "AJMFR76NFH"
     MARKETING_VERSION: "1.0.0"
-    CURRENT_PROJECT_VERSION: "1"
+    CURRENT_PROJECT_VERSION: "4"
     ENABLE_USER_SCRIPT_SANDBOXING: YES
     GCC_TREAT_WARNINGS_AS_ERRORS: YES
     SWIFT_TREAT_WARNINGS_AS_ERRORS: NO # CI'da YES'e çekilebilir
